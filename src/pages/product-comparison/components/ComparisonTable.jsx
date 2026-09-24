@@ -2,9 +2,27 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
+import cartService from '../../../services/cartService';
+import { getStoreBuyUrl, formatINR } from '../../../utils/productUtils';
 
 const ComparisonTable = ({ products, onRemoveProduct, onAddToWatchlist, onSetPriceAlert }) => {
   const [expandedSpecs, setExpandedSpecs] = useState({});
+  const [addedItems, setAddedItems] = useState({});
+
+  const handleBuyNow = (product) => {
+    const url =
+      product?.purchaseUrl ||
+      getStoreBuyUrl(product?.brand || 'Amazon India', product?.name);
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleAddToCart = (product) => {
+    cartService.addToCart(product, 1, product?.brand || 'Amazon India');
+    setAddedItems((prev) => ({ ...prev, [product.id]: true }));
+    setTimeout(() => {
+      setAddedItems((prev) => ({ ...prev, [product.id]: false }));
+    }, 2000);
+  };
 
   const toggleSpecs = (productId) => {
     setExpandedSpecs((prev) => ({
@@ -287,15 +305,33 @@ const ComparisonTable = ({ products, onRemoveProduct, onAddToWatchlist, onSetPri
               {products?.map((product) => (
                 <td key={product?.id} className="p-4">
                   <div className="space-y-2">
-                    <Button
-                      variant="default"
-                      size="sm"
-                      className="w-full"
-                      iconName="ExternalLink"
-                      iconPosition="right"
-                    >
-                      Buy Now - ₹{product?.currentPrice}
-                    </Button>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        variant={addedItems[product?.id] ? 'secondary' : 'outline'}
+                        size="sm"
+                        onClick={() => handleAddToCart(product)}
+                        className={`text-xs flex items-center justify-center space-x-1 ${
+                          addedItems[product?.id]
+                            ? 'bg-success/15 text-success border-success/30 font-semibold'
+                            : ''
+                        }`}
+                        title="Save product in user cart"
+                      >
+                        <Icon name={addedItems[product?.id] ? 'Check' : 'ShoppingCart'} size={13} />
+                        <span>{addedItems[product?.id] ? 'Added' : 'Add Cart'}</span>
+                      </Button>
+
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => handleBuyNow(product)}
+                        className="text-xs flex items-center justify-center space-x-1 font-semibold"
+                        title="Open store purchase link in a new web page"
+                      >
+                        <Icon name="ExternalLink" size={13} />
+                        <span>Buy Now</span>
+                      </Button>
+                    </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <Button

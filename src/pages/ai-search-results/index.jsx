@@ -10,6 +10,8 @@ import SearchResultsGrid from './components/SearchResultsGrid';
 import SearchFilters from './components/SearchFilters';
 import AIRefinementPanel from './components/AIRefinementPanel';
 import aiProductService from '../../services/aiProductService';
+import historyService from '../../services/historyService';
+import ProductQuickViewModal from '../../components/ui/ProductQuickViewModal';
 
 const AISearchResults = () => {
   const location = useLocation();
@@ -23,6 +25,8 @@ const AISearchResults = () => {
   const [hasMore, setHasMore] = useState(true);
   const [searchStats, setSearchStats] = useState({});
   const [aiSource, setAiSource] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
   // Initialize search from URL params or location state
   useEffect(() => {
@@ -34,12 +38,16 @@ const AISearchResults = () => {
     if (location?.state?.results && location?.state?.results?.length > 0) {
       const passedResults = location.state.results;
       setProducts(passedResults);
-      setSearchQuery(location?.state?.searchQuery || 'Uploaded product');
+      const effectiveQuery = location?.state?.searchQuery || 'Uploaded product';
+      setSearchQuery(effectiveQuery);
       setAiSource(
         location?.state?.searchType === 'upload' || location?.state?.searchType === 'camera'
           ? 'AI Vision'
           : 'AI Search'
       );
+      historyService.saveSearchQuery(effectiveQuery, {
+        resultCount: passedResults?.length || 0
+      });
       const stats = {
         totalResults: passedResults?.length,
         avgConfidence:
@@ -116,6 +124,12 @@ const AISearchResults = () => {
       setProducts(searchResults);
       setSearchStats(stats);
       setHasMore(false);
+
+      if (query && query.trim()) {
+        historyService.saveSearchQuery(query.trim(), {
+          resultCount: searchResults?.length || 0
+        });
+      }
     } catch (error) {
       console.error('Search failed:', error);
       setProducts([]);
@@ -236,10 +250,14 @@ const AISearchResults = () => {
         });
         break;
       }
-      case 'view_details':
-        console.log('View details for product:', productIds?.[0]);
-        // Could navigate to a product detail page
+      case 'view_details': {
+        const found = products?.find((p) => p?.id === productIds?.[0]) || data;
+        if (found) {
+          setSelectedProduct(found);
+          setIsQuickViewOpen(true);
+        }
         break;
+      }
       default:
         console.log('Unknown action:', action);
     }
@@ -448,6 +466,13 @@ const AISearchResults = () => {
         onCameraSearch={handleCameraSearch}
         onQuickAdd={() => console.log('Quick add to watchlist')}
         onPriceAlert={() => navigate('/deal-alerts-and-notifications')}
+      />
+
+      {/* Product Quick View / Selection Modal */}
+      <ProductQuickViewModal
+        product={selectedProduct}
+        isOpen={isQuickViewOpen}
+        onClose={() => setIsQuickViewOpen(false)}
       />
     </div>
   );

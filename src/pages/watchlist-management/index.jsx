@@ -11,6 +11,7 @@ import WatchlistFilters from './components/WatchlistFilters';
 import ProductCard from './components/ProductCard';
 import BulkActions from './components/BulkActions';
 import NotificationSettings from './components/NotificationSettings';
+import ProductQuickViewModal from '../../components/ui/ProductQuickViewModal';
 
 const WatchlistManagement = () => {
   const navigate = useNavigate();
@@ -20,6 +21,8 @@ const WatchlistManagement = () => {
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState('date_added');
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedProductForModal, setSelectedProductForModal] = useState(null);
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
   // Mock data for watchlist items
   const mockWatchlistItems = [
@@ -233,7 +236,8 @@ const WatchlistManagement = () => {
   };
 
   const handleViewDetails = (product) => {
-    navigate('/product-comparison', { state: { product } });
+    setSelectedProductForModal(product);
+    setIsQuickViewOpen(true);
   };
 
   const handleVoiceSearch = () => {
@@ -421,6 +425,13 @@ const WatchlistManagement = () => {
         onCameraSearch={handleCameraSearch}
         onQuickAdd={handleQuickAdd}
         onPriceAlert={handlePriceAlert}
+      />
+
+      {/* Product Quick View / Details Modal */}
+      <ProductQuickViewModal
+        product={selectedProductForModal}
+        isOpen={isQuickViewOpen}
+        onClose={() => setIsQuickViewOpen(false)}
       />
     </div>
   );

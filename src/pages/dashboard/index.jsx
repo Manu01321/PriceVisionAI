@@ -13,6 +13,7 @@ import TrendingDeals from './components/TrendingDeals';
 import AIRecommendations from './components/AIRecommendations';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
+import historyService from '../../services/historyService';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -233,11 +234,14 @@ const Dashboard = () => {
   const handleSearch = (query) => {
     setSearchQuery(query);
     setIsSearching(true);
+    if (query?.trim()) {
+      historyService.saveSearchQuery(query.trim());
+    }
 
     setTimeout(() => {
       setIsSearching(false);
       navigate('/ai-search-results', { state: { searchQuery: query } });
-    }, 1500);
+    }, 600);
   };
 
   const handleVoiceSearch = () => {
