@@ -6,6 +6,43 @@
 const OPENAI_API_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OPENAI_API_KEY) || (typeof process !== 'undefined' ? process.env?.VITE_OPENAI_API_KEY : undefined);
 const GEMINI_API_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) || (typeof process !== 'undefined' ? process.env?.VITE_GEMINI_API_KEY : undefined);
 
+function safeParseJSON(text, fallback = null) {
+  if (!text || typeof text !== 'string') return fallback;
+
+  let cleaned = text.trim();
+  if (cleaned.startsWith('```json')) cleaned = cleaned.slice(7);
+  else if (cleaned.startsWith('```')) cleaned = cleaned.slice(3);
+  if (cleaned.endsWith('```')) cleaned = cleaned.slice(0, -3);
+  cleaned = cleaned.trim();
+
+  try {
+    return JSON.parse(cleaned);
+  } catch (err1) {
+    const match = cleaned.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+    if (match) {
+      try {
+        return JSON.parse(match[0]);
+      } catch (err2) {
+        let candidate = match[0].replace(/,\s*([\]}])/g, '$1');
+        try {
+          return JSON.parse(candidate);
+        } catch (err3) {
+          let openBraces = (candidate.match(/\{/g) || []).length - (candidate.match(/\}/g) || []).length;
+          let openBrackets = (candidate.match(/\[/g) || []).length - (candidate.match(/\]/g) || []).length;
+          while (openBrackets > 0) { candidate += ']'; openBrackets--; }
+          while (openBraces > 0) { candidate += '}'; openBraces--; }
+          try {
+            return JSON.parse(candidate);
+          } catch (err4) {
+            console.warn('safeParseJSON could not recover JSON:', err1.message);
+          }
+        }
+      }
+    }
+    return fallback;
+  }
+}
+
 class AIProductService {
   constructor() {
     this.openaiEndpoint = 'https://api.openai.com/v1/chat/completions';
@@ -242,17 +279,16 @@ Return ONLY the JSON, no other text.`;
       }],
       generationConfig: {
         temperature: 0.7,
-        maxOutputTokens: 2500
+        maxOutputTokens: 5000,
+        responseMimeType: 'application/json'
       }
     });
 
-    // Extract JSON from response (Gemini might include markdown)
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+    const parsed = safeParseJSON(content, null);
+    if (!parsed) {
       throw new Error('Could not parse JSON from Gemini response');
     }
 
-    const parsed = JSON.parse(jsonMatch[0]);
     return this.enhanceProducts(parsed.products || []);
   }
 
@@ -461,16 +497,15 @@ Return 5-10 real products matching the image. ONLY return JSON. Prices must be i
       }],
       generationConfig: {
         temperature: 0.5,
-        maxOutputTokens: 3000
+        maxOutputTokens: 5000,
+        responseMimeType: 'application/json'
       }
     });
 
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+    const parsed = safeParseJSON(content, null);
+    if (!parsed) {
       throw new Error('Could not parse JSON from Gemini Vision response');
     }
-
-    const parsed = JSON.parse(jsonMatch[0]);
     
     return {
       success: true,
