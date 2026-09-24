@@ -273,12 +273,27 @@ const DealAlertsAndNotifications = () => {
   const handleQuickAction = (alertId, action) => {
     console.log('Quick action:', action, 'for alert:', alertId);
 
+    const targetAlert = alerts?.find(a => a?.id === alertId);
+
     switch (action) {
-      case 'view_product':navigate('/product-comparison');
+      case 'view_product':
+      case 'compare_prices':
+        navigate('/product-comparison', {
+          state: {
+            product: targetAlert ? {
+              id: targetAlert.id,
+              name: targetAlert.productName || targetAlert.title || 'Tracked Product',
+              currentPrice: targetAlert.currentPrice || targetAlert.price,
+              originalPrice: targetAlert.originalPrice || targetAlert.targetPrice,
+              image: targetAlert.productImage || targetAlert.image,
+              brand: targetAlert.brand || 'Retailer',
+              rating: targetAlert.rating || 4.5
+            } : null
+          }
+        });
         break;
-      case 'add_to_watchlist':navigate('/watchlist-management');
-        break;
-      case 'compare_prices':navigate('/product-comparison');
+      case 'add_to_watchlist':
+        navigate('/watchlist-management');
         break;
       case 'set_alert':
         // Handle set alert

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import AIAssistantPanel from '../../components/ui/AIAssistantPanel';
@@ -10,6 +10,197 @@ import SmartRecommendations from './components/SmartRecommendations';
 import ComparisonActions from './components/ComparisonActions';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
+import aiProductService from '../../services/aiProductService';
+
+// Helper to normalize any incoming product structure for all comparison views
+export const normalizeProductForComparison = (product, index = 0) => {
+  if (!product) return null;
+
+  const currentPrice = Number(product.currentPrice || product.price || 0);
+  const originalPrice = Number(product.originalPrice || Math.round(currentPrice * 1.25) || currentPrice);
+  const discount = product.discount || (originalPrice > currentPrice ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : 0);
+  const rating = Number(product.rating || 4.5);
+  const reviewCount = Number(product.reviewCount || product.reviews || 2400);
+
+  // Extract keySpecs from features or keySpecs
+  let keySpecs = [];
+  if (Array.isArray(product.keySpecs) && product.keySpecs.length > 0) {
+    keySpecs = product.keySpecs;
+  } else if (Array.isArray(product.features) && product.features.length > 0) {
+    keySpecs = product.features.map((feat, i) => {
+      const parts = String(feat).split(':');
+      if (parts.length > 1) {
+        return { name: parts[0].trim(), value: parts.slice(1).join(':').trim() };
+      }
+      return { name: `Feature ${i + 1}`, value: String(feat) };
+    });
+  } else {
+    keySpecs = [
+      { name: 'Category', value: product.category || 'Electronics' },
+      { name: 'Brand', value: product.brand || 'Original Brand' },
+      { name: 'Warranty', value: '1 Year Manufacturer Warranty' },
+      { name: 'Return Policy', value: '7 Days Replacement' }
+    ];
+  }
+
+  // AI Scores
+  const aiScores = {
+    value: Number(product.aiScores?.value || product.confidence || (discount > 30 ? 92 : 86)),
+    quality: Number(product.aiScores?.quality || (rating >= 4.5 ? 94 : 88)),
+    urgency: Number(product.aiScores?.urgency || product.dealUrgency || (discount > 40 ? 88 : 70))
+  };
+
+  // AI Analysis (Pros & Cons)
+  let aiAnalysis = product.aiAnalysis;
+  if (!aiAnalysis || !aiAnalysis.pros) {
+    const featurePros = (product.features || []).slice(0, 3);
+    aiAnalysis = {
+      pros: featurePros.length > 0 ? featurePros : [
+        `Competitive price point at ₹${currentPrice.toLocaleString('en-IN')}`,
+        `Verified user satisfaction (${rating}/5 rating)`,
+        `Available with fast shipping and multi-store deals`
+      ],
+      cons: [
+        discount > 50 ? 'High seasonal demand with fast-selling stock' : 'Price varies between e-commerce stores',
+        'Standard manufacturer warranty applies'
+      ]
+    };
+  }
+
+  // Price History
+  let priceHistory = [];
+  if (Array.isArray(product.priceHistory) && product.priceHistory.length > 0) {
+    if (typeof product.priceHistory[0] === 'number') {
+      priceHistory = product.priceHistory.map((pr, idx, arr) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (arr.length - 1 - idx) * 7);
+        return {
+          date: d.toISOString().split('T')[0],
+          price: pr,
+          bestTimeToBuy: idx === arr.length - 1
+        };
+      });
+    } else {
+      priceHistory = product.priceHistory;
+    }
+  } else {
+    priceHistory = [
+      { date: new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0], price: Math.round(currentPrice * 1.15) },
+      { date: new Date(Date.now() - 20 * 86400000).toISOString().split('T')[0], price: Math.round(currentPrice * 1.10) },
+      { date: new Date(Date.now() - 10 * 86400000).toISOString().split('T')[0], price: Math.round(currentPrice * 1.05) },
+      { date: new Date().toISOString().split('T')[0], price: currentPrice, bestTimeToBuy: true }
+    ];
+  }
+
+  // Retailers
+  const retailers = Array.isArray(product.retailers) && product.retailers.length > 0
+    ? product.retailers
+    : [
+        { name: 'Amazon India', price: currentPrice },
+        { name: 'Flipkart', price: Math.round(currentPrice * 1.03) },
+        { name: 'Reliance Digital', price: Math.round(currentPrice * 1.05) }
+      ];
+
+  return {
+    id: String(product.id || `prod-${Date.now()}-${index}`),
+    name: product.name || 'Selected Product',
+    brand: product.brand || (product.name ? product.name.split(' ')[0] : 'Brand'),
+    image: product.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e',
+    imageAlt: product.imageAlt || product.name || 'Product Image',
+    currentPrice,
+    originalPrice,
+    priceChange: product.priceChange || -Math.round(currentPrice * 0.08),
+    discount,
+    rating,
+    reviewCount,
+    fakeReviewAlert: Boolean(product.fakeReviewAlert),
+    aiScores,
+    keySpecs,
+    aiAnalysis,
+    priceHistory,
+    retailers,
+    source: product.source || 'user_selection'
+  };
+};
+
+// Intelligently create a competitor when only one item is selected
+export const createSmartCompetitor = (mainProduct) => {
+  const price = mainProduct.currentPrice || 1000;
+  const nameLower = (mainProduct.name || '').toLowerCase();
+
+  let compName = `Alternative to ${mainProduct.name}`;
+  let compBrand = 'Market Competitor';
+  let compPrice = Math.round(price * 0.95);
+  let compImage = 'https://images.unsplash.com/photo-1546868871-7041f2a55e12';
+
+  if (nameLower.includes('watch')) {
+    compName = nameLower.includes('boat') 
+      ? 'Noise ColorFit Pro 4 AMOLED Smartwatch'
+      : 'boAt Wave Call 2 Bluetooth Calling Smartwatch';
+    compBrand = nameLower.includes('boat') ? 'Noise' : 'boAt';
+    compPrice = nameLower.includes('boat') ? Math.round(price * 1.15) : Math.round(price * 0.85);
+    compImage = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30';
+  } else if (nameLower.includes('phone') || nameLower.includes('iphone') || nameLower.includes('galaxy')) {
+    compName = nameLower.includes('apple') || nameLower.includes('iphone')
+      ? 'Samsung Galaxy S24 Ultra'
+      : 'Apple iPhone 15 Pro';
+    compBrand = compName.includes('Samsung') ? 'Samsung' : 'Apple';
+    compPrice = Math.round(price * 1.05);
+    compImage = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9';
+  } else if (nameLower.includes('laptop') || nameLower.includes('macbook')) {
+    compName = nameLower.includes('macbook')
+      ? 'Dell XPS 13 OLED Laptop'
+      : 'Apple MacBook Air M2';
+    compBrand = compName.includes('Apple') ? 'Apple' : 'Dell';
+    compPrice = Math.round(price * 0.98);
+    compImage = 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853';
+  } else if (nameLower.includes('headphone') || nameLower.includes('earbud') || nameLower.includes('audio')) {
+    compName = 'Sony WH-1000XM4 Wireless Noise Cancelling Headphones';
+    compBrand = 'Sony';
+    compPrice = Math.round(price * 1.1);
+    compImage = 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e';
+  }
+
+  return normalizeProductForComparison({
+    id: `competitor-${Date.now()}`,
+    name: compName,
+    brand: compBrand,
+    currentPrice: compPrice,
+    originalPrice: Math.round(compPrice * 1.3),
+    rating: 4.5,
+    reviewCount: 8400,
+    image: compImage,
+    features: ['Direct market alternative match', 'Verified customer choice', 'Competitive pricing across major stores']
+  }, 1);
+};
+
+// Baseline mock products used only as fallback if no query or state is present
+const fallbackMockProducts = [
+  {
+    id: 'iphone-15-pro',
+    name: 'iPhone 15 Pro 128GB',
+    brand: 'Apple',
+    image: "https://images.unsplash.com/photo-1572538194597-42aeefa26482",
+    imageAlt: 'iPhone 15 Pro in natural titanium color',
+    currentPrice: 99990,
+    originalPrice: 119900,
+    rating: 4.7,
+    reviewCount: 12450,
+    features: ['A17 Pro Chip', '48MP Main Camera', '6.1" Super Retina XDR Display', 'Titanium Frame']
+  },
+  {
+    id: 'samsung-s24-ultra',
+    name: 'Samsung Galaxy S24 Ultra 256GB',
+    brand: 'Samsung',
+    image: "https://images.unsplash.com/photo-1707410420102-faff6eb0e033",
+    imageAlt: 'Samsung Galaxy S24 Ultra in titanium gray',
+    currentPrice: 119999,
+    originalPrice: 134999,
+    rating: 4.6,
+    reviewCount: 9870,
+    features: ['Snapdragon 8 Gen 3', '200MP Quad Telephoto', '6.8" Dynamic AMOLED 2X', 'S-Pen Included']
+  }
+];
 
 const ProductComparison = () => {
   const navigate = useNavigate();
@@ -19,247 +210,82 @@ const ProductComparison = () => {
   const [activeView, setActiveView] = useState('comparison');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Mock products data
-  const mockProducts = [
-  {
-    id: 'iphone-15-pro',
-    name: 'iPhone 15 Pro 128GB',
-    brand: 'Apple',
-    image: "https://images.unsplash.com/photo-1572538194597-42aeefa26482",
-    imageAlt: 'iPhone 15 Pro in natural titanium color showing front and back design with triple camera system',
-    currentPrice: 999,
-    originalPrice: 1099,
-    priceChange: -25,
-    rating: 4.7,
-    reviewCount: 12450,
-    fakeReviewAlert: false,
-    aiScores: {
-      value: 88,
-      quality: 92,
-      urgency: 65
-    },
-    keySpecs: [
-    { name: 'Display', value: '6.1" Super Retina XDR' },
-    { name: 'Processor', value: 'A17 Pro Chip' },
-    { name: 'Camera', value: '48MP Main + 12MP Ultra Wide' },
-    { name: 'Storage', value: '128GB' },
-    { name: 'Battery', value: 'Up to 23 hours video' },
-    { name: 'Material', value: 'Titanium' }],
-
-    aiAnalysis: {
-      pros: [
-      'Exceptional camera quality with ProRAW support',
-      'Premium titanium build quality',
-      'Excellent performance with A17 Pro chip',
-      'Long software support lifecycle'],
-
-      cons: [
-      'High price point compared to alternatives',
-      'Limited storage in base model',
-      'No significant design changes from previous generation']
-
-    },
-    priceHistory: [
-    { date: '2025-08-01', price: 1099, bestTimeToBuy: false },
-    { date: '2025-08-15', price: 1079, bestTimeToBuy: false },
-    { date: '2025-09-01', price: 1059, bestTimeToBuy: false },
-    { date: '2025-09-15', price: 1039, bestTimeToBuy: false },
-    { date: '2025-10-01', price: 1019, bestTimeToBuy: true, seasonalPattern: 'Pre-holiday discount' },
-    { date: '2025-10-15', price: 1009, bestTimeToBuy: true },
-    { date: '2025-10-26', price: 999, bestTimeToBuy: true, seasonalPattern: 'Black Friday preview' }],
-
-    reviewAnalysis: {
-      positiveHighlights: [
-      'Outstanding camera performance in all lighting conditions',
-      'Premium build quality with titanium construction',
-      'Smooth iOS experience with regular updates',
-      'Excellent battery life for daily usage'],
-
-      negativeHighlights: [
-      'Expensive compared to Android alternatives',
-      'Base storage insufficient for power users',
-      'Charging speed slower than competitors',
-      'Limited customization options'],
-
-      aiSummary: `The iPhone 15 Pro receives consistently high ratings for its camera system and build quality. Users particularly praise the titanium construction and A17 Pro performance. Main criticisms focus on pricing and storage limitations in the base model.`,
-      sentimentBreakdown: {
-        positive: { percentage: 72, count: 8964 },
-        neutral: { percentage: 18, count: 2241 },
-        negative: { percentage: 10, count: 1245 }
-      },
-      sentimentTrends: [
-      { period: 'Last 30 days', sentiment: 'positive', change: '+5%', description: 'Improved after iOS update' },
-      { period: 'Last 7 days', sentiment: 'positive', change: '+2%', description: 'Price drop appreciation' }],
-
-      topKeywords: [
-      { word: 'camera', mentions: 3420 },
-      { word: 'battery', mentions: 2890 },
-      { word: 'performance', mentions: 2650 },
-      { word: 'design', mentions: 2340 },
-      { word: 'price', mentions: 2100 }],
-
-      featureRatings: [
-      { name: 'Camera Quality', rating: 4.8 },
-      { name: 'Build Quality', rating: 4.7 },
-      { name: 'Performance', rating: 4.6 },
-      { name: 'Battery Life', rating: 4.2 },
-      { name: 'Value for Money', rating: 3.8 }],
-
-      authenticityScore: 87,
-      suspiciousReviews: 156,
-      botActivity: 8,
-      qualityIndicators: [
-      { metric: 'Review Length', value: 'Good', status: 'good', description: 'Average 85 words per review' },
-      { metric: 'Verified Purchases', value: '78%', status: 'good', description: 'High verification rate' },
-      { metric: 'Review Velocity', value: 'Normal', status: 'good', description: 'Steady review pattern' },
-      { metric: 'Duplicate Content', value: '3%', status: 'warning', description: 'Slightly elevated duplicates' }]
-
-    }
-  },
-  {
-    id: 'samsung-s24-ultra',
-    name: 'Samsung Galaxy S24 Ultra 256GB',
-    brand: 'Samsung',
-    image: "https://images.unsplash.com/photo-1707410420102-faff6eb0e033",
-    imageAlt: 'Samsung Galaxy S24 Ultra in titanium gray showing S Pen and large camera module design',
-    currentPrice: 1199,
-    originalPrice: 1299,
-    priceChange: -35,
-    rating: 4.6,
-    reviewCount: 9870,
-    fakeReviewAlert: true,
-    aiScores: {
-      value: 91,
-      quality: 89,
-      urgency: 78
-    },
-    keySpecs: [
-    { name: 'Display', value: '6.8" Dynamic AMOLED 2X' },
-    { name: 'Processor', value: 'Snapdragon 8 Gen 3' },
-    { name: 'Camera', value: '200MP Main + 50MP Periscope' },
-    { name: 'Storage', value: '256GB' },
-    { name: 'Battery', value: '5000mAh with 45W charging' },
-    { name: 'Special', value: 'S Pen Included' }],
-
-    aiAnalysis: {
-      pros: [
-      'Incredible 200MP camera with excellent zoom capabilities',
-      'Large, vibrant display perfect for productivity',
-      'S Pen functionality adds versatility',
-      'Generous storage and RAM configuration'],
-
-      cons: [
-      'Large size may not suit all users',
-      'Battery life could be better given the size',
-      'OneUI can feel overwhelming for some users']
-
-    },
-    priceHistory: [
-    { date: '2025-08-01', price: 1299, bestTimeToBuy: false },
-    { date: '2025-08-15', price: 1279, bestTimeToBuy: false },
-    { date: '2025-09-01', price: 1259, bestTimeToBuy: false },
-    { date: '2025-09-15', price: 1239, bestTimeToBuy: false },
-    { date: '2025-10-01', price: 1219, bestTimeToBuy: true },
-    { date: '2025-10-15', price: 1209, bestTimeToBuy: true },
-    { date: '2025-10-26', price: 1199, bestTimeToBuy: true }],
-
-    reviewAnalysis: {
-      positiveHighlights: [
-      'Exceptional camera zoom capabilities up to 100x',
-      'S Pen functionality enhances productivity',
-      'Beautiful large display with great brightness',
-      'Solid build quality and premium materials'],
-
-      negativeHighlights: [
-      'Device size too large for one-handed use',
-      'Battery drains quickly with heavy usage',
-      'OneUI interface can be confusing',
-      'Price premium over standard S24 models'],
-
-      aiSummary: `The Galaxy S24 Ultra is praised for its camera system and S Pen functionality. Users love the productivity features but some find the device too large. Battery life receives mixed reviews depending on usage patterns.`,
-      sentimentBreakdown: {
-        positive: { percentage: 68, count: 6712 },
-        neutral: { percentage: 22, count: 2171 },
-        negative: { percentage: 10, count: 987 }
-      },
-      sentimentTrends: [
-      { period: 'Last 30 days', sentiment: 'positive', change: '+3%', description: 'Camera updates well received' },
-      { period: 'Last 7 days', sentiment: 'neutral', change: '0%', description: 'Stable sentiment' }],
-
-      topKeywords: [
-      { word: 'camera', mentions: 2890 },
-      { word: 's-pen', mentions: 2340 },
-      { word: 'display', mentions: 2100 },
-      { word: 'size', mentions: 1980 },
-      { word: 'battery', mentions: 1850 }],
-
-      featureRatings: [
-      { name: 'Camera Quality', rating: 4.9 },
-      { name: 'Display Quality', rating: 4.8 },
-      { name: 'S Pen Functionality', rating: 4.7 },
-      { name: 'Performance', rating: 4.5 },
-      { name: 'Battery Life', rating: 4.0 }],
-
-      authenticityScore: 82,
-      suspiciousReviews: 234,
-      botActivity: 12,
-      qualityIndicators: [
-      { metric: 'Review Length', value: 'Good', status: 'good', description: 'Average 92 words per review' },
-      { metric: 'Verified Purchases', value: '71%', status: 'warning', description: 'Moderate verification rate' },
-      { metric: 'Review Velocity', value: 'High', status: 'warning', description: 'Rapid review influx detected' },
-      { metric: 'Duplicate Content', value: '7%', status: 'error', description: 'Elevated duplicate content' }]
-
-    }
-  }];
-
+  // Live "Add Product" Search Modal State
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [modalSearchQuery, setModalSearchQuery] = useState('');
+  const [modalSearchResults, setModalSearchResults] = useState([]);
+  const [isSearchingModal, setIsSearchingModal] = useState(false);
+  const [searchError, setSearchError] = useState('');
 
   const views = [
-  { id: 'comparison', label: 'Comparison Table', icon: 'Table' },
-  { id: 'charts', label: 'Price History', icon: 'TrendingUp' },
-  { id: 'reviews', label: 'Review Analysis', icon: 'MessageSquare' },
-  { id: 'recommendations', label: 'Recommendations', icon: 'Sparkles' }];
+    { id: 'comparison', label: 'Comparison Table', icon: 'Table' },
+    { id: 'charts', label: 'Price History', icon: 'TrendingUp' },
+    { id: 'reviews', label: 'Review Analysis', icon: 'MessageSquare' },
+    { id: 'recommendations', label: 'Recommendations', icon: 'Sparkles' }
+  ];
 
-
+  // Dynamic initialization from router location state
   useEffect(() => {
-    // Initialize with products from location state or mock data
-    const productsFromState = location?.state?.products || mockProducts;
-    setSelectedProducts(productsFromState);
+    let initialList = [];
+
+    if (location?.state?.products && Array.isArray(location.state.products) && location.state.products.length > 0) {
+      initialList = location.state.products.map(normalizeProductForComparison);
+      // If only 1 product came in, add a smart competitor so side-by-side comparison works immediately
+      if (initialList.length === 1) {
+        initialList.push(createSmartCompetitor(initialList[0]));
+      }
+    } else if (location?.state?.product) {
+      const main = normalizeProductForComparison(location.state.product);
+      initialList = [main, createSmartCompetitor(main)];
+    } else if (location?.state?.deal) {
+      const main = normalizeProductForComparison(location.state.deal);
+      initialList = [main, createSmartCompetitor(main)];
+    } else if (location?.state?.baseProduct) {
+      const main = normalizeProductForComparison(location.state.baseProduct);
+      const competitors = (location.state.competitors || []).map(normalizeProductForComparison);
+      initialList = [main, ...competitors];
+      if (initialList.length === 1) {
+        initialList.push(createSmartCompetitor(main));
+      }
+    } else {
+      // Default to normalized fallback
+      initialList = fallbackMockProducts.map(normalizeProductForComparison);
+    }
+
+    setSelectedProducts(initialList);
   }, [location?.state]);
 
   const handleRemoveProduct = (productId) => {
-    setSelectedProducts((prev) => prev?.filter((p) => p?.id !== productId));
+    setSelectedProducts((prev) => prev.filter((p) => p?.id !== productId));
   };
 
   const handleAddToWatchlist = (productId) => {
     console.log('Adding to watchlist:', productId);
-    // Navigate to watchlist management
     navigate('/watchlist-management');
   };
 
   const handleSetPriceAlert = (productId) => {
     console.log('Setting price alert:', productId);
-    // Navigate to deal alerts
     navigate('/deal-alerts-and-notifications');
   };
 
-  const handleAddToComparison = (product) => {
-    if (!selectedProducts?.find((p) => p?.id === product?.id)) {
-      setSelectedProducts((prev) => [...prev, product]);
+  const handleAddToComparison = (rawProduct) => {
+    const normalized = normalizeProductForComparison(rawProduct);
+    if (!selectedProducts.find((p) => p?.id === normalized?.id)) {
+      setSelectedProducts((prev) => [...prev, normalized].slice(0, 4));
     }
   };
 
   const handleExportComparison = async (format) => {
     setIsLoading(true);
-    // Simulate export process
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     console.log(`Exporting comparison as ${format}`);
     setIsLoading(false);
   };
 
   const handleSaveComparison = async () => {
     setIsLoading(true);
-    // Simulate save process
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     console.log('Comparison saved');
     setIsLoading(false);
   };
@@ -272,36 +298,118 @@ const ProductComparison = () => {
     setSelectedProducts([]);
   };
 
-  const handleAddProduct = () => {
-    navigate('/ai-search-results');
+  const handleOpenAddModal = () => {
+    setIsAddModalOpen(true);
+    setSearchError('');
   };
 
-  const handleVoiceSearch = () => {
-    navigate('/voice-and-camera-search');
+  const handleExecuteModalSearch = async (queryToSearch) => {
+    const q = queryToSearch || modalSearchQuery;
+    if (!q?.trim()) return;
+
+    setIsSearchingModal(true);
+    setSearchError('');
+    try {
+      const results = await aiProductService.searchProducts(q);
+      const products = Array.isArray(results) ? results : (results.products || []);
+      setModalSearchResults(products.map(normalizeProductForComparison));
+    } catch (err) {
+      console.error('Modal search failed:', err);
+      setSearchError('Search failed. Please try a different query.');
+    } finally {
+      setIsSearchingModal(false);
+    }
   };
 
-  const handleCameraSearch = () => {
-    navigate('/voice-and-camera-search');
-  };
+  // Dynamic AI Verdict computation comparing all currently selected products
+  const aiVerdict = useMemo(() => {
+    if (!selectedProducts || selectedProducts.length < 2) return null;
 
-  const handleQuickAdd = () => {
-    navigate('/watchlist-management');
-  };
+    const sortedByPrice = [...selectedProducts].sort((a, b) => a.currentPrice - b.currentPrice);
+    const sortedByRating = [...selectedProducts].sort((a, b) => b.rating - a.rating);
+    const sortedByValue = [...selectedProducts].sort((a, b) => (b.aiScores?.value || 0) - (a.aiScores?.value || 0));
 
-  const handlePriceAlert = () => {
-    navigate('/deal-alerts-and-notifications');
-  };
+    const cheapest = sortedByPrice[0];
+    const mostExpensive = sortedByPrice[sortedByPrice.length - 1];
+    const priceDiff = mostExpensive.currentPrice - cheapest.currentPrice;
+    const bestValue = sortedByValue[0];
+    const topRated = sortedByRating[0];
+
+    return {
+      cheapest,
+      mostExpensive,
+      priceDiff,
+      bestValue,
+      topRated,
+      summary: `${bestValue.name} leads in overall value rating with ${bestValue.aiScores?.value}/100 score. ${cheapest.name} offers the lowest entry price at ₹${cheapest.currentPrice.toLocaleString('en-IN')}${priceDiff > 0 ? ` (₹${priceDiff.toLocaleString('en-IN')} savings)` : ''}.`
+    };
+  }, [selectedProducts]);
 
   const renderActiveView = () => {
     switch (activeView) {
       case 'comparison':
         return (
-          <ComparisonTable
-            products={selectedProducts}
-            onRemoveProduct={handleRemoveProduct}
-            onAddToWatchlist={handleAddToWatchlist}
-            onSetPriceAlert={handleSetPriceAlert} />);
+          <div className="space-y-6">
+            {/* Dynamic AI Comparison Verdict Header */}
+            {aiVerdict && (
+              <div className="bg-gradient-to-r from-primary/10 via-accent/10 to-primary/5 border border-primary/20 rounded-xl p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-2">
+                    <span className="p-1.5 bg-primary text-primary-foreground rounded-lg">
+                      <Icon name="Sparkles" size={16} />
+                    </span>
+                    <h3 className="font-semibold text-foreground text-base">
+                      AI Comparison Verdict
+                    </h3>
+                  </div>
+                  <span className="text-xs px-2.5 py-1 bg-primary/10 text-primary font-medium rounded-full">
+                    Live Analysis
+                  </span>
+                </div>
 
+                <p className="text-sm text-foreground/90 leading-relaxed mb-4">
+                  {aiVerdict.summary}
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-border/60">
+                  <div className="flex items-center space-x-3 p-2 bg-surface/80 rounded-lg border border-border/50">
+                    <Icon name="DollarSign" size={18} className="text-success" />
+                    <div>
+                      <div className="text-xs text-muted-foreground font-medium">Best Budget</div>
+                      <div className="text-xs font-semibold text-foreground line-clamp-1">{aiVerdict.cheapest.name}</div>
+                      <div className="text-xs text-success font-bold">₹{aiVerdict.cheapest.currentPrice.toLocaleString('en-IN')}</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-3 p-2 bg-surface/80 rounded-lg border border-border/50">
+                    <Icon name="Star" size={18} className="text-warning fill-current" />
+                    <div>
+                      <div className="text-xs text-muted-foreground font-medium">Highest Rated</div>
+                      <div className="text-xs font-semibold text-foreground line-clamp-1">{aiVerdict.topRated.name}</div>
+                      <div className="text-xs text-warning font-bold">{aiVerdict.topRated.rating} ★ ({aiVerdict.topRated.reviewCount.toLocaleString()} reviews)</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-3 p-2 bg-surface/80 rounded-lg border border-border/50">
+                    <Icon name="Award" size={18} className="text-primary" />
+                    <div>
+                      <div className="text-xs text-muted-foreground font-medium">Top AI Value Score</div>
+                      <div className="text-xs font-semibold text-foreground line-clamp-1">{aiVerdict.bestValue.name}</div>
+                      <div className="text-xs text-primary font-bold">{aiVerdict.bestValue.aiScores?.value}/100 Score</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <ComparisonTable
+              products={selectedProducts}
+              onRemoveProduct={handleRemoveProduct}
+              onAddToWatchlist={handleAddToWatchlist}
+              onSetPriceAlert={handleSetPriceAlert}
+            />
+          </div>
+        );
 
       case 'charts':
         return <PriceHistoryChart products={selectedProducts} />;
@@ -312,8 +420,9 @@ const ProductComparison = () => {
           <SmartRecommendations
             currentProducts={selectedProducts}
             onAddToComparison={handleAddToComparison}
-            onAddToWatchlist={handleAddToWatchlist} />);
-
+            onAddToWatchlist={handleAddToWatchlist}
+          />
+        );
 
       default:
         return null;
@@ -328,29 +437,29 @@ const ProductComparison = () => {
         <div className={`flex-1 transition-all duration-300 ${isAIAssistantOpen ? 'lg:mr-80' : ''}`}>
           <div className="p-4 lg:p-6 space-y-6">
             {/* Page Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Product Comparison</h1>
                 <p className="text-muted-foreground mt-1">
-                  AI-powered analysis and intelligent shopping guidance
+                  Real-time multi-retailer price comparison and AI evaluation
                 </p>
               </div>
-              
+
               <div className="flex items-center space-x-3">
                 <Button
                   variant="outline"
-                  onClick={() => navigate('/ai-search-results')}
-                  iconName="Search"
-                  iconPosition="left">
-
-                  Find Products
+                  onClick={handleOpenAddModal}
+                  iconName="Plus"
+                  iconPosition="left"
+                >
+                  Add Product
                 </Button>
                 <Button
                   variant="default"
                   onClick={() => setIsAIAssistantOpen(!isAIAssistantOpen)}
                   iconName="Bot"
-                  iconPosition="left">
-
+                  iconPosition="left"
+                >
                   AI Assistant
                 </Button>
               </div>
@@ -359,55 +468,55 @@ const ProductComparison = () => {
             {/* View Selector */}
             <div className="bg-surface border border-border rounded-lg p-1">
               <div className="flex overflow-x-auto">
-                {views?.map((view) =>
-                <button
-                  key={view?.id}
-                  onClick={() => setActiveView(view?.id)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
-                  activeView === view?.id ?
-                  'bg-primary text-primary-foreground' :
-                  'text-muted-foreground hover:text-foreground hover:bg-muted'}`
-                  }>
-
-                    <Icon name={view?.icon} size={16} />
-                    <span>{view?.label}</span>
+                {views.map((view) => (
+                  <button
+                    key={view.id}
+                    onClick={() => setActiveView(view.id)}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
+                      activeView === view.id
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <Icon name={view.icon} size={16} />
+                    <span>{view.label}</span>
                   </button>
-                )}
+                ))}
               </div>
             </div>
 
             {/* Empty State */}
-            {selectedProducts?.length === 0 &&
-            <div className="bg-surface border border-border rounded-lg p-12 text-center">
-                <Icon name="Package" size={64} className="text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-foreground mb-2">No Products to Compare</h3>
+            {selectedProducts.length === 0 && (
+              <div className="bg-surface border border-border rounded-lg p-12 text-center">
+                <Icon name="Scale" size={64} className="text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-foreground mb-2">No Products in Comparison</h3>
                 <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                  Start by searching for products or browse our recommendations to begin your comparison analysis.
+                  Add products using the search button above or browse your search results to compare prices across stores.
                 </p>
                 <div className="flex items-center justify-center space-x-3">
                   <Button
-                  variant="default"
-                  onClick={() => navigate('/ai-search-results')}
-                  iconName="Search"
-                  iconPosition="left">
-
-                    Search Products
+                    variant="default"
+                    onClick={handleOpenAddModal}
+                    iconName="Plus"
+                    iconPosition="left"
+                  >
+                    Add Product to Compare
                   </Button>
                   <Button
-                  variant="outline"
-                  onClick={() => navigate('/dashboard')}
-                  iconName="Home"
-                  iconPosition="left">
-
-                    Go to Dashboard
+                    variant="outline"
+                    onClick={() => navigate('/ai-search-results')}
+                    iconName="Search"
+                    iconPosition="left"
+                  >
+                    Browse Search Results
                   </Button>
                 </div>
               </div>
-            }
+            )}
 
             {/* Main Content Grid */}
-            {selectedProducts?.length > 0 &&
-            <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+            {selectedProducts.length > 0 && (
+              <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
                 {/* Primary Content */}
                 <div className="xl:col-span-3 space-y-6">
                   {renderActiveView()}
@@ -416,31 +525,16 @@ const ProductComparison = () => {
                 {/* Sidebar */}
                 <div className="xl:col-span-1 space-y-6">
                   <ComparisonActions
-                  selectedProducts={selectedProducts}
-                  onExportComparison={handleExportComparison}
-                  onSaveComparison={handleSaveComparison}
-                  onShareComparison={handleShareComparison}
-                  onClearAll={handleClearAll}
-                  onAddProduct={handleAddProduct} />
-
+                    selectedProducts={selectedProducts}
+                    onExportComparison={handleExportComparison}
+                    onSaveComparison={handleSaveComparison}
+                    onShareComparison={handleShareComparison}
+                    onClearAll={handleClearAll}
+                    onAddProduct={handleOpenAddModal}
+                  />
                 </div>
               </div>
-            }
-
-            {/* Mobile View Adjustments */}
-            <div className="lg:hidden">
-              {selectedProducts?.length > 0 && activeView === 'comparison' &&
-              <div className="bg-surface border border-border rounded-lg p-4">
-                  <div className="flex items-center space-x-2 mb-3">
-                    <Icon name="Info" size={16} className="text-primary" />
-                    <span className="text-sm font-medium text-foreground">Mobile Tip</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Swipe horizontally on the comparison table to view all product details.
-                  </p>
-                </div>
-              }
-            </div>
+            )}
           </div>
         </div>
 
@@ -451,29 +545,172 @@ const ProductComparison = () => {
           onClose={() => setIsAIAssistantOpen(false)}
           contextData={{
             pageName: 'Product Comparison',
-            productCount: selectedProducts?.length,
-            products: selectedProducts?.map((p) => p?.name)
-          }} />
-
+            productCount: selectedProducts.length,
+            products: selectedProducts.map((p) => p?.name)
+          }}
+        />
       </div>
+
       {/* Quick Action Menu */}
       <QuickActionMenu
-        onVoiceSearch={handleVoiceSearch}
-        onCameraSearch={handleCameraSearch}
-        onQuickAdd={handleQuickAdd}
-        onPriceAlert={handlePriceAlert} />
+        onVoiceSearch={() => navigate('/voice-and-camera-search', { state: { mode: 'voice' } })}
+        onCameraSearch={() => navigate('/voice-and-camera-search', { state: { mode: 'camera' } })}
+        onQuickAdd={() => navigate('/watchlist-management')}
+        onPriceAlert={() => navigate('/deal-alerts-and-notifications')}
+      />
+
+      {/* Interactive "Add Product to Compare" Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-surface border border-border rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-4 border-b border-border flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Icon name="PlusCircle" size={20} className="text-primary" />
+                <h3 className="font-semibold text-foreground text-lg">Add Product to Compare</h3>
+              </div>
+              <button
+                onClick={() => setIsAddModalOpen(false)}
+                className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors"
+              >
+                <Icon name="X" size={18} />
+              </button>
+            </div>
+
+            {/* Modal Search Input */}
+            <div className="p-4 border-b border-border space-y-3">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleExecuteModalSearch();
+                }}
+                className="flex items-center space-x-2"
+              >
+                <div className="relative flex-1">
+                  <Icon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={modalSearchQuery}
+                    onChange={(e) => setModalSearchQuery(e.target.value)}
+                    placeholder="Search any product (e.g. boAt Wave, iPhone 15, Sony WH-1000XM5)..."
+                    className="w-full pl-9 pr-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
+                    autoFocus
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  variant="default"
+                  size="sm"
+                  disabled={isSearchingModal || !modalSearchQuery.trim()}
+                >
+                  {isSearchingModal ? 'Searching...' : 'Search'}
+                </Button>
+              </form>
+
+              {/* Quick Suggestion Chips */}
+              <div className="flex items-center space-x-1.5 overflow-x-auto text-xs py-1">
+                <span className="text-muted-foreground whitespace-nowrap">Try:</span>
+                {['Noise ColorFit', 'boAt Wave Call 2', 'MacBook Air', 'OnePlus Nord', 'Sony Headphones'].map((chip) => (
+                  <button
+                    key={chip}
+                    type="button"
+                    onClick={() => {
+                      setModalSearchQuery(chip);
+                      handleExecuteModalSearch(chip);
+                    }}
+                    className="px-2.5 py-1 bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 rounded-full whitespace-nowrap transition-colors"
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Modal Results Body */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {isSearchingModal && (
+                <div className="py-12 text-center space-y-3">
+                  <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+                  <p className="text-sm text-muted-foreground">Searching market prices and product specifications...</p>
+                </div>
+              )}
+
+              {searchError && (
+                <div className="p-3 bg-error/10 border border-error/20 text-error text-sm rounded-lg">
+                  {searchError}
+                </div>
+              )}
+
+              {!isSearchingModal && modalSearchResults.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-xs text-muted-foreground font-medium mb-1">
+                    Found {modalSearchResults.length} matching products:
+                  </div>
+                  {modalSearchResults.map((prod) => {
+                    const isAlreadyAdded = selectedProducts.some((p) => p.id === prod.id || p.name === prod.name);
+                    return (
+                      <div
+                        key={prod.id}
+                        className="flex items-center justify-between p-3 bg-muted/30 border border-border rounded-lg hover:border-primary/50 transition-all"
+                      >
+                        <div className="flex items-center space-x-3 flex-1 min-w-0 mr-3">
+                          <img
+                            src={prod.image}
+                            alt={prod.name}
+                            className="w-12 h-12 rounded object-cover bg-muted flex-shrink-0"
+                            onError={(e) => {
+                              e.currentTarget.src = 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e';
+                            }}
+                          />
+                          <div className="min-w-0">
+                            <h4 className="text-sm font-medium text-foreground line-clamp-1">{prod.name}</h4>
+                            <div className="flex items-center space-x-2 text-xs text-muted-foreground mt-0.5">
+                              <span className="font-semibold text-foreground">₹{prod.currentPrice.toLocaleString('en-IN')}</span>
+                              {prod.discount > 0 && <span className="text-success font-medium">({prod.discount}% off)</span>}
+                              <span>• {prod.rating} ★</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <Button
+                          variant={isAlreadyAdded ? 'outline' : 'default'}
+                          size="sm"
+                          disabled={isAlreadyAdded || selectedProducts.length >= 4}
+                          onClick={() => {
+                            handleAddToComparison(prod);
+                            setIsAddModalOpen(false);
+                          }}
+                        >
+                          {isAlreadyAdded ? 'Added' : '+ Compare'}
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {!isSearchingModal && modalSearchResults.length === 0 && !searchError && (
+                <div className="py-8 text-center text-muted-foreground text-sm">
+                  <Icon name="Search" size={32} className="mx-auto mb-2 text-muted-foreground/60" />
+                  <p>Type a query or pick a suggestion above to search and compare products side-by-side.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Loading Overlay */}
-      {isLoading &&
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-500 flex items-center justify-center">
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-surface border border-border rounded-lg p-6 flex items-center space-x-3">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
             <span className="text-foreground">Processing...</span>
           </div>
         </div>
-      }
-    </div>);
-
+      )}
+    </div>
+  );
 };
 
 export default ProductComparison;

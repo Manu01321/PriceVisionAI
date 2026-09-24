@@ -103,12 +103,12 @@ const ComparisonTable = ({ products, onRemoveProduct, onAddToWatchlist, onSetPri
                 <td key={product?.id} className="p-4">
                   <div className="space-y-2">
                     <div className="text-xl font-bold text-foreground">
-                      ₹{product?.currentPrice}
+                      ₹{Number(product?.currentPrice || 0).toLocaleString('en-IN')}
                     </div>
                     {product?.originalPrice && product?.originalPrice > product?.currentPrice && (
                       <div className="flex items-center space-x-2">
                         <span className="text-sm text-muted-foreground line-through">
-                          ₹{product?.originalPrice}
+                          ₹{Number(product?.originalPrice || 0).toLocaleString('en-IN')}
                         </span>
                         <span className="text-sm text-success font-medium">
                           {Math.round(((product?.originalPrice - product?.currentPrice) / product?.originalPrice) * 100)}% off
@@ -118,7 +118,7 @@ const ComparisonTable = ({ products, onRemoveProduct, onAddToWatchlist, onSetPri
                     <div className="flex items-center space-x-1">
                       <Icon name="TrendingDown" size={14} className="text-success" />
                       <span className="text-xs text-success">
-                        ₹{product?.priceChange} in 30 days
+                        ₹{Math.abs(Number(product?.priceChange || 0)).toLocaleString('en-IN')} in 30 days
                       </span>
                     </div>
                   </div>

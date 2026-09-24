@@ -75,19 +75,19 @@ const ComparisonActions = ({
         </div>
         <div className="text-center p-3 bg-muted/30 rounded-lg">
           <div className="text-lg font-bold text-success">
-            ₹{Math.min(...selectedProducts?.map(p => p?.currentPrice))}
+            ₹{selectedProducts?.length ? Math.min(...selectedProducts.map(p => Number(p?.currentPrice || 0))).toLocaleString('en-IN') : 0}
           </div>
           <div className="text-xs text-muted-foreground">Lowest Price</div>
         </div>
         <div className="text-center p-3 bg-muted/30 rounded-lg">
           <div className="text-lg font-bold text-error">
-            ₹{Math.max(...selectedProducts?.map(p => p?.currentPrice))}
+            ₹{selectedProducts?.length ? Math.max(...selectedProducts.map(p => Number(p?.currentPrice || 0))).toLocaleString('en-IN') : 0}
           </div>
           <div className="text-xs text-muted-foreground">Highest Price</div>
         </div>
         <div className="text-center p-3 bg-muted/30 rounded-lg">
           <div className="text-lg font-bold text-warning">
-            {Math.round(selectedProducts?.reduce((sum, p) => sum + p?.aiScores?.value, 0) / selectedProducts?.length)}
+            {selectedProducts?.length ? Math.round(selectedProducts.reduce((sum, p) => sum + Number(p?.aiScores?.value || p?.confidence || 85), 0) / selectedProducts.length) : 0}
           </div>
           <div className="text-xs text-muted-foreground">Avg AI Score</div>
         </div>

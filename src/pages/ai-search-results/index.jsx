@@ -201,10 +201,25 @@ const AISearchResults = () => {
         );
         console.log('Toggle watchlist for products:', productIds);
         break;
-      case 'compare': navigate('/product-comparison', {
-          state: { productIds, fromSearch: true }
+      case 'compare': {
+        const selectedToCompare = products?.filter(product => productIds?.includes(product?.id)) || [];
+        // If a single product is selected for comparison, pair it with the next relevant search product
+        if (selectedToCompare.length === 1 && products?.length > 1) {
+          const alternative = products.find(p => p?.id !== selectedToCompare[0]?.id);
+          if (alternative) {
+            selectedToCompare.push(alternative);
+          }
+        }
+        navigate('/product-comparison', {
+          state: { 
+            products: selectedToCompare, 
+            productIds, 
+            fromSearch: true,
+            searchQuery 
+          }
         });
         break;
+      }
       case 'view_details': console.log('View details for product:', productIds?.[0]);
         // Could navigate to a product detail page
         break;
