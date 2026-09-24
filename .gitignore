@@ -1,0 +1,46 @@
+# Dependencies
+node_modules
+*/node_modules
+
+# Environment variables & Credentials
+.env
+.env.*
+!.env.example
+*.env
+backend/.env
+backend/.env.*
+!backend/.env.example
+credentials*.json
+*.pem
+*.key
+*.cert
+
+# Production builds
+/build
+dist
+dist-ssr
+*.local
+
+# Logs
+logs
+*.log
+backend/logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor & OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Lock files & config
+package-lock.json
+vite.config.*s.*
