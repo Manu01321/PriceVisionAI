@@ -154,7 +154,7 @@ Return 6-12 real products matching the query. Use accurate INR prices for the In
       throw new Error('Gemini API key is not configured');
     }
 
-    const candidateModels = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-3.5-flash'];
+    const candidateModels = ['gemini-flash-lite-latest', 'gemini-2.5-flash', 'gemini-flash-latest'];
     let lastError = null;
 
     for (const model of candidateModels) {
@@ -181,8 +181,8 @@ Return 6-12 real products matching the query. Use accurate INR prices for the In
         const errMsg = error.error?.message || response.statusText;
         lastError = new Error(`Gemini API error (${model}): ${errMsg}`);
 
-        // If model not found or high demand spike, attempt next fallback model
-        if (response.status === 404 || response.status === 503) {
+        // If model not found, high demand, or rate/quota limit reached, attempt next fallback model
+        if (response.status === 404 || response.status === 503 || response.status === 429) {
           console.warn(`Gemini model ${model} returned ${response.status}. Trying fallback...`);
           continue;
         }
@@ -190,7 +190,7 @@ Return 6-12 real products matching the query. Use accurate INR prices for the In
         throw lastError;
       } catch (err) {
         lastError = err;
-        if (err.message && (err.message.includes('API key') || err.message.includes('401') || err.message.includes('quota'))) {
+        if (err.message && (err.message.includes('API key') || err.message.includes('401'))) {
           throw err;
         }
       }
