@@ -27,7 +27,10 @@ const TrendingDeals = ({ deals = [], onViewDeal, onAddToWatchlist }) => {
       </div>
       <div className="space-y-3">
         {deals?.map((deal) => (
-          <div key={deal?.id} className="bg-surface border border-border rounded-lg p-4 hover:shadow-soft transition-smooth">
+          <div
+            key={deal?.id}
+            className="bg-surface border border-border rounded-lg p-4 hover:shadow-soft transition-smooth"
+          >
             <div className="flex items-start space-x-4">
               {/* Product Image */}
               <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
@@ -45,19 +48,21 @@ const TrendingDeals = ({ deals = [], onViewDeal, onAddToWatchlist }) => {
                     {deal?.title}
                   </h4>
                   <div className="flex items-center space-x-2">
-                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${getDiscountBadge(deal?.discount)}`}>
+                    <div
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${getDiscountBadge(deal?.discount)}`}
+                    >
                       -{deal?.discount}%
                     </div>
-                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(deal?.urgencyScore)}`}>
+                    <div
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(deal?.urgencyScore)}`}
+                    >
                       {deal?.urgencyScore}
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-2 mb-2">
-                  <span className="text-lg font-bold text-foreground">
-                    ₹{deal?.currentPrice}
-                  </span>
+                  <span className="text-lg font-bold text-foreground">₹{deal?.currentPrice}</span>
                   <span className="text-sm text-muted-foreground line-through">
                     ₹{deal?.originalPrice}
                   </span>
@@ -78,18 +83,10 @@ const TrendingDeals = ({ deals = [], onViewDeal, onAddToWatchlist }) => {
                   </div>
 
                   <div className="flex items-center space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onAddToWatchlist(deal)}
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => onAddToWatchlist(deal)}>
                       <Icon name="Heart" size={14} />
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onViewDeal(deal)}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => onViewDeal(deal)}>
                       View Deal
                     </Button>
                   </div>

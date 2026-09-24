@@ -21,22 +21,22 @@ export { default as configValidator } from '../utils/configValidator.js';
 export async function initializeServices() {
   try {
     console.log('🔧 Initializing Price Vision services...');
-    
+
     // Check API connectivity
     const { default: apiClient } = await import('./apiClient.js');
     const health = await apiClient.healthCheck();
-    
+
     if (!health.healthy) {
       throw new Error(`Backend not available: ${health.error}`);
     }
-    
+
     // Get supported sites
     const sites = await apiClient.getSupportedSites();
-    
+
     console.log('✅ Services initialized successfully');
     console.log(`🌐 Backend status: ${health.status}`);
     console.log(`🛍️ Supported sites: ${sites.sites?.length || 0}`);
-    
+
     return {
       success: true,
       backend: health,
@@ -49,10 +49,9 @@ export async function initializeServices() {
         'Automated price alerts'
       ]
     };
-    
   } catch (error) {
     console.error('❌ Service initialization failed:', error);
-    
+
     return {
       success: false,
       error: error.message,
@@ -71,16 +70,16 @@ export async function requestNotificationPermission() {
     console.warn('Browser does not support notifications');
     return false;
   }
-  
+
   if (Notification.permission === 'granted') {
     return true;
   }
-  
+
   if (Notification.permission === 'denied') {
     console.warn('Notification permission denied');
     return false;
   }
-  
+
   try {
     const permission = await Notification.requestPermission();
     return permission === 'granted';
@@ -107,18 +106,17 @@ export async function getServiceStats() {
       import('./priceTrackingService.js'),
       import('./apiClient.js')
     ]);
-    
+
     return {
       api: await apiClient.healthCheck(),
       productSearch: {
         searchHistory: productSearchService.getSearchHistory().length,
-        cacheStats: productSearchService.getCacheStats(),
+        cacheStats: productSearchService.getCacheStats()
       },
       imageSearch: imageSearchService.getStats(),
       priceTracking: priceTrackingService.getTrackingStats(),
       lastUpdated: new Date().toISOString()
     };
-    
   } catch (error) {
     console.error('Failed to get service stats:', error);
     return { error: error.message };
@@ -184,19 +182,15 @@ export async function getTrackedProducts() {
  */
 export async function clearServiceCaches() {
   try {
-    const [
-      { default: productSearchService },
-      { default: imageSearchService }
-    ] = await Promise.all([
+    const [{ default: productSearchService }, { default: imageSearchService }] = await Promise.all([
       import('./productSearchService.js'),
       import('./imageSearchService.js')
     ]);
-    
+
     productSearchService.clearCache();
     imageSearchService.clearCache();
-    
+
     console.log('✅ Service caches cleared');
-    
   } catch (error) {
     console.error('Failed to clear caches:', error);
   }
@@ -212,24 +206,23 @@ export async function checkServiceHealth(retries = 3) {
     try {
       const { default: apiClient } = await import('./apiClient.js');
       const health = await apiClient.healthCheck();
-      
+
       if (health.healthy) {
         return true;
       }
-      
+
       if (i < retries - 1) {
-        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+        await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
       }
-      
     } catch (error) {
       console.warn(`Health check attempt ${i + 1} failed:`, error.message);
-      
+
       if (i < retries - 1) {
-        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+        await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
       }
     }
   }
-  
+
   return false;
 }
 
@@ -278,19 +271,19 @@ export const SITE_CONFIGS = {
 // Export service instances for direct access
 export const services = {
   get productSearch() {
-    return import('./productSearchService.js').then(m => m.default);
+    return import('./productSearchService.js').then((m) => m.default);
   },
   get imageSearch() {
-    return import('./imageSearchService.js').then(m => m.default);
+    return import('./imageSearchService.js').then((m) => m.default);
   },
   get priceTracking() {
-    return import('./priceTrackingService.js').then(m => m.default);
+    return import('./priceTrackingService.js').then((m) => m.default);
   },
   get apiClient() {
-    return import('./apiClient.js').then(m => m.default);
+    return import('./apiClient.js').then((m) => m.default);
   },
   get aiProduct() {
-    return import('./aiProductService.js').then(m => m.default);
+    return import('./aiProductService.js').then((m) => m.default);
   }
 };
 

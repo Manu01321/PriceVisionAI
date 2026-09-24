@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Icon from '../AppIcon';
 import Button from './Button';
 
-const NotificationBadge = ({ 
-  notifications = [], 
-  onNotificationClick, 
-  onMarkAsRead, 
+const NotificationBadge = ({
+  notifications = [],
+  onNotificationClick,
+  onMarkAsRead,
   onMarkAllAsRead,
-  className = "" 
+  className = ''
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -60,7 +60,7 @@ const NotificationBadge = ({
   useEffect(() => {
     const notificationData = notifications?.length > 0 ? notifications : mockNotifications;
     setRecentNotifications(notificationData?.slice(0, 5));
-    setUnreadCount(notificationData?.filter(n => !n?.isRead)?.length);
+    setUnreadCount(notificationData?.filter((n) => !n?.isRead)?.length);
   }, [notifications]);
 
   const getNotificationIcon = (type) => {
@@ -134,14 +134,14 @@ const NotificationBadge = ({
         className="relative hover:bg-primary/5 transition-smooth"
       >
         <Icon name="Bell" size={20} className="text-foreground" />
-        
+
         {/* Badge */}
         {unreadCount > 0 && (
           <div className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-error text-white text-xs rounded-full flex items-center justify-center px-1 animate-pulse">
             {unreadCount > 99 ? '99+' : unreadCount}
           </div>
         )}
-        
+
         {/* Pulse indicator for new notifications */}
         {unreadCount > 0 && (
           <div className="absolute -top-1 -right-1 w-5 h-5 bg-error rounded-full animate-ping opacity-20"></div>
@@ -151,11 +151,8 @@ const NotificationBadge = ({
       {isOpen && (
         <>
           {/* Backdrop */}
-          <div 
-            className="fixed inset-0 z-200" 
-            onClick={() => setIsOpen(false)}
-          ></div>
-          
+          <div className="fixed inset-0 z-200" onClick={() => setIsOpen(false)}></div>
+
           {/* Dropdown Panel */}
           <div className="absolute right-0 top-full mt-2 w-80 bg-surface border border-border rounded-lg shadow-elevated animate-slide-up z-300">
             {/* Header */}
@@ -169,7 +166,7 @@ const NotificationBadge = ({
                   </div>
                 )}
               </div>
-              
+
               {unreadCount > 0 && (
                 <Button
                   variant="ghost"
@@ -195,13 +192,18 @@ const NotificationBadge = ({
                       }`}
                     >
                       {/* Icon */}
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                        notification?.urgency === 'high' ? 'bg-error/10' :
-                        notification?.urgency === 'medium'? 'bg-warning/10' : 'bg-success/10'
-                      }`}>
-                        <Icon 
-                          name={getNotificationIcon(notification?.type)} 
-                          size={16} 
+                      <div
+                        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                          notification?.urgency === 'high'
+                            ? 'bg-error/10'
+                            : notification?.urgency === 'medium'
+                              ? 'bg-warning/10'
+                              : 'bg-success/10'
+                        }`}
+                      >
+                        <Icon
+                          name={getNotificationIcon(notification?.type)}
+                          size={16}
                           className={getUrgencyColor(notification?.urgency)}
                         />
                       </div>
@@ -209,30 +211,36 @@ const NotificationBadge = ({
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between">
-                          <h4 className={`text-sm font-medium ${
-                            !notification?.isRead ? 'text-foreground' : 'text-muted-foreground'
-                          }`}>
+                          <h4
+                            className={`text-sm font-medium ${
+                              !notification?.isRead ? 'text-foreground' : 'text-muted-foreground'
+                            }`}
+                          >
                             {notification?.title}
                           </h4>
                           {!notification?.isRead && (
                             <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 ml-2 mt-1"></div>
                           )}
                         </div>
-                        
+
                         <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                           {notification?.message}
                         </p>
-                        
+
                         <div className="flex items-center justify-between mt-2">
                           <span className="text-xs text-muted-foreground">
                             {formatTimestamp(notification?.timestamp)}
                           </span>
-                          
+
                           {notification?.type === 'price_drop' && notification?.data && (
                             <div className="flex items-center space-x-1 text-xs">
-                              <span className="text-muted-foreground">₹{notification?.data?.oldPrice}</span>
+                              <span className="text-muted-foreground">
+                                ₹{notification?.data?.oldPrice}
+                              </span>
                               <Icon name="ArrowRight" size={12} className="text-muted-foreground" />
-                              <span className="text-success font-medium">₹{notification?.data?.newPrice}</span>
+                              <span className="text-success font-medium">
+                                ₹{notification?.data?.newPrice}
+                              </span>
                             </div>
                           )}
                         </div>

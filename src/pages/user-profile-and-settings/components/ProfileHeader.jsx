@@ -3,7 +3,8 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import { saveUser } from '../../../utils/auth';
 
-const inputCls = "w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary";
+const inputCls =
+  'w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary';
 
 const ProfileHeader = ({ user, onUpdateProfile }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -11,11 +12,11 @@ const ProfileHeader = ({ user, onUpdateProfile }) => {
     name: user?.name || '',
     email: user?.email || '',
     phone: user?.phone || '',
-    location: user?.location || '',
+    location: user?.location || ''
   });
   const [saved, setSaved] = useState(false);
 
-  const handleChange = (field, value) => setForm(p => ({ ...p, [field]: value }));
+  const handleChange = (field, value) => setForm((p) => ({ ...p, [field]: value }));
 
   const handleSave = () => {
     saveUser(form);
@@ -26,7 +27,12 @@ const ProfileHeader = ({ user, onUpdateProfile }) => {
   };
 
   const handleCancel = () => {
-    setForm({ name: user?.name || '', email: user?.email || '', phone: user?.phone || '', location: user?.location || '' });
+    setForm({
+      name: user?.name || '',
+      email: user?.email || '',
+      phone: user?.phone || '',
+      location: user?.location || ''
+    });
     setIsEditing(false);
   };
 
@@ -54,27 +60,48 @@ const ProfileHeader = ({ user, onUpdateProfile }) => {
                   { field: 'name', label: 'Full Name', type: 'text', icon: 'User' },
                   { field: 'email', label: 'Email', type: 'email', icon: 'Mail' },
                   { field: 'phone', label: 'Phone', type: 'tel', icon: 'Phone' },
-                  { field: 'location', label: 'Location', type: 'text', icon: 'MapPin' },
+                  { field: 'location', label: 'Location', type: 'text', icon: 'MapPin' }
                 ].map(({ field, label, type }) => (
                   <div key={field}>
-                    <label className="block text-xs font-medium text-muted-foreground mb-1">{label}</label>
-                    <input type={type} value={form[field]} onChange={e => handleChange(field, e.target.value)} className={inputCls} />
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">
+                      {label}
+                    </label>
+                    <input
+                      type={type}
+                      value={form[field]}
+                      onChange={(e) => handleChange(field, e.target.value)}
+                      className={inputCls}
+                    />
                   </div>
                 ))}
               </div>
               <div className="flex space-x-3">
-                <Button onClick={handleSave} iconName="Check" iconPosition="left">Save Changes</Button>
-                <Button variant="outline" onClick={handleCancel}>Cancel</Button>
+                <Button onClick={handleSave} iconName="Check" iconPosition="left">
+                  Save Changes
+                </Button>
+                <Button variant="outline" onClick={handleCancel}>
+                  Cancel
+                </Button>
               </div>
             </div>
           ) : (
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <h2 className="text-2xl font-bold text-foreground">{user?.name || 'Guest User'}</h2>
-                  <p className="text-sm text-muted-foreground">Member since {user?.memberSince || 'Today'}</p>
+                  <h2 className="text-2xl font-bold text-foreground">
+                    {user?.name || 'Guest User'}
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Member since {user?.memberSince || 'Today'}
+                  </p>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} iconName="Edit" iconPosition="left">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditing(true)}
+                  iconName="Edit"
+                  iconPosition="left"
+                >
                   Edit Profile
                 </Button>
               </div>
@@ -88,7 +115,7 @@ const ProfileHeader = ({ user, onUpdateProfile }) => {
                   { icon: 'Mail', label: 'Email', value: user?.email },
                   { icon: 'Phone', label: 'Phone', value: user?.phone || 'Not set' },
                   { icon: 'MapPin', label: 'Location', value: user?.location || 'Not set' },
-                  { icon: 'Calendar', label: 'Member since', value: user?.memberSince || 'Today' },
+                  { icon: 'Calendar', label: 'Member since', value: user?.memberSince || 'Today' }
                 ].map(({ icon, label, value }) => (
                   <div key={label} className="flex items-center space-x-2">
                     <Icon name={icon} size={15} className="text-muted-foreground flex-shrink-0" />

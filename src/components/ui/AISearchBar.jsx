@@ -2,14 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import Icon from '../AppIcon';
 import Button from './Button';
 
-const AISearchBar = ({ 
-  onSearch, 
-  onVoiceSearch, 
-  onCameraSearch, 
-  placeholder = "Search products with AI assistance...",
-  className = "",
+const AISearchBar = ({
+  onSearch,
+  onVoiceSearch,
+  onCameraSearch,
+  placeholder = 'Search products with AI assistance...',
+  className = '',
   showConfidence = true,
-  isProcessing = false 
+  isProcessing = false
 }) => {
   const [query, setQuery] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
@@ -19,15 +19,15 @@ const AISearchBar = ({
   const inputRef = useRef(null);
 
   const mockSuggestions = [
-    { text: "iPhone 15 Pro Max best price", confidence: 95 },
-    { text: "Gaming laptops under ₹83,000", confidence: 88 },
-    { text: "Wireless headphones comparison", confidence: 92 },
-    { text: "Smart TV deals Black Friday", confidence: 90 }
+    { text: 'iPhone 15 Pro Max best price', confidence: 95 },
+    { text: 'Gaming laptops under ₹83,000', confidence: 88 },
+    { text: 'Wireless headphones comparison', confidence: 92 },
+    { text: 'Smart TV deals Black Friday', confidence: 90 }
   ];
 
   useEffect(() => {
     if (query?.length > 2) {
-      const filtered = mockSuggestions?.filter(s => 
+      const filtered = mockSuggestions?.filter((s) =>
         s?.text?.toLowerCase()?.includes(query?.toLowerCase())
       );
       setSuggestions(filtered?.slice(0, 4));
@@ -39,7 +39,7 @@ const AISearchBar = ({
   const handleInputChange = (e) => {
     const value = e?.target?.value;
     setQuery(value);
-    
+
     // Simulate AI confidence scoring
     if (value?.length > 0) {
       const newConfidence = Math.min(95, Math.max(60, value?.length * 8));
@@ -98,12 +98,12 @@ const AISearchBar = ({
         <div className={`relative transition-all duration-300 ${isExpanded ? 'scale-105' : ''}`}>
           {/* Search Input */}
           <div className="relative">
-            <Icon 
-              name="Search" 
-              size={20} 
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground z-10" 
+            <Icon
+              name="Search"
+              size={20}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground z-10"
             />
-            
+
             <input
               ref={inputRef}
               type="text"
@@ -126,9 +126,9 @@ const AISearchBar = ({
                 className={`h-8 w-8 transition-colors ${isListening ? 'bg-error/10 text-error' : 'hover:bg-primary/10'}`}
                 disabled={isProcessing}
               >
-                <Icon name={isListening ? "MicOff" : "Mic"} size={16} />
+                <Icon name={isListening ? 'MicOff' : 'Mic'} size={16} />
               </Button>
-              
+
               <Button
                 type="button"
                 variant="ghost"
@@ -156,10 +156,9 @@ const AISearchBar = ({
           {showConfidence && confidence > 0 && !isProcessing && (
             <div className="absolute -bottom-1 left-3 right-24">
               <div className="h-1 bg-muted rounded-full overflow-hidden">
-                <div 
+                <div
                   className={`h-full transition-all duration-500 ${
-                    confidence >= 80 ? 'bg-success' : 
-                    confidence >= 60 ? 'bg-warning' : 'bg-error'
+                    confidence >= 80 ? 'bg-success' : confidence >= 60 ? 'bg-warning' : 'bg-error'
                   }`}
                   style={{ width: `${confidence}%` }}
                 ></div>
@@ -204,10 +203,15 @@ const AISearchBar = ({
                       <Icon name="Brain" size={16} className="text-accent" />
                       <span className="text-muted-foreground">AI Confidence:</span>
                     </div>
-                    <div className={`font-medium ${
-                      confidence >= 80 ? 'text-success' : 
-                      confidence >= 60 ? 'text-warning' : 'text-error'
-                    }`}>
+                    <div
+                      className={`font-medium ${
+                        confidence >= 80
+                          ? 'text-success'
+                          : confidence >= 60
+                            ? 'text-warning'
+                            : 'text-error'
+                      }`}
+                    >
                       {confidence}%
                     </div>
                   </div>
@@ -226,10 +230,15 @@ const AISearchBar = ({
                           <Icon name="Search" size={14} className="text-muted-foreground" />
                           <span>{suggestion?.text}</span>
                         </div>
-                        <div className={`text-xs font-medium ${
-                          suggestion?.confidence >= 80 ? 'text-success' : 
-                          suggestion?.confidence >= 60 ? 'text-warning' : 'text-error'
-                        }`}>
+                        <div
+                          className={`text-xs font-medium ${
+                            suggestion?.confidence >= 80
+                              ? 'text-success'
+                              : suggestion?.confidence >= 60
+                                ? 'text-warning'
+                                : 'text-error'
+                          }`}
+                        >
                           {suggestion?.confidence}%
                         </div>
                       </button>

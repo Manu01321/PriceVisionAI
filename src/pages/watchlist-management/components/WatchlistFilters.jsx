@@ -4,12 +4,7 @@ import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
 
-const WatchlistFilters = ({ 
-  onFilterChange, 
-  onSortChange, 
-  activeFilters = {},
-  className = "" 
-}) => {
+const WatchlistFilters = ({ onFilterChange, onSortChange, activeFilters = {}, className = '' }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [filters, setFilters] = useState({
     priceRange: { min: '', max: '' },
@@ -93,7 +88,7 @@ const WatchlistFilters = ({
           <Button
             variant="ghost"
             size="sm"
-            iconName={isExpanded ? "ChevronUp" : "ChevronDown"}
+            iconName={isExpanded ? 'ChevronUp' : 'ChevronDown'}
             iconPosition="left"
             onClick={() => setIsExpanded(!isExpanded)}
           >
@@ -117,14 +112,9 @@ const WatchlistFilters = ({
             placeholder="Sort by"
             className="w-48"
           />
-          
+
           {activeFilterCount > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              iconName="X"
-              onClick={clearAllFilters}
-            >
+            <Button variant="ghost" size="sm" iconName="X" onClick={clearAllFilters}>
               Clear
             </Button>
           )}

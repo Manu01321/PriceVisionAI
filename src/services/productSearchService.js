@@ -21,7 +21,7 @@ class ProductSearchService {
     }
 
     const searchKey = this.generateSearchKey(query, options);
-    
+
     // Check cache first
     if (this.searchCache.has(searchKey)) {
       const cached = this.searchCache.get(searchKey);
@@ -59,8 +59,8 @@ class ProductSearchService {
           return {
             success: true,
             query,
-            results: Array.isArray(aiResults) ? aiResults : (aiResults.products || []),
-            count: Array.isArray(aiResults) ? aiResults.length : (aiResults.products?.length || 0),
+            results: Array.isArray(aiResults) ? aiResults : aiResults.products || [],
+            count: Array.isArray(aiResults) ? aiResults.length : aiResults.products?.length || 0,
             searchTime: 'AI',
             sites: {},
             filters: {},
@@ -84,21 +84,22 @@ class ProductSearchService {
       this.addToSearchHistory(query, processedResults.count);
 
       return processedResults;
-
     } catch (error) {
       console.error('Product search failed:', error);
-      
+
       if (error instanceof ApiError) {
         // Handle specific API errors
         if (error.isNetworkError) {
-          throw new Error('Unable to connect to search service. Please check your internet connection.');
+          throw new Error(
+            'Unable to connect to search service. Please check your internet connection.'
+          );
         } else if (error.isTimeout) {
           throw new Error('Search request timed out. Please try again.');
         } else if (error.isServerError) {
           throw new Error('Search service is temporarily unavailable. Please try again later.');
         }
       }
-      
+
       throw new Error(`Search failed: ${error.message}`);
     }
   }
@@ -112,25 +113,41 @@ class ProductSearchService {
     if (!query || query.length < 2) return [];
 
     const suggestions = new Set();
-    
+
     // Add from recent searches
     this.recentSearches
-      .filter(search => search.toLowerCase().includes(query.toLowerCase()))
+      .filter((search) => search.toLowerCase().includes(query.toLowerCase()))
       .slice(0, 5)
-      .forEach(search => suggestions.add(search));
+      .forEach((search) => suggestions.add(search));
 
     // Add common product categories and brands
     const commonSuggestions = [
-      'iPhone', 'Samsung Galaxy', 'MacBook', 'Dell Laptop', 'Sony Headphones',
-      'Nike Shoes', 'Adidas', 'Levi\'s Jeans', 'iPhone 15', 'iPad',
-      'AirPods', 'Samsung TV', 'LG TV', 'Canon Camera', 'PlayStation',
-      'Xbox', 'Nintendo Switch', 'Books', 'Kindle', 'Fitbit'
+      'iPhone',
+      'Samsung Galaxy',
+      'MacBook',
+      'Dell Laptop',
+      'Sony Headphones',
+      'Nike Shoes',
+      'Adidas',
+      "Levi's Jeans",
+      'iPhone 15',
+      'iPad',
+      'AirPods',
+      'Samsung TV',
+      'LG TV',
+      'Canon Camera',
+      'PlayStation',
+      'Xbox',
+      'Nintendo Switch',
+      'Books',
+      'Kindle',
+      'Fitbit'
     ];
 
     commonSuggestions
-      .filter(item => item.toLowerCase().includes(query.toLowerCase()))
+      .filter((item) => item.toLowerCase().includes(query.toLowerCase()))
       .slice(0, 3)
-      .forEach(item => suggestions.add(item));
+      .forEach((item) => suggestions.add(item));
 
     return Array.from(suggestions).slice(0, 8);
   }
@@ -167,7 +184,6 @@ class ProductSearchService {
       });
 
       return this.processPriceComparison(response);
-
     } catch (error) {
       console.error('Price comparison failed:', error);
       throw new Error(`Price comparison failed: ${error.message}`);
@@ -186,7 +202,6 @@ class ProductSearchService {
       });
 
       return response.product;
-
     } catch (error) {
       console.error('Product details fetch failed:', error);
       throw new Error(`Failed to get product details: ${error.message}`);
@@ -201,7 +216,7 @@ class ProductSearchService {
 
   processSearchResults(response, originalQuery) {
     const results = response.results || [];
-    
+
     return {
       success: true,
       query: originalQuery,
@@ -218,30 +233,37 @@ class ProductSearchService {
   enhanceProductResult(product) {
     return {
       ...product,
-      
+
       // Price formatting
-      formattedPrice: product.price ? `₹${product.price.toLocaleString('en-IN')}` : 'Price not available',
-      formattedOriginalPrice: product.originalPrice ? `₹${product.originalPrice.toLocaleString('en-IN')}` : null,
-      
+      formattedPrice: product.price
+        ? `₹${product.price.toLocaleString('en-IN')}`
+        : 'Price not available',
+      formattedOriginalPrice: product.originalPrice
+        ? `₹${product.originalPrice.toLocaleString('en-IN')}`
+        : null,
+
       // Savings calculation
       savings: product.originalPrice && product.price ? product.originalPrice - product.price : 0,
-      savingsPercentage: product.originalPrice && product.price 
-        ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-        : 0,
-      
+      savingsPercentage:
+        product.originalPrice && product.price
+          ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+          : 0,
+
       // Rating display
       ratingStars: this.generateStarRating(product.rating),
-      formattedReviewCount: product.reviewCount ? `${product.reviewCount.toLocaleString()} reviews` : '',
-      
+      formattedReviewCount: product.reviewCount
+        ? `${product.reviewCount.toLocaleString()} reviews`
+        : '',
+
       // Enhanced metadata
       searchScore: product.overallScore || product.relevanceScore || 0,
       trustScore: this.calculateTrustScore(product),
       dealQuality: this.assessDealQuality(product),
-      
+
       // Availability status
       availabilityStatus: this.normalizeAvailability(product.availability),
       stockLevel: this.estimateStockLevel(product),
-      
+
       // Enhanced source info
       sourceInfo: {
         ...product.source,
@@ -253,10 +275,10 @@ class ProductSearchService {
 
   generateStarRating(rating) {
     if (!rating) return '';
-    
+
     const stars = Math.round(rating * 2) / 2; // Round to nearest 0.5
     let result = '';
-    
+
     for (let i = 1; i <= 5; i++) {
       if (i <= stars) {
         result += '★';
@@ -266,23 +288,23 @@ class ProductSearchService {
         result += '☆';
       }
     }
-    
+
     return result;
   }
 
   calculateTrustScore(product) {
     let score = 50; // Base score
-    
+
     // Rating bonus
     if (product.rating >= 4.5) score += 25;
     else if (product.rating >= 4.0) score += 15;
     else if (product.rating >= 3.5) score += 5;
-    
+
     // Review count bonus
     if (product.reviewCount > 1000) score += 15;
     else if (product.reviewCount > 100) score += 10;
     else if (product.reviewCount > 10) score += 5;
-    
+
     // Source credibility
     const siteScores = {
       amazon: 20,
@@ -291,40 +313,40 @@ class ProductSearchService {
       snapdeal: 12
     };
     score += siteScores[product.source?.site] || 10;
-    
+
     return Math.min(score, 100);
   }
 
   assessDealQuality(product) {
     if (!product.price) return 'unknown';
-    
+
     const discountPercentage = product.savingsPercentage || 0;
     const trustScore = this.calculateTrustScore(product);
-    
+
     if (discountPercentage > 30 && trustScore > 80) return 'excellent';
     if (discountPercentage > 20 && trustScore > 70) return 'very good';
     if (discountPercentage > 10 && trustScore > 60) return 'good';
     if (discountPercentage > 5) return 'fair';
-    
+
     return 'regular';
   }
 
   normalizeAvailability(availability) {
     if (!availability) return 'unknown';
-    
+
     const status = availability.toLowerCase();
-    
+
     if (status.includes('in stock') || status.includes('available')) return 'in_stock';
     if (status.includes('out of stock') || status.includes('unavailable')) return 'out_of_stock';
     if (status.includes('limited')) return 'limited_stock';
-    
+
     return 'unknown';
   }
 
   estimateStockLevel(product) {
     // This is a mock implementation - in a real app, you'd have actual stock data
     const availability = product.availability?.toLowerCase() || '';
-    
+
     if (availability.includes('only') && availability.includes('left')) {
       return 'low';
     } else if (availability.includes('limited')) {
@@ -332,7 +354,7 @@ class ProductSearchService {
     } else if (availability.includes('in stock')) {
       return 'high';
     }
-    
+
     return 'unknown';
   }
 
@@ -343,7 +365,7 @@ class ProductSearchService {
       myntra: '/logos/myntra.png',
       snapdeal: '/logos/snapdeal.png'
     };
-    
+
     return logos[siteName] || '/logos/default.png';
   }
 
@@ -354,14 +376,14 @@ class ProductSearchService {
       myntra: 4.4,
       snapdeal: 4.2
     };
-    
+
     return ratings[siteName] || 4.0;
   }
 
   groupResultsBySite(results) {
     const siteGroups = {};
-    
-    results.forEach(product => {
+
+    results.forEach((product) => {
       const siteName = product.source?.site || 'unknown';
       if (!siteGroups[siteName]) {
         siteGroups[siteName] = {
@@ -372,28 +394,33 @@ class ProductSearchService {
           priceRange: { min: Infinity, max: 0 }
         };
       }
-      
+
       siteGroups[siteName].count++;
       siteGroups[siteName].products.push(product);
-      
+
       if (product.price) {
-        siteGroups[siteName].priceRange.min = Math.min(siteGroups[siteName].priceRange.min, product.price);
-        siteGroups[siteName].priceRange.max = Math.max(siteGroups[siteName].priceRange.max, product.price);
+        siteGroups[siteName].priceRange.min = Math.min(
+          siteGroups[siteName].priceRange.min,
+          product.price
+        );
+        siteGroups[siteName].priceRange.max = Math.max(
+          siteGroups[siteName].priceRange.max,
+          product.price
+        );
       }
     });
-    
+
     // Calculate average prices
-    Object.values(siteGroups).forEach(group => {
-      const prices = group.products.filter(p => p.price).map(p => p.price);
-      group.averagePrice = prices.length > 0 
-        ? prices.reduce((sum, price) => sum + price, 0) / prices.length 
-        : 0;
-      
+    Object.values(siteGroups).forEach((group) => {
+      const prices = group.products.filter((p) => p.price).map((p) => p.price);
+      group.averagePrice =
+        prices.length > 0 ? prices.reduce((sum, price) => sum + price, 0) / prices.length : 0;
+
       if (group.priceRange.min === Infinity) {
         group.priceRange.min = 0;
       }
     });
-    
+
     return siteGroups;
   }
 
@@ -401,18 +428,18 @@ class ProductSearchService {
     const brands = new Set();
     const categories = new Set();
     const priceRanges = [];
-    
-    results.forEach(product => {
+
+    results.forEach((product) => {
       if (product.brand) brands.add(product.brand);
       if (product.source?.category) categories.add(product.source.category);
       if (product.price) priceRanges.push(product.price);
     });
-    
+
     // Calculate price ranges
     priceRanges.sort((a, b) => a - b);
     const minPrice = priceRanges[0] || 0;
     const maxPrice = priceRanges[priceRanges.length - 1] || 0;
-    
+
     return {
       brands: Array.from(brands).slice(0, 10),
       categories: Array.from(categories),
@@ -438,10 +465,10 @@ class ProductSearchService {
       resultCount,
       timestamp: new Date().toISOString()
     };
-    
+
     this.searchHistory.unshift(historyItem);
     this.searchHistory = this.searchHistory.slice(0, 100); // Keep last 100 searches
-    
+
     // Add to recent searches for suggestions
     this.recentSearches.unshift(query);
     this.recentSearches = [...new Set(this.recentSearches)].slice(0, 20);

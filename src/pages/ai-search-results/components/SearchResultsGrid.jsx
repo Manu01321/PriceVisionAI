@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Icon from '../../../components/AppIcon';
 import SearchResultCard from './SearchResultCard';
 
-const SearchResultsGrid = ({ 
-  products = [], 
-  loading = false, 
-  onLoadMore, 
+const SearchResultsGrid = ({
+  products = [],
+  loading = false,
+  onLoadMore,
   hasMore = true,
-  onProductAction 
+  onProductAction
 }) => {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -48,10 +48,8 @@ const SearchResultsGrid = ({
   };
 
   const handleProductSelect = (productId) => {
-    setSelectedProducts(prev => 
-      prev?.includes(productId) 
-        ? prev?.filter(id => id !== productId)
-        : [...prev, productId]
+    setSelectedProducts((prev) =>
+      prev?.includes(productId) ? prev?.filter((id) => id !== productId) : [...prev, productId]
     );
   };
 
@@ -63,11 +61,18 @@ const SearchResultsGrid = ({
   };
 
   const renderLoadingSkeleton = () => (
-    <div className={`grid gap-6 ${
-      viewMode === 'grid' ?'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' :'grid-cols-1'
-    }`}>
+    <div
+      className={`grid gap-6 ${
+        viewMode === 'grid'
+          ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+          : 'grid-cols-1'
+      }`}
+    >
       {Array.from({ length: 8 })?.map((_, index) => (
-        <div key={index} className="bg-surface border border-border rounded-lg overflow-hidden animate-pulse">
+        <div
+          key={index}
+          className="bg-surface border border-border rounded-lg overflow-hidden animate-pulse"
+        >
           <div className="aspect-square bg-muted"></div>
           <div className="p-4 space-y-3">
             <div className="h-4 bg-muted rounded w-3/4"></div>
@@ -103,7 +108,7 @@ const SearchResultsGrid = ({
               AI-powered results with confidence scoring
             </p>
           </div>
-          
+
           {selectedProducts?.length > 0 && (
             <div className="flex items-center space-x-2">
               <span className="text-sm text-muted-foreground">
@@ -133,7 +138,9 @@ const SearchResultsGrid = ({
             <button
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-md transition-colors ${
-                viewMode === 'grid' ?'bg-surface text-foreground shadow-sm' :'text-muted-foreground hover:text-foreground'
+                viewMode === 'grid'
+                  ? 'bg-surface text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <Icon name="Grid3X3" size={16} />
@@ -141,7 +148,9 @@ const SearchResultsGrid = ({
             <button
               onClick={() => setViewMode('list')}
               className={`p-2 rounded-md transition-colors ${
-                viewMode === 'list' ?'bg-surface text-foreground shadow-sm' :'text-muted-foreground hover:text-foreground'
+                viewMode === 'list'
+                  ? 'bg-surface text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <Icon name="List" size={16} />
@@ -151,9 +160,13 @@ const SearchResultsGrid = ({
       </div>
       {/* Results Grid */}
       {products?.length > 0 ? (
-        <div className={`grid gap-6 ${
-          viewMode === 'grid' ?'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' :'grid-cols-1 lg:grid-cols-2'
-        }`}>
+        <div
+          className={`grid gap-6 ${
+            viewMode === 'grid'
+              ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+              : 'grid-cols-1 lg:grid-cols-2'
+          }`}
+        >
           {products?.map((product) => (
             <div key={product?.id} className="relative">
               {/* Selection Checkbox */}
@@ -165,7 +178,7 @@ const SearchResultsGrid = ({
                   className="w-4 h-4 text-primary bg-white border-2 border-white rounded focus:ring-primary focus:ring-2 shadow-sm"
                 />
               </div>
-              
+
               <SearchResultCard
                 product={product}
                 onAddToWatchlist={(id, isAdded) => {

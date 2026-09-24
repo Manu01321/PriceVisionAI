@@ -41,11 +41,11 @@ class OpenAIService {
    */
   switchToNextKey() {
     const startIndex = this.currentKeyIndex;
-    
+
     // Try to find next active key
     do {
       this.currentKeyIndex = (this.currentKeyIndex + 1) % this.apiKeys.length;
-      
+
       // If we've cycled through all keys, return false
       if (this.currentKeyIndex === startIndex) {
         console.error('[OpenAI Service] All API keys have been exhausted');
@@ -64,8 +64,10 @@ class OpenAIService {
   handleKeyFailure(error) {
     const currentKey = this.apiKeys[this.currentKeyIndex];
     currentKey.failCount++;
-    
-    console.warn(`[OpenAI Service] Key ${this.currentKeyIndex + 1} failed (${currentKey.failCount} failures): ${error.message}`);
+
+    console.warn(
+      `[OpenAI Service] Key ${this.currentKeyIndex + 1} failed (${currentKey.failCount} failures): ${error.message}`
+    );
 
     // Deactivate key if it has too many failures or specific error types
     if (
@@ -92,16 +94,19 @@ class OpenAIService {
     while (attempts < this.maxRetries) {
       try {
         const result = await apiCall(this.client);
-        
+
         // Reset fail count on success
         this.apiKeys[this.currentKeyIndex].failCount = 0;
-        
+
         return result;
       } catch (error) {
         lastError = error;
         attempts++;
 
-        console.error(`[OpenAI Service] API call failed (attempt ${attempts}/${this.maxRetries}):`, error.message);
+        console.error(
+          `[OpenAI Service] API call failed (attempt ${attempts}/${this.maxRetries}):`,
+          error.message
+        );
 
         // If it's a rate limit error, try next key immediately
         if (error.status === 429 || error.message?.includes('rate limit')) {
@@ -119,7 +124,9 @@ class OpenAIService {
       }
     }
 
-    throw new Error(`All OpenAI API keys exhausted. Last error: ${lastError?.message || 'Unknown error'}`);
+    throw new Error(
+      `All OpenAI API keys exhausted. Last error: ${lastError?.message || 'Unknown error'}`
+    );
   }
 
   /**
@@ -161,7 +168,7 @@ class OpenAIService {
             role: 'user',
             content: [
               { type: 'text', text: prompt },
-              { 
+              {
                 type: 'image_url',
                 image_url: { url: imageUrl }
               }
@@ -191,12 +198,15 @@ class OpenAIService {
     
     Format as JSON.`;
 
-    const response = await this.createChatCompletion([
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt }
-    ], {
-      response_format: { type: 'json_object' }
-    });
+    const response = await this.createChatCompletion(
+      [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      {
+        response_format: { type: 'json_object' }
+      }
+    );
 
     return JSON.parse(response.choices[0].message.content);
   }
@@ -213,13 +223,16 @@ class OpenAIService {
     Suggest 5 product categories or specific products the user might be interested in.
     Format as JSON with: {recommendations: [{name, reason, category, estimatedPrice}]}`;
 
-    const response = await this.createChatCompletion([
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt }
-    ], {
-      response_format: { type: 'json_object' },
-      model: 'gpt-4o-mini'
-    });
+    const response = await this.createChatCompletion(
+      [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      {
+        response_format: { type: 'json_object' },
+        model: 'gpt-4o-mini'
+      }
+    );
 
     return JSON.parse(response.choices[0].message.content);
   }
@@ -241,13 +254,16 @@ class OpenAIService {
     
     Format as JSON.`;
 
-    const response = await this.createChatCompletion([
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt }
-    ], {
-      response_format: { type: 'json_object' },
-      model: 'gpt-4o-mini'
-    });
+    const response = await this.createChatCompletion(
+      [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      {
+        response_format: { type: 'json_object' },
+        model: 'gpt-4o-mini'
+      }
+    );
 
     return JSON.parse(response.choices[0].message.content);
   }
@@ -259,7 +275,7 @@ class OpenAIService {
     return {
       currentKey: this.currentKeyIndex + 1,
       totalKeys: this.apiKeys.length,
-      activeKeys: this.apiKeys.filter(k => k.active).length,
+      activeKeys: this.apiKeys.filter((k) => k.active).length,
       keys: this.apiKeys.map((k, i) => ({
         index: i + 1,
         active: k.active,
@@ -273,7 +289,7 @@ class OpenAIService {
    * Reset all keys (useful for testing or manual recovery)
    */
   resetKeys() {
-    this.apiKeys.forEach(key => {
+    this.apiKeys.forEach((key) => {
       key.active = true;
       key.failCount = 0;
     });

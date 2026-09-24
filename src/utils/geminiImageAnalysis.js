@@ -25,7 +25,11 @@ export function handleGeminiError(error) {
     return 'Request timed out. Please check your internet connection and try again.';
   }
 
-  if (error?.message?.includes('API key') || error?.message?.includes('authentication') || error?.status === 401) {
+  if (
+    error?.message?.includes('API key') ||
+    error?.message?.includes('authentication') ||
+    error?.status === 401
+  ) {
     return 'API key is invalid or missing. Please check your Gemini API configuration.';
   }
 
@@ -51,23 +55,23 @@ export function handleGeminiError(error) {
  */
 export function getSafetySettings() {
   return [
-  {
-    category: "HARM_CATEGORY_HARASSMENT",
-    threshold: "BLOCK_MEDIUM_AND_ABOVE"
-  },
-  {
-    category: "HARM_CATEGORY_HATE_SPEECH",
-    threshold: "BLOCK_MEDIUM_AND_ABOVE"
-  },
-  {
-    category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-    threshold: "BLOCK_MEDIUM_AND_ABOVE"
-  },
-  {
-    category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-    threshold: "BLOCK_MEDIUM_AND_ABOVE"
-  }];
-
+    {
+      category: 'HARM_CATEGORY_HARASSMENT',
+      threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+    },
+    {
+      category: 'HARM_CATEGORY_HATE_SPEECH',
+      threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+    },
+    {
+      category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+      threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+    },
+    {
+      category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+      threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+    }
+  ];
 }
 
 /**
@@ -80,34 +84,40 @@ export async function convertFilesToBase64(imageFiles) {
   const SUPPORTED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
 
   const toBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    // Validate file
-    if (!SUPPORTED_TYPES.includes(file?.type)) {
-      reject(new Error(`Unsupported file type: ${file?.type}. Please use JPG, PNG, WebP, or GIF.`));
-      return;
-    }
-
-    if (file?.size > MAX_FILE_SIZE) {
-      reject(new Error(`File too large: ${(file?.size / 1024 / 1024).toFixed(1)}MB. Maximum size is 10MB.`));
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      try {
-        const base64Data = reader?.result?.split(',')?.[1];
-        if (!base64Data) {
-          reject(new Error('Failed to convert image to base64'));
-          return;
-        }
-        resolve(base64Data);
-      } catch (err) {
-        reject(new Error('Error processing image data'));
+    new Promise((resolve, reject) => {
+      // Validate file
+      if (!SUPPORTED_TYPES.includes(file?.type)) {
+        reject(
+          new Error(`Unsupported file type: ${file?.type}. Please use JPG, PNG, WebP, or GIF.`)
+        );
+        return;
       }
-    };
-    reader.onerror = () => reject(new Error('Failed to read image file'));
-  });
+
+      if (file?.size > MAX_FILE_SIZE) {
+        reject(
+          new Error(
+            `File too large: ${(file?.size / 1024 / 1024).toFixed(1)}MB. Maximum size is 10MB.`
+          )
+        );
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        try {
+          const base64Data = reader?.result?.split(',')?.[1];
+          if (!base64Data) {
+            reject(new Error('Failed to convert image to base64'));
+            return;
+          }
+          resolve(base64Data);
+        } catch (err) {
+          reject(new Error('Error processing image data'));
+        }
+      };
+      reader.onerror = () => reject(new Error('Failed to read image file'));
+    });
 
   try {
     const imagePromises = imageFiles?.map(async (file) => {
@@ -138,17 +148,23 @@ export async function parseImageAnalysisResponse(response) {
     }
 
     if (response?.promptFeedback?.blockReason) {
-      throw new Error(`Content blocked: ${response?.promptFeedback?.blockReason}. Please try a different image.`);
+      throw new Error(
+        `Content blocked: ${response?.promptFeedback?.blockReason}. Please try a different image.`
+      );
     }
 
     if (!response?.candidates || response?.candidates?.length === 0) {
-      throw new Error('No analysis candidates returned. The image might be unclear or unsupported.');
+      throw new Error(
+        'No analysis candidates returned. The image might be unclear or unsupported.'
+      );
     }
 
     const candidate = response?.candidates?.[0];
 
     if (candidate?.finishReason === 'SAFETY') {
-      throw new Error('Content blocked by safety filters. Please upload a different product image.');
+      throw new Error(
+        'Content blocked by safety filters. Please upload a different product image.'
+      );
     }
 
     if (candidate?.finishReason === 'RECITATION') {
@@ -167,7 +183,9 @@ export async function parseImageAnalysisResponse(response) {
         const analysisText = part?.text?.trim();
 
         if (analysisText?.length < 50) {
-          throw new Error('Analysis result too short. Please try uploading a clearer product image.');
+          throw new Error(
+            'Analysis result too short. Please try uploading a clearer product image.'
+          );
         }
 
         // Parse the response to extract product information
@@ -175,8 +193,9 @@ export async function parseImageAnalysisResponse(response) {
       }
     }
 
-    throw new Error('No valid text analysis found in response. Please try again with a different image.');
-
+    throw new Error(
+      'No valid text analysis found in response. Please try again with a different image.'
+    );
   } catch (error) {
     console.error('Error parsing Gemini response:', error);
     throw error;
@@ -215,7 +234,23 @@ function parseProductAnalysis(analysisText) {
     // Enhanced fallback product identification
     if (!extractedData?.productName) {
       // Look for product words anywhere in the text
-      const productWords = ['phone', 'smartphone', 'laptop', 'tablet', 'camera', 'watch', 'headphones', 'speaker', 'tv', 'monitor', 'keyboard', 'mouse', 'computer', 'device', 'gadget'];
+      const productWords = [
+        'phone',
+        'smartphone',
+        'laptop',
+        'tablet',
+        'camera',
+        'watch',
+        'headphones',
+        'speaker',
+        'tv',
+        'monitor',
+        'keyboard',
+        'mouse',
+        'computer',
+        'device',
+        'gadget'
+      ];
 
       for (const word of productWords) {
         const regex = new RegExp(`([^.]*${word}[^.]*)`, 'i');
@@ -305,20 +340,20 @@ function calculateAnalysisConfidence(extractedData, analysisText) {
  */
 function generateFallbackProducts() {
   return [
-  {
-    id: 1,
-    name: 'Product from uploaded image',
-    brand: 'Various',
-    category: 'General',
-    price: 99.99,
-    originalPrice: 119.99,
-    discount: 17,
-    rating: 4.2,
-    reviews: 150,
-    image: "https://images.unsplash.com/photo-1735538501138-635296c82088",
-    imageAlt: "General product item from uploaded image"
-  }];
-
+    {
+      id: 1,
+      name: 'Product from uploaded image',
+      brand: 'Various',
+      category: 'General',
+      price: 99.99,
+      originalPrice: 119.99,
+      discount: 17,
+      rating: 4.2,
+      reviews: 150,
+      image: 'https://images.unsplash.com/photo-1735538501138-635296c82088',
+      imageAlt: 'General product item from uploaded image'
+    }
+  ];
 }
 
 /**
@@ -339,7 +374,7 @@ function generateProductsFromAnalysis(extractedData, analysisText) {
       color: extractedData?.color || 'Standard',
       rating: 4.2 + Math.random() * 0.6, // 4.2-4.8
       reviews: Math.floor(Math.random() * 1000) + 100,
-      image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f",
+      image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f',
       imageAlt: `${extractedData?.productName || 'Product'} - high quality electronics device`
     };
 
@@ -349,20 +384,33 @@ function generateProductsFromAnalysis(extractedData, analysisText) {
       basePrice = parseFloat(extractedData?.price) || 299.99;
     } else if (extractedData?.category) {
       const categoryPrices = {
-        'phone': 699.99, 'smartphone': 699.99, 'mobile': 699.99,
-        'laptop': 999.99, 'computer': 899.99, 'pc': 899.99,
-        'tablet': 399.99, 'ipad': 599.99,
-        'camera': 599.99, 'photography': 599.99,
-        'headphones': 199.99, 'earphones': 149.99, 'audio': 199.99,
-        'speaker': 149.99, 'bluetooth': 129.99,
-        'tv': 799.99, 'television': 799.99,
-        'monitor': 299.99, 'display': 399.99,
-        'watch': 349.99, 'smartwatch': 399.99,
-        'gaming': 499.99, 'console': 499.99
+        phone: 699.99,
+        smartphone: 699.99,
+        mobile: 699.99,
+        laptop: 999.99,
+        computer: 899.99,
+        pc: 899.99,
+        tablet: 399.99,
+        ipad: 599.99,
+        camera: 599.99,
+        photography: 599.99,
+        headphones: 199.99,
+        earphones: 149.99,
+        audio: 199.99,
+        speaker: 149.99,
+        bluetooth: 129.99,
+        tv: 799.99,
+        television: 799.99,
+        monitor: 299.99,
+        display: 399.99,
+        watch: 349.99,
+        smartwatch: 399.99,
+        gaming: 499.99,
+        console: 499.99
       };
 
       const categoryKey = Object.keys(categoryPrices)?.find((key) =>
-      extractedData?.category?.toLowerCase()?.includes(key)
+        extractedData?.category?.toLowerCase()?.includes(key)
       );
 
       if (categoryKey) {
@@ -372,7 +420,9 @@ function generateProductsFromAnalysis(extractedData, analysisText) {
 
     baseProduct.price = Math.round(basePrice * 100) / 100;
     baseProduct.originalPrice = Math.round(basePrice * 1.15 * 100) / 100; // 15% markup
-    baseProduct.discount = Math.round((baseProduct?.originalPrice - baseProduct?.price) / baseProduct?.originalPrice * 100);
+    baseProduct.discount = Math.round(
+      ((baseProduct?.originalPrice - baseProduct?.price) / baseProduct?.originalPrice) * 100
+    );
 
     // Generate similar products
     const similarProducts = [];
@@ -394,13 +444,14 @@ function generateProductsFromAnalysis(extractedData, analysisText) {
       };
 
       variation.originalPrice = Math.round(variation?.price * 1.1 * 100) / 100;
-      variation.discount = Math.round((variation?.originalPrice - variation?.price) / variation?.originalPrice * 100);
+      variation.discount = Math.round(
+        ((variation?.originalPrice - variation?.price) / variation?.originalPrice) * 100
+      );
 
       similarProducts?.push(variation);
     }
 
     return [baseProduct, ...similarProducts];
-
   } catch (error) {
     console.error('Error generating products:', error);
     return generateFallbackProducts();
@@ -421,7 +472,9 @@ export async function analyzeProductImages(imageFiles, signal = null) {
 
     // Validate API key
     if (!import.meta.env?.VITE_GEMINI_API_KEY || !genAI) {
-      throw new Error('Gemini API key is not configured. Please add VITE_GEMINI_API_KEY to your environment variables.');
+      throw new Error(
+        'Gemini API key is not configured. Please add VITE_GEMINI_API_KEY to your environment variables.'
+      );
     }
 
     // Check for abort signal early
@@ -463,13 +516,15 @@ Color: [Primary color(s)]
 
 Please format your response with clear labels and be as specific as possible to help with product search and comparison.`;
 
-    const contents = [{
-      role: "user",
-      parts: [
-      ...imageParts, // Images first
-      { text: analysisPrompt } // Then analysis instructions
-      ]
-    }];
+    const contents = [
+      {
+        role: 'user',
+        parts: [
+          ...imageParts, // Images first
+          { text: analysisPrompt } // Then analysis instructions
+        ]
+      }
+    ];
 
     const generationConfig = {
       temperature: 0.2, // Lower for more factual analysis
@@ -517,7 +572,6 @@ Please format your response with clear labels and be as specific as possible to 
     }
 
     return await parseImageAnalysisResponse(response);
-
   } catch (error) {
     console.error('Error in analyzeProductImages:', error);
 
@@ -578,7 +632,6 @@ Focus on products similar to or complementary to the analyzed item.`;
       recommendations: recommendationText?.trim(),
       timestamp: new Date()
     };
-
   } catch (error) {
     console.error('Error generating recommendations:', error);
     throw new Error(handleGeminiError(error));

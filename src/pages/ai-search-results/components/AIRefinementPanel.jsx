@@ -18,21 +18,21 @@ const AIRefinementPanel = ({ searchQuery, onRefinementSelect, onAlternativeSelec
       id: 2,
       query: `${searchQuery} under $100`,
       confidence: 88,
-      reason: "Price filter for budget-conscious shoppers",
+      reason: 'Price filter for budget-conscious shoppers',
       resultCount: 856
     },
     {
       id: 3,
       query: `${searchQuery} 2024 model`,
       confidence: 85,
-      reason: "Latest models often have better features",
+      reason: 'Latest models often have better features',
       resultCount: 432
     },
     {
       id: 4,
       query: `${searchQuery} with warranty`,
       confidence: 79,
-      reason: "Warranty protection adds value",
+      reason: 'Warranty protection adds value',
       resultCount: 623
     }
   ];
@@ -40,48 +40,48 @@ const AIRefinementPanel = ({ searchQuery, onRefinementSelect, onAlternativeSelec
   const alternatives = [
     {
       id: 1,
-      name: "Premium Alternative",
-      description: "Higher-end option with advanced features",
+      name: 'Premium Alternative',
+      description: 'Higher-end option with advanced features',
       confidence: 94,
-      priceRange: "$200 - $500",
-      keyFeatures: ["Premium build quality", "Extended warranty", "Advanced features"],
-      icon: "Crown"
+      priceRange: '$200 - $500',
+      keyFeatures: ['Premium build quality', 'Extended warranty', 'Advanced features'],
+      icon: 'Crown'
     },
     {
       id: 2,
-      name: "Budget-Friendly Option",
-      description: "Cost-effective choice with essential features",
+      name: 'Budget-Friendly Option',
+      description: 'Cost-effective choice with essential features',
       confidence: 89,
-      priceRange: "$50 - $150",
-      keyFeatures: ["Great value", "Essential features", "Reliable brand"],
-      icon: "DollarSign"
+      priceRange: '$50 - $150',
+      keyFeatures: ['Great value', 'Essential features', 'Reliable brand'],
+      icon: 'DollarSign'
     },
     {
       id: 3,
-      name: "Eco-Friendly Choice",
-      description: "Sustainable option with environmental benefits",
+      name: 'Eco-Friendly Choice',
+      description: 'Sustainable option with environmental benefits',
       confidence: 82,
-      priceRange: "$100 - $300",
-      keyFeatures: ["Sustainable materials", "Energy efficient", "Recyclable"],
-      icon: "Leaf"
+      priceRange: '$100 - $300',
+      keyFeatures: ['Sustainable materials', 'Energy efficient', 'Recyclable'],
+      icon: 'Leaf'
     },
     {
       id: 4,
-      name: "Professional Grade",
-      description: "Commercial-quality for demanding users",
+      name: 'Professional Grade',
+      description: 'Commercial-quality for demanding users',
       confidence: 91,
-      priceRange: "$300 - $800",
-      keyFeatures: ["Professional quality", "Heavy-duty build", "Extended support"],
-      icon: "Briefcase"
+      priceRange: '$300 - $800',
+      keyFeatures: ['Professional quality', 'Heavy-duty build', 'Extended support'],
+      icon: 'Briefcase'
     }
   ];
 
   const smartKeywords = [
-    { keyword: "wireless", boost: "+15% relevance", color: "bg-primary/10 text-primary" },
-    { keyword: "portable", boost: "+12% relevance", color: "bg-secondary/10 text-secondary" },
-    { keyword: "durable", boost: "+10% relevance", color: "bg-success/10 text-success" },
-    { keyword: "compact", boost: "+8% relevance", color: "bg-warning/10 text-warning" },
-    { keyword: "premium", boost: "+6% relevance", color: "bg-accent/10 text-accent" }
+    { keyword: 'wireless', boost: '+15% relevance', color: 'bg-primary/10 text-primary' },
+    { keyword: 'portable', boost: '+12% relevance', color: 'bg-secondary/10 text-secondary' },
+    { keyword: 'durable', boost: '+10% relevance', color: 'bg-success/10 text-success' },
+    { keyword: 'compact', boost: '+8% relevance', color: 'bg-warning/10 text-warning' },
+    { keyword: 'premium', boost: '+6% relevance', color: 'bg-accent/10 text-accent' }
   ];
 
   const tabs = [
@@ -130,14 +130,13 @@ const AIRefinementPanel = ({ searchQuery, onRefinementSelect, onAlternativeSelec
             onClick={() => setActiveTab(tab?.id)}
             className={`flex-1 flex items-center justify-center space-x-2 px-4 py-3 text-sm font-medium transition-colors ${
               activeTab === tab?.id
-                ? 'text-primary border-b-2 border-primary bg-primary/5' :'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                ? 'text-primary border-b-2 border-primary bg-primary/5'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`}
           >
             <Icon name={tab?.icon} size={14} />
             <span>{tab?.label}</span>
-            <div className="px-1.5 py-0.5 bg-muted text-xs rounded-full">
-              {tab?.count}
-            </div>
+            <div className="px-1.5 py-0.5 bg-muted text-xs rounded-full">{tab?.count}</div>
           </button>
         ))}
       </div>
@@ -161,13 +160,19 @@ const AIRefinementPanel = ({ searchQuery, onRefinementSelect, onAlternativeSelec
                     </div>
                     <p className="text-xs text-muted-foreground">{refinement?.reason}</p>
                   </div>
-                  <div className={`text-xs font-medium ${getConfidenceColor(refinement?.confidence)}`}>
+                  <div
+                    className={`text-xs font-medium ${getConfidenceColor(refinement?.confidence)}`}
+                  >
                     {refinement?.confidence}%
                   </div>
                 </div>
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>{refinement?.resultCount?.toLocaleString()} results</span>
-                  <Icon name="ArrowRight" size={12} className="group-hover:translate-x-1 transition-transform" />
+                  <Icon
+                    name="ArrowRight"
+                    size={12}
+                    className="group-hover:translate-x-1 transition-transform"
+                  />
                 </div>
               </button>
             ))}
@@ -191,18 +196,29 @@ const AIRefinementPanel = ({ searchQuery, onRefinementSelect, onAlternativeSelec
                       <h4 className="font-medium text-foreground group-hover:text-primary transition-colors">
                         {alternative?.name}
                       </h4>
-                      <div className={`text-xs font-medium ${getConfidenceColor(alternative?.confidence)}`}>
+                      <div
+                        className={`text-xs font-medium ${getConfidenceColor(alternative?.confidence)}`}
+                      >
                         {alternative?.confidence}%
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground mb-2">{alternative?.description}</p>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-foreground">{alternative?.priceRange}</span>
-                      <Icon name="ArrowRight" size={12} className="text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                      <span className="text-xs font-medium text-foreground">
+                        {alternative?.priceRange}
+                      </span>
+                      <Icon
+                        name="ArrowRight"
+                        size={12}
+                        className="text-muted-foreground group-hover:translate-x-1 transition-transform"
+                      />
                     </div>
                     <div className="flex flex-wrap gap-1 mt-2">
                       {alternative?.keyFeatures?.slice(0, 2)?.map((feature, index) => (
-                        <span key={index} className="px-2 py-1 bg-primary/5 text-primary text-xs rounded">
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-primary/5 text-primary text-xs rounded"
+                        >
                           {feature}
                         </span>
                       ))}
@@ -237,11 +253,15 @@ const AIRefinementPanel = ({ searchQuery, onRefinementSelect, onAlternativeSelec
                     </div>
                     <span className="text-xs text-muted-foreground">{item?.boost}</span>
                   </div>
-                  <Icon name="Plus" size={14} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                  <Icon
+                    name="Plus"
+                    size={14}
+                    className="text-muted-foreground group-hover:text-primary transition-colors"
+                  />
                 </button>
               ))}
             </div>
-            
+
             {/* Custom Keyword Input */}
             <div className="pt-3 border-t border-border">
               <div className="flex space-x-2">

@@ -1,4 +1,7 @@
-const API_BASE_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL) || (typeof process !== 'undefined' ? process.env?.VITE_API_BASE_URL : undefined) || 'http://localhost:5001';
+const API_BASE_URL =
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL) ||
+  (typeof process !== 'undefined' ? process.env?.VITE_API_BASE_URL : undefined) ||
+  'http://localhost:5001';
 
 class ApiClient {
   constructor(baseURL = API_BASE_URL) {
@@ -8,14 +11,14 @@ class ApiClient {
 
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
-    
+
     const config = {
       timeout: this.timeout,
       headers: {
         'Content-Type': 'application/json',
-        ...options.headers,
+        ...options.headers
       },
-      ...options,
+      ...options
     };
 
     try {
@@ -24,7 +27,7 @@ class ApiClient {
 
       const response = await fetch(url, {
         ...config,
-        signal: controller.signal,
+        signal: controller.signal
       });
 
       clearTimeout(timeoutId);
@@ -40,51 +43,46 @@ class ApiClient {
 
       const data = await response.json();
       return data;
-
     } catch (error) {
       if (error.name === 'AbortError') {
         throw new ApiError('Request timeout', 408);
       }
-      
+
       if (error instanceof ApiError) {
         throw error;
       }
 
       // Network or other errors
-      throw new ApiError(
-        error.message || 'Network error occurred',
-        0,
-        { originalError: error }
-      );
+      throw new ApiError(error.message || 'Network error occurred', 0, { originalError: error });
     }
   }
 
   async get(endpoint, params = {}) {
     const queryString = new URLSearchParams(params).toString();
     const url = queryString ? `${endpoint}?${queryString}` : endpoint;
-    
+
     return this.request(url, {
-      method: 'GET',
+      method: 'GET'
     });
   }
 
   async post(endpoint, data = {}) {
     return this.request(endpoint, {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify(data)
     });
   }
 
   async put(endpoint, data = {}) {
     return this.request(endpoint, {
       method: 'PUT',
-      body: JSON.stringify(data),
+      body: JSON.stringify(data)
     });
   }
 
   async delete(endpoint) {
     return this.request(endpoint, {
-      method: 'DELETE',
+      method: 'DELETE'
     });
   }
 
@@ -95,7 +93,7 @@ class ApiClient {
       headers: {
         // Don't set Content-Type, let browser set it for FormData
       },
-      body: formData,
+      body: formData
     });
   }
 

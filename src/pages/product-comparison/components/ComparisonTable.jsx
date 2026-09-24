@@ -7,7 +7,7 @@ const ComparisonTable = ({ products, onRemoveProduct, onAddToWatchlist, onSetPri
   const [expandedSpecs, setExpandedSpecs] = useState({});
 
   const toggleSpecs = (productId) => {
-    setExpandedSpecs(prev => ({
+    setExpandedSpecs((prev) => ({
       ...prev,
       [productId]: !prev?.[productId]
     }));
@@ -70,7 +70,7 @@ const ComparisonTable = ({ products, onRemoveProduct, onAddToWatchlist, onSetPri
                     >
                       <Icon name="X" size={12} />
                     </Button>
-                    
+
                     <div className="space-y-3">
                       <div className="aspect-square w-24 mx-auto bg-muted rounded-lg overflow-hidden">
                         <Image
@@ -79,14 +79,12 @@ const ComparisonTable = ({ products, onRemoveProduct, onAddToWatchlist, onSetPri
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      
+
                       <div className="text-center">
                         <h3 className="font-semibold text-foreground text-sm line-clamp-2">
                           {product?.name}
                         </h3>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {product?.brand}
-                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">{product?.brand}</p>
                       </div>
                     </div>
                   </div>
@@ -94,7 +92,7 @@ const ComparisonTable = ({ products, onRemoveProduct, onAddToWatchlist, onSetPri
               ))}
             </tr>
           </thead>
-          
+
           <tbody>
             {/* Price Row */}
             <tr className="border-b border-border">
@@ -111,14 +109,20 @@ const ComparisonTable = ({ products, onRemoveProduct, onAddToWatchlist, onSetPri
                           ₹{Number(product?.originalPrice || 0).toLocaleString('en-IN')}
                         </span>
                         <span className="text-sm text-success font-medium">
-                          {Math.round(((product?.originalPrice - product?.currentPrice) / product?.originalPrice) * 100)}% off
+                          {Math.round(
+                            ((product?.originalPrice - product?.currentPrice) /
+                              product?.originalPrice) *
+                              100
+                          )}
+                          % off
                         </span>
                       </div>
                     )}
                     <div className="flex items-center space-x-1">
                       <Icon name="TrendingDown" size={14} className="text-success" />
                       <span className="text-xs text-success">
-                        ₹{Math.abs(Number(product?.priceChange || 0)).toLocaleString('en-IN')} in 30 days
+                        ₹{Math.abs(Number(product?.priceChange || 0)).toLocaleString('en-IN')} in 30
+                        days
                       </span>
                     </div>
                   </div>
@@ -134,19 +138,25 @@ const ComparisonTable = ({ products, onRemoveProduct, onAddToWatchlist, onSetPri
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Value</span>
-                      <div className={`px-2 py-1 rounded text-xs font-medium ${getScoreBg(product?.aiScores?.value)} ${getScoreColor(product?.aiScores?.value)}`}>
+                      <div
+                        className={`px-2 py-1 rounded text-xs font-medium ${getScoreBg(product?.aiScores?.value)} ${getScoreColor(product?.aiScores?.value)}`}
+                      >
                         {product?.aiScores?.value}/100
                       </div>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Quality</span>
-                      <div className={`px-2 py-1 rounded text-xs font-medium ${getScoreBg(product?.aiScores?.quality)} ${getScoreColor(product?.aiScores?.quality)}`}>
+                      <div
+                        className={`px-2 py-1 rounded text-xs font-medium ${getScoreBg(product?.aiScores?.quality)} ${getScoreColor(product?.aiScores?.quality)}`}
+                      >
                         {product?.aiScores?.quality}/100
                       </div>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Deal Urgency</span>
-                      <div className={`px-2 py-1 rounded text-xs font-medium ${getUrgencyColor(product?.aiScores?.urgency)}`}>
+                      <div
+                        className={`px-2 py-1 rounded text-xs font-medium ${getUrgencyColor(product?.aiScores?.urgency)}`}
+                      >
                         {product?.aiScores?.urgency}/100
                       </div>
                     </div>
@@ -168,13 +178,15 @@ const ComparisonTable = ({ products, onRemoveProduct, onAddToWatchlist, onSetPri
                             key={i}
                             name="Star"
                             size={16}
-                            className={i < Math.floor(product?.rating) ? 'text-warning fill-current' : 'text-muted-foreground'}
+                            className={
+                              i < Math.floor(product?.rating)
+                                ? 'text-warning fill-current'
+                                : 'text-muted-foreground'
+                            }
                           />
                         ))}
                       </div>
-                      <span className="text-sm font-medium text-foreground">
-                        {product?.rating}
-                      </span>
+                      <span className="text-sm font-medium text-foreground">{product?.rating}</span>
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {product?.reviewCount?.toLocaleString()} reviews
@@ -196,12 +208,14 @@ const ComparisonTable = ({ products, onRemoveProduct, onAddToWatchlist, onSetPri
               {products?.map((product) => (
                 <td key={product?.id} className="p-4">
                   <div className="space-y-2">
-                    {product?.keySpecs?.slice(0, expandedSpecs?.[product?.id] ? product?.keySpecs?.length : 3)?.map((spec, index) => (
-                      <div key={index} className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">{spec?.name}</span>
-                        <span className="text-foreground font-medium">{spec?.value}</span>
-                      </div>
-                    ))}
+                    {product?.keySpecs
+                      ?.slice(0, expandedSpecs?.[product?.id] ? product?.keySpecs?.length : 3)
+                      ?.map((spec, index) => (
+                        <div key={index} className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">{spec?.name}</span>
+                          <span className="text-foreground font-medium">{spec?.value}</span>
+                        </div>
+                      ))}
                     {product?.keySpecs?.length > 3 && (
                       <Button
                         variant="ghost"
@@ -209,7 +223,9 @@ const ComparisonTable = ({ products, onRemoveProduct, onAddToWatchlist, onSetPri
                         onClick={() => toggleSpecs(product?.id)}
                         className="text-xs text-primary"
                       >
-                        {expandedSpecs?.[product?.id] ? 'Show Less' : `Show ${product?.keySpecs?.length - 3} More`}
+                        {expandedSpecs?.[product?.id]
+                          ? 'Show Less'
+                          : `Show ${product?.keySpecs?.length - 3} More`}
                       </Button>
                     )}
                   </div>
@@ -227,20 +243,34 @@ const ComparisonTable = ({ products, onRemoveProduct, onAddToWatchlist, onSetPri
                       <h4 className="text-sm font-medium text-success mb-1">Pros</h4>
                       <ul className="space-y-1">
                         {product?.aiAnalysis?.pros?.map((pro, index) => (
-                          <li key={index} className="text-xs text-muted-foreground flex items-start space-x-1">
-                            <Icon name="Plus" size={12} className="text-success mt-0.5 flex-shrink-0" />
+                          <li
+                            key={index}
+                            className="text-xs text-muted-foreground flex items-start space-x-1"
+                          >
+                            <Icon
+                              name="Plus"
+                              size={12}
+                              className="text-success mt-0.5 flex-shrink-0"
+                            />
                             <span>{pro}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
-                    
+
                     <div>
                       <h4 className="text-sm font-medium text-error mb-1">Cons</h4>
                       <ul className="space-y-1">
                         {product?.aiAnalysis?.cons?.map((con, index) => (
-                          <li key={index} className="text-xs text-muted-foreground flex items-start space-x-1">
-                            <Icon name="Minus" size={12} className="text-error mt-0.5 flex-shrink-0" />
+                          <li
+                            key={index}
+                            className="text-xs text-muted-foreground flex items-start space-x-1"
+                          >
+                            <Icon
+                              name="Minus"
+                              size={12}
+                              className="text-error mt-0.5 flex-shrink-0"
+                            />
                             <span>{con}</span>
                           </li>
                         ))}
@@ -266,7 +296,7 @@ const ComparisonTable = ({ products, onRemoveProduct, onAddToWatchlist, onSetPri
                     >
                       Buy Now - ₹{product?.currentPrice}
                     </Button>
-                    
+
                     <div className="grid grid-cols-2 gap-2">
                       <Button
                         variant="outline"

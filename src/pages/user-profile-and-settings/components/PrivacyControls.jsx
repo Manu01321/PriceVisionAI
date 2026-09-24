@@ -49,13 +49,24 @@ const PrivacyControls = ({ privacySettings, onUpdatePrivacy }) => {
       id: 'balanced',
       title: 'Balanced',
       description: 'Moderate personalization with privacy protection',
-      features: ['Personalized recommendations', 'Smart price predictions', 'Behavioral insights', 'Anonymous analytics']
+      features: [
+        'Personalized recommendations',
+        'Smart price predictions',
+        'Behavioral insights',
+        'Anonymous analytics'
+      ]
     },
     {
       id: 'full',
       title: 'Full Personalization',
       description: 'Complete AI assistance with all features',
-      features: ['Advanced AI recommendations', 'Predictive shopping', 'Full behavioral analysis', 'Cross-device sync', 'Social features']
+      features: [
+        'Advanced AI recommendations',
+        'Predictive shopping',
+        'Full behavioral analysis',
+        'Cross-device sync',
+        'Social features'
+      ]
     }
   ];
 
@@ -87,7 +98,7 @@ const PrivacyControls = ({ privacySettings, onUpdatePrivacy }) => {
   ];
 
   const handleDataSharingToggle = (categoryId) => {
-    setLocalSettings(prev => ({
+    setLocalSettings((prev) => ({
       ...prev,
       dataSharing: {
         ...prev?.dataSharing,
@@ -98,7 +109,7 @@ const PrivacyControls = ({ privacySettings, onUpdatePrivacy }) => {
   };
 
   const handleAILevelChange = (level) => {
-    setLocalSettings(prev => ({
+    setLocalSettings((prev) => ({
       ...prev,
       aiPersonalizationLevel: level
     }));
@@ -106,7 +117,7 @@ const PrivacyControls = ({ privacySettings, onUpdatePrivacy }) => {
   };
 
   const handleMarketingToggle = (preferenceId) => {
-    setLocalSettings(prev => ({
+    setLocalSettings((prev) => ({
       ...prev,
       marketingPreferences: {
         ...prev?.marketingPreferences,
@@ -117,7 +128,7 @@ const PrivacyControls = ({ privacySettings, onUpdatePrivacy }) => {
   };
 
   const handleGDPRToggle = (setting) => {
-    setLocalSettings(prev => ({
+    setLocalSettings((prev) => ({
       ...prev,
       gdprSettings: {
         ...prev?.gdprSettings,
@@ -174,22 +185,29 @@ const PrivacyControls = ({ privacySettings, onUpdatePrivacy }) => {
           <h4 className="text-sm font-medium text-foreground mb-4">Data Sharing Preferences</h4>
           <div className="space-y-4">
             {dataCategories?.map((category) => (
-              <div key={category?.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
+              <div
+                key={category?.id}
+                className="flex items-center justify-between p-4 border border-border rounded-lg"
+              >
                 <div className="flex items-center space-x-3">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    category?.sensitive ? 'bg-warning/10' : 'bg-muted'
-                  }`}>
-                    <Icon 
-                      name={category?.icon} 
-                      size={20} 
-                      className={category?.sensitive ? 'text-warning' : 'text-muted-foreground'} 
+                  <div
+                    className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      category?.sensitive ? 'bg-warning/10' : 'bg-muted'
+                    }`}
+                  >
+                    <Icon
+                      name={category?.icon}
+                      size={20}
+                      className={category?.sensitive ? 'text-warning' : 'text-muted-foreground'}
                     />
                   </div>
                   <div>
                     <div className="flex items-center space-x-2">
                       <span className="font-medium text-foreground">{category?.title}</span>
                       {category?.sensitive && (
-                        <span className="px-2 py-1 bg-warning/10 text-warning text-xs rounded-full">Sensitive</span>
+                        <span className="px-2 py-1 bg-warning/10 text-warning text-xs rounded-full">
+                          Sensitive
+                        </span>
                       )}
                     </div>
                     <div className="text-sm text-muted-foreground">{category?.description}</div>
@@ -214,14 +232,18 @@ const PrivacyControls = ({ privacySettings, onUpdatePrivacy }) => {
                 onClick={() => handleAILevelChange(level?.id)}
                 className={`p-4 rounded-lg border cursor-pointer transition-all ${
                   localSettings?.aiPersonalizationLevel === level?.id
-                    ? 'border-primary bg-primary/5' :'border-border hover:border-primary/50'
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary/50'
                 }`}
               >
                 <div className="flex items-start space-x-3">
-                  <div className={`w-4 h-4 rounded-full border-2 mt-1 ${
-                    localSettings?.aiPersonalizationLevel === level?.id
-                      ? 'border-primary bg-primary' :'border-muted-foreground'
-                  }`}>
+                  <div
+                    className={`w-4 h-4 rounded-full border-2 mt-1 ${
+                      localSettings?.aiPersonalizationLevel === level?.id
+                        ? 'border-primary bg-primary'
+                        : 'border-muted-foreground'
+                    }`}
+                  >
                     {localSettings?.aiPersonalizationLevel === level?.id && (
                       <div className="w-full h-full rounded-full bg-white scale-50"></div>
                     )}
@@ -231,7 +253,10 @@ const PrivacyControls = ({ privacySettings, onUpdatePrivacy }) => {
                     <div className="text-sm text-muted-foreground mb-2">{level?.description}</div>
                     <div className="flex flex-wrap gap-2">
                       {level?.features?.map((feature, index) => (
-                        <span key={index} className="px-2 py-1 bg-muted text-xs rounded-full text-muted-foreground">
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-muted text-xs rounded-full text-muted-foreground"
+                        >
                           {feature}
                         </span>
                       ))}
@@ -248,7 +273,10 @@ const PrivacyControls = ({ privacySettings, onUpdatePrivacy }) => {
           <h4 className="text-sm font-medium text-foreground mb-4">Marketing Communications</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {marketingPreferences?.map((preference) => (
-              <div key={preference?.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
+              <div
+                key={preference?.id}
+                className="flex items-center justify-between p-4 border border-border rounded-lg"
+              >
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
                     <Icon name={preference?.icon} size={16} className="text-muted-foreground" />
@@ -276,7 +304,13 @@ const PrivacyControls = ({ privacySettings, onUpdatePrivacy }) => {
                 <div className="font-medium text-foreground">Data Portability</div>
                 <div className="text-sm text-muted-foreground">Download all your personal data</div>
               </div>
-              <Button variant="outline" size="sm" onClick={handleExportData} iconName="Download" iconPosition="left">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportData}
+                iconName="Download"
+                iconPosition="left"
+              >
                 Export Data
               </Button>
             </div>
@@ -284,9 +318,17 @@ const PrivacyControls = ({ privacySettings, onUpdatePrivacy }) => {
             <div className="flex items-center justify-between p-4 border border-border rounded-lg">
               <div>
                 <div className="font-medium text-foreground">Right to be Forgotten</div>
-                <div className="text-sm text-muted-foreground">Permanently delete your account and data</div>
+                <div className="text-sm text-muted-foreground">
+                  Permanently delete your account and data
+                </div>
               </div>
-              <Button variant="destructive" size="sm" onClick={handleDeleteAccount} iconName="Trash2" iconPosition="left">
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleDeleteAccount}
+                iconName="Trash2"
+                iconPosition="left"
+              >
                 Delete Account
               </Button>
             </div>
@@ -321,7 +363,7 @@ const PrivacyControls = ({ privacySettings, onUpdatePrivacy }) => {
             <div>
               <h5 className="font-medium text-foreground mb-2">Your Privacy Matters</h5>
               <p className="text-sm text-muted-foreground mb-3">
-                We are committed to protecting your privacy and giving you control over your data. 
+                We are committed to protecting your privacy and giving you control over your data.
                 All settings are applied immediately and you can change them at any time.
               </p>
               <div className="flex space-x-4 text-xs">

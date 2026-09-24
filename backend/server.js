@@ -51,12 +51,14 @@ app.options('*', (req, res) => {
 });
 
 // CORS middleware - must come before helmet
-app.use(cors({
-  origin: '*',
-  credentials: false,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
-}));
+app.use(
+  cors({
+    origin: '*',
+    credentials: false,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
+  })
+);
 
 // Explicit CORS headers for all responses
 app.use((req, res, next) => {
@@ -67,11 +69,13 @@ app.use((req, res, next) => {
 });
 
 // Helmet with relaxed settings for development
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-  crossOriginOpenerPolicy: false,
-  crossOriginEmbedderPolicy: false
-}));
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginOpenerPolicy: false,
+    crossOriginEmbedderPolicy: false
+  })
+);
 
 // Rate limiting
 const limiter = rateLimit({
@@ -108,13 +112,17 @@ async function initializeServices() {
     await browserPool.initialize();
     logger.info('Browser pool initialized successfully');
   } catch (error) {
-    logger.warn('Browser pool unavailable (run: npx playwright install). Scraping features disabled.');
+    logger.warn(
+      'Browser pool unavailable (run: npx playwright install). Scraping features disabled.'
+    );
     browserPool = null;
   }
 
   // Initialize services (work with or without browser pool)
   try {
-    productSearchService = new ProductSearchService(browserPool, logger, { cacheClient: redisClient });
+    productSearchService = new ProductSearchService(browserPool, logger, {
+      cacheClient: redisClient
+    });
     priceTracker = new PriceTracker(browserPool, logger);
     imageSearchService = new ImageSearchService(browserPool, logger, { cacheClient: redisClient });
     logger.info('All services initialized successfully');
@@ -144,7 +152,7 @@ app.get('/api/health', (req, res) => {
 app.post('/api/search/text', async (req, res) => {
   try {
     const { query, filters = {}, limit = 20 } = req.body;
-    
+
     if (!query || query.trim().length < 2) {
       return res.status(400).json({
         error: 'Search query must be at least 2 characters long'
@@ -152,12 +160,12 @@ app.post('/api/search/text', async (req, res) => {
     }
 
     logger.info(`Text search request: "${query}"`);
-    
+
     const results = await productSearchService.searchByText(query, {
       ...filters,
       limit: Math.min(limit, 50) // Cap at 50 results
     });
-    
+
     res.json({
       success: true,
       query,
@@ -188,7 +196,7 @@ app.post('/api/search/image', upload.single('image'), async (req, res) => {
     if (req.file) {
       imageBase64 = req.file.buffer.toString('base64');
     }
-    
+
     if (!imageUrl && !imageBase64) {
       return res.status(400).json({
         error: 'Either imageUrl or imageBase64 is required'
@@ -196,14 +204,14 @@ app.post('/api/search/image', upload.single('image'), async (req, res) => {
     }
 
     logger.info('Image search request received');
-    
+
     const results = await imageSearchService.searchByImage({
       imageUrl,
       imageBase64,
       confidence: Math.min(Math.max(confidence, 0.1), 1.0),
       limit: Math.min(limit, 30)
     });
-    
+
     const extractedInfo = results.extractedInfo || results.aiAnalysis || {};
     res.json({
       success: true,
@@ -231,7 +239,7 @@ app.post('/api/analyze/image', upload.single('image'), async (req, res) => {
     if (req.file) {
       imageBase64 = req.file.buffer.toString('base64');
     }
-    
+
     if (!imageBase64) {
       return res.status(400).json({
         error: 'imageBase64 is required for analysis'
@@ -239,14 +247,14 @@ app.post('/api/analyze/image', upload.single('image'), async (req, res) => {
     }
 
     logger.info('Image analysis request received');
-    
-    // Extract just the AI analysis part  
+
+    // Extract just the AI analysis part
     const analysis = await imageSearchService.searchByImage({
       imageBase64,
       confidence: 0.8,
       limit: 1
     });
-    
+
     const extractedInfo = analysis.extractedInfo || analysis.aiAnalysis || {};
     res.json({
       success: true,
@@ -268,7 +276,7 @@ app.post('/api/analyze/image', upload.single('image'), async (req, res) => {
 app.post('/api/product/details', async (req, res) => {
   try {
     const { productUrl } = req.body;
-    
+
     if (!productUrl) {
       return res.status(400).json({
         error: 'Product URL is required'
@@ -276,7 +284,7 @@ app.post('/api/product/details', async (req, res) => {
     }
 
     logger.info(`Product details request: ${productUrl}`);
-    
+
     // Determine which scraper to use based on URL
     let scraper;
     if (productUrl.includes('amazon.in')) {
@@ -290,11 +298,14 @@ app.post('/api/product/details', async (req, res) => {
         error: 'Unsupported product URL. Currently supports Amazon India and Flipkart.'
       });
     }
-    
-    const productData = await scraper.extractProductData({ 
-      release: () => {} // Mock release function
-    }, productUrl);
-    
+
+    const productData = await scraper.extractProductData(
+      {
+        release: () => {} // Mock release function
+      },
+      productUrl
+    );
+
     res.json({
       success: true,
       product: productData,
@@ -313,7 +324,7 @@ app.post('/api/product/details', async (req, res) => {
 app.post('/api/compare/prices', async (req, res) => {
   try {
     const { productName, productUrl, sites = [] } = req.body;
-    
+
     if (!productName || productName.trim().length < 2) {
       return res.status(400).json({
         error: 'Product name is required'
@@ -321,13 +332,13 @@ app.post('/api/compare/prices', async (req, res) => {
     }
 
     logger.info(`Price comparison request: "${productName}"`);
-    
+
     const comparison = await priceTracker.compareAcrossSites({
       productName: productName.trim(),
       productUrl,
       targetSites: sites.length > 0 ? sites : ['amazon', 'flipkart', 'myntra', 'snapdeal']
     });
-    
+
     res.json({
       success: true,
       productName,
@@ -347,7 +358,7 @@ app.post('/api/compare/prices', async (req, res) => {
 app.post('/api/track/product', async (req, res) => {
   try {
     const { productUrl, targetPrice, notificationMethod } = req.body;
-    
+
     if (!productUrl) {
       return res.status(400).json({
         error: 'Product URL is required'
@@ -355,13 +366,13 @@ app.post('/api/track/product', async (req, res) => {
     }
 
     logger.info(`Price tracking request: ${productUrl}`);
-    
+
     const trackingId = await priceTracker.addToTracking({
       productUrl,
       targetPrice: targetPrice ? parseFloat(targetPrice) : null,
       notificationMethod: notificationMethod || 'api'
     });
-    
+
     res.json({
       success: true,
       trackingId,
@@ -381,11 +392,11 @@ app.post('/api/track/product', async (req, res) => {
 app.delete('/api/track/product/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     logger.info(`Remove tracking request: ${id}`);
-    
+
     await priceTracker.removeFromTracking(id);
-    
+
     res.json({
       success: true,
       message: 'Product removed from tracking',
@@ -405,11 +416,11 @@ app.put('/api/track/product/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
-    
+
     logger.info(`Update tracking settings: ${id}`);
-    
+
     const updatedTracking = await priceTracker.updateTrackingSettings(id, updates);
-    
+
     res.json({
       success: true,
       trackingData: updatedTracking,
@@ -429,9 +440,9 @@ app.put('/api/track/product/:id', async (req, res) => {
 app.post('/api/track/sync', async (req, res) => {
   try {
     const { trackingIds = [] } = req.body;
-    
+
     logger.info(`Sync tracking data for ${trackingIds.length} products`);
-    
+
     // Get current tracking data for requested IDs
     const updates = [];
     for (const trackingId of trackingIds) {
@@ -448,7 +459,7 @@ app.post('/api/track/sync', async (req, res) => {
         logger.warn(`Failed to sync tracking ${trackingId}:`, error.message);
       }
     }
-    
+
     res.json({
       success: true,
       updates,
@@ -536,7 +547,7 @@ app.get('/api/config', (req, res) => {
 app.post('/api/ai/search', async (req, res) => {
   try {
     const { query, context = {} } = req.body;
-    
+
     if (!query || query.trim().length < 2) {
       return res.status(400).json({
         error: 'Search query must be at least 2 characters long'
@@ -544,9 +555,9 @@ app.post('/api/ai/search', async (req, res) => {
     }
 
     logger.info(`AI-powered search request: "${query}"`);
-    
+
     const aiSearchResult = await OpenAIService.searchProduct(query, context);
-    
+
     res.json({
       success: true,
       query,
@@ -567,12 +578,9 @@ app.post('/api/ai/recommendations', async (req, res) => {
     const { userPreferences = {}, recentSearches = [] } = req.body;
 
     logger.info('AI recommendations request');
-    
-    const recommendations = await OpenAIService.getRecommendations(
-      userPreferences,
-      recentSearches
-    );
-    
+
+    const recommendations = await OpenAIService.getRecommendations(userPreferences, recentSearches);
+
     res.json({
       success: true,
       recommendations,
@@ -590,7 +598,7 @@ app.post('/api/ai/recommendations', async (req, res) => {
 app.post('/api/ai/analyze-price', async (req, res) => {
   try {
     const { priceHistory, productName } = req.body;
-    
+
     if (!priceHistory || !Array.isArray(priceHistory) || priceHistory.length === 0) {
       return res.status(400).json({
         error: 'Price history array is required'
@@ -598,9 +606,9 @@ app.post('/api/ai/analyze-price', async (req, res) => {
     }
 
     logger.info(`AI price analysis request for: "${productName}"`);
-    
+
     const analysis = await OpenAIService.analyzePriceTrend(priceHistory, productName);
-    
+
     res.json({
       success: true,
       productName,
@@ -619,7 +627,7 @@ app.post('/api/ai/analyze-price', async (req, res) => {
 app.post('/api/ai/analyze-product-image', async (req, res) => {
   try {
     const { imageUrl, prompt } = req.body;
-    
+
     if (!imageUrl) {
       return res.status(400).json({
         error: 'Image URL is required'
@@ -627,9 +635,9 @@ app.post('/api/ai/analyze-product-image', async (req, res) => {
     }
 
     logger.info('AI image analysis request (OpenAI Vision)');
-    
+
     const analysis = await OpenAIService.analyzeImage(imageUrl, prompt);
-    
+
     res.json({
       success: true,
       analysis: analysis.choices[0].message.content,
@@ -648,7 +656,7 @@ app.post('/api/ai/analyze-product-image', async (req, res) => {
 app.post('/api/ai/chat', async (req, res) => {
   try {
     const { messages, options = {} } = req.body;
-    
+
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({
         error: 'Messages array is required'
@@ -656,9 +664,9 @@ app.post('/api/ai/chat', async (req, res) => {
     }
 
     logger.info('AI chat request');
-    
+
     const response = await OpenAIService.createChatCompletion(messages, options);
-    
+
     res.json({
       success: true,
       response: response.choices[0].message,
@@ -678,7 +686,7 @@ app.post('/api/ai/chat', async (req, res) => {
 app.get('/api/ai/status', (req, res) => {
   try {
     const status = OpenAIService.getStatus();
-    
+
     res.json({
       success: true,
       openai: status,
@@ -696,7 +704,7 @@ app.get('/api/ai/status', (req, res) => {
 app.post('/api/ai/reset-keys', (req, res) => {
   try {
     OpenAIService.resetKeys();
-    
+
     res.json({
       success: true,
       message: 'All OpenAI API keys have been reset',
@@ -762,21 +770,21 @@ app.use('*', (req, res) => {
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   logger.info('Received SIGTERM, shutting down gracefully...');
-  
+
   if (browserPool) {
     await browserPool.cleanup();
   }
-  
+
   process.exit(0);
 });
 
 process.on('SIGINT', async () => {
   logger.info('Received SIGINT, shutting down gracefully...');
-  
+
   if (browserPool) {
     await browserPool.cleanup();
   }
-  
+
   process.exit(0);
 });
 
@@ -788,7 +796,9 @@ async function startServer() {
     logger.info(`🚀 Price Vision Backend running on port ${PORT}`);
     logger.info(`🌐 API endpoints available at http://localhost:${PORT}/api`);
     logger.info(`📊 Health check: http://localhost:${PORT}/api/health`);
-    logger.info(`⚠️  Scraping: ${browserPool ? 'enabled' : 'disabled (run: npx playwright install)'}`);
+    logger.info(
+      `⚠️  Scraping: ${browserPool ? 'enabled' : 'disabled (run: npx playwright install)'}`
+    );
   });
 }
 

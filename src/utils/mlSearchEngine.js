@@ -21,16 +21,20 @@ function productToDocument(product) {
     product.category,
     ...(product.features || []),
     product.aiInsight || '',
-    String(product.currentPrice || ''),
+    String(product.currentPrice || '')
   ].join(' ');
 }
 
 // ─── TF (term frequency within a document) ────────────────────────────────────
 function computeTF(tokens) {
   const tf = {};
-  tokens.forEach((t) => { tf[t] = (tf[t] || 0) + 1; });
+  tokens.forEach((t) => {
+    tf[t] = (tf[t] || 0) + 1;
+  });
   const total = tokens.length || 1;
-  Object.keys(tf).forEach((t) => { tf[t] /= total; });
+  Object.keys(tf).forEach((t) => {
+    tf[t] /= total;
+  });
   return tf;
 }
 
@@ -40,7 +44,9 @@ function computeIDF(corpus) {
   const df = {};
   corpus.forEach((tokens) => {
     const unique = new Set(tokens);
-    unique.forEach((t) => { df[t] = (df[t] || 0) + 1; });
+    unique.forEach((t) => {
+      df[t] = (df[t] || 0) + 1;
+    });
   });
   const idf = {};
   Object.keys(df).forEach((t) => {
@@ -61,12 +67,16 @@ function tfidfVector(tokens, idf) {
 
 // ─── Cosine similarity between two sparse vectors ─────────────────────────────
 function cosineSimilarity(a, b) {
-  let dot = 0, normA = 0, normB = 0;
+  let dot = 0,
+    normA = 0,
+    normB = 0;
   Object.keys(a).forEach((t) => {
     dot += (a[t] || 0) * (b[t] || 0);
     normA += a[t] ** 2;
   });
-  Object.keys(b).forEach((t) => { normB += b[t] ** 2; });
+  Object.keys(b).forEach((t) => {
+    normB += b[t] ** 2;
+  });
   if (!normA || !normB) return 0;
   return dot / (Math.sqrt(normA) * Math.sqrt(normB));
 }
@@ -87,7 +97,9 @@ class MLSearchEngine {
     this.idf = computeIDF(corpus);
     this.docVectors = corpus.map((tokens) => tfidfVector(tokens, this.idf));
     this.trained = true;
-    console.log(`[MLSearchEngine] Trained on ${products.length} products, vocab size: ${Object.keys(this.idf).length}`);
+    console.log(
+      `[MLSearchEngine] Trained on ${products.length} products, vocab size: ${Object.keys(this.idf).length}`
+    );
   }
 
   /**
@@ -121,7 +133,7 @@ class MLSearchEngine {
       .slice(0, topK)
       .map((s) => ({
         ...s.product,
-        confidence: Math.min(99, Math.round(50 + s.score * 200)),
+        confidence: Math.min(99, Math.round(50 + s.score * 200))
       }));
 
     return this._applyFilters(relevant, filters);
@@ -129,16 +141,19 @@ class MLSearchEngine {
 
   _applyFilters(products, filters) {
     let result = [...products];
-    if (filters?.priceRange?.min) result = result.filter((p) => p.currentPrice >= +filters.priceRange.min);
-    if (filters?.priceRange?.max) result = result.filter((p) => p.currentPrice <= +filters.priceRange.max);
+    if (filters?.priceRange?.min)
+      result = result.filter((p) => p.currentPrice >= +filters.priceRange.min);
+    if (filters?.priceRange?.max)
+      result = result.filter((p) => p.currentPrice <= +filters.priceRange.max);
     if (filters?.brand?.length) result = result.filter((p) => filters.brand.includes(p.brand));
-    if (filters?.category?.length) result = result.filter((p) => filters.category.includes(p.category));
+    if (filters?.category?.length)
+      result = result.filter((p) => filters.category.includes(p.category));
     if (filters?.sortBy) {
       const sorts = {
         price_low: (a, b) => a.currentPrice - b.currentPrice,
         price_high: (a, b) => b.currentPrice - a.currentPrice,
         rating: (a, b) => b.rating - a.rating,
-        deal_quality: (a, b) => b.dealUrgency - a.dealUrgency,
+        deal_quality: (a, b) => b.dealUrgency - a.dealUrgency
       };
       if (sorts[filters.sortBy]) result.sort(sorts[filters.sortBy]);
     }

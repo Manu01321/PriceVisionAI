@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const ComparisonActions = ({ 
-  selectedProducts, 
-  onExportComparison, 
-  onSaveComparison, 
+const ComparisonActions = ({
+  selectedProducts,
+  onExportComparison,
+  onSaveComparison,
   onShareComparison,
   onClearAll,
-  onAddProduct 
+  onAddProduct
 }) => {
   const [isExporting, setIsExporting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -75,19 +75,36 @@ const ComparisonActions = ({
         </div>
         <div className="text-center p-3 bg-muted/30 rounded-lg">
           <div className="text-lg font-bold text-success">
-            ₹{selectedProducts?.length ? Math.min(...selectedProducts.map(p => Number(p?.currentPrice || 0))).toLocaleString('en-IN') : 0}
+            ₹
+            {selectedProducts?.length
+              ? Math.min(
+                  ...selectedProducts.map((p) => Number(p?.currentPrice || 0))
+                ).toLocaleString('en-IN')
+              : 0}
           </div>
           <div className="text-xs text-muted-foreground">Lowest Price</div>
         </div>
         <div className="text-center p-3 bg-muted/30 rounded-lg">
           <div className="text-lg font-bold text-error">
-            ₹{selectedProducts?.length ? Math.max(...selectedProducts.map(p => Number(p?.currentPrice || 0))).toLocaleString('en-IN') : 0}
+            ₹
+            {selectedProducts?.length
+              ? Math.max(
+                  ...selectedProducts.map((p) => Number(p?.currentPrice || 0))
+                ).toLocaleString('en-IN')
+              : 0}
           </div>
           <div className="text-xs text-muted-foreground">Highest Price</div>
         </div>
         <div className="text-center p-3 bg-muted/30 rounded-lg">
           <div className="text-lg font-bold text-warning">
-            {selectedProducts?.length ? Math.round(selectedProducts.reduce((sum, p) => sum + Number(p?.aiScores?.value || p?.confidence || 85), 0) / selectedProducts.length) : 0}
+            {selectedProducts?.length
+              ? Math.round(
+                  selectedProducts.reduce(
+                    (sum, p) => sum + Number(p?.aiScores?.value || p?.confidence || 85),
+                    0
+                  ) / selectedProducts.length
+                )
+              : 0}
           </div>
           <div className="text-xs text-muted-foreground">Avg AI Score</div>
         </div>
@@ -104,7 +121,7 @@ const ComparisonActions = ({
           >
             Add Product
           </Button>
-          
+
           <Button
             variant="outline"
             onClick={handleSave}
@@ -154,13 +171,10 @@ const ComparisonActions = ({
             >
               Share Comparison
             </Button>
-            
+
             {showShareMenu && (
               <>
-                <div 
-                  className="fixed inset-0 z-200" 
-                  onClick={() => setShowShareMenu(false)}
-                />
+                <div className="fixed inset-0 z-200" onClick={() => setShowShareMenu(false)} />
                 <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-border rounded-lg shadow-elevated z-300 animate-slide-up">
                   <div className="py-2">
                     {shareOptions?.map((option) => (
@@ -193,7 +207,7 @@ const ComparisonActions = ({
           >
             Clear All
           </Button>
-          
+
           <Button
             variant="ghost"
             size="sm"
@@ -203,7 +217,7 @@ const ComparisonActions = ({
           >
             Refresh Prices
           </Button>
-          
+
           <Button
             variant="ghost"
             size="sm"
@@ -222,24 +236,31 @@ const ComparisonActions = ({
             <Icon name="Brain" size={16} className="text-accent" />
             <h4 className="font-medium text-foreground">AI Comparison Insights</h4>
           </div>
-          
+
           <div className="space-y-2 text-sm">
             <div className="flex items-start space-x-2">
               <Icon name="TrendingUp" size={14} className="text-success mt-0.5" />
               <span className="text-muted-foreground">
-                Best value: {selectedProducts?.reduce((best, product) => 
-                  product?.aiScores?.value > best?.aiScores?.value ? product : best
-                )?.name?.split(' ')?.slice(0, 2)?.join(' ')}
+                Best value:{' '}
+                {selectedProducts
+                  ?.reduce((best, product) =>
+                    product?.aiScores?.value > best?.aiScores?.value ? product : best
+                  )
+                  ?.name?.split(' ')
+                  ?.slice(0, 2)
+                  ?.join(' ')}
               </span>
             </div>
-            
+
             <div className="flex items-start space-x-2">
               <Icon name="DollarSign" size={14} className="text-primary mt-0.5" />
               <span className="text-muted-foreground">
-                Price difference: ₹{Math.max(...selectedProducts?.map(p => p?.currentPrice)) - Math.min(...selectedProducts?.map(p => p?.currentPrice))}
+                Price difference: ₹
+                {Math.max(...selectedProducts?.map((p) => p?.currentPrice)) -
+                  Math.min(...selectedProducts?.map((p) => p?.currentPrice))}
               </span>
             </div>
-            
+
             <div className="flex items-start space-x-2">
               <Icon name="Clock" size={14} className="text-warning mt-0.5" />
               <span className="text-muted-foreground">

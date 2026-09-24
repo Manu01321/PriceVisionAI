@@ -1,8 +1,11 @@
 const KEY = 'pv_user';
 
 export function getUser() {
-  try { return JSON.parse(localStorage.getItem(KEY)) || null; }
-  catch { return null; }
+  try {
+    return JSON.parse(localStorage.getItem(KEY)) || null;
+  } catch {
+    return null;
+  }
 }
 
 export function saveUser(data) {

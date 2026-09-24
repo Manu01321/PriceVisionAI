@@ -13,7 +13,7 @@ const ReviewAnalysis = ({ products }) => {
     { id: 'authenticity', label: 'Authenticity', icon: 'Shield' }
   ];
 
-  const selectedProductData = products?.find(p => p?.id === selectedProduct);
+  const selectedProductData = products?.find((p) => p?.id === selectedProduct);
 
   const reviewAnalysis = selectedProductData?.reviewAnalysis || {
     positiveHighlights: [
@@ -27,13 +27,32 @@ const ReviewAnalysis = ({ products }) => {
     ],
     aiSummary: `${selectedProductData?.name || 'This product'} shows strong buyer satisfaction with an average rating of ${selectedProductData?.rating || 4.5}/5. Verified reviews highlight competitive value and robust design.`,
     sentimentBreakdown: {
-      positive: { percentage: 76, count: Math.round(Number(selectedProductData?.reviewCount || 1000) * 0.76) },
-      neutral: { percentage: 16, count: Math.round(Number(selectedProductData?.reviewCount || 1000) * 0.16) },
-      negative: { percentage: 8, count: Math.round(Number(selectedProductData?.reviewCount || 1000) * 0.08) }
+      positive: {
+        percentage: 76,
+        count: Math.round(Number(selectedProductData?.reviewCount || 1000) * 0.76)
+      },
+      neutral: {
+        percentage: 16,
+        count: Math.round(Number(selectedProductData?.reviewCount || 1000) * 0.16)
+      },
+      negative: {
+        percentage: 8,
+        count: Math.round(Number(selectedProductData?.reviewCount || 1000) * 0.08)
+      }
     },
     sentimentTrends: [
-      { period: 'Last 30 days', sentiment: 'positive', change: '+5%', description: 'Improved after recent updates' },
-      { period: 'Last 7 days', sentiment: 'positive', change: '+2%', description: 'Price drop appreciation' }
+      {
+        period: 'Last 30 days',
+        sentiment: 'positive',
+        change: '+5%',
+        description: 'Improved after recent updates'
+      },
+      {
+        period: 'Last 7 days',
+        sentiment: 'positive',
+        change: '+2%',
+        description: 'Price drop appreciation'
+      }
     ],
     topKeywords: [
       { word: 'quality', mentions: 1240 },
@@ -53,28 +72,56 @@ const ReviewAnalysis = ({ products }) => {
     suspiciousReviews: 18,
     botActivity: 3,
     qualityIndicators: [
-      { metric: 'Verified Purchases', value: '82%', status: 'good', description: 'High verification rate' },
-      { metric: 'Review Length', value: 'Good', status: 'good', description: 'Detailed user reviews' },
-      { metric: 'Review Velocity', value: 'Normal', status: 'good', description: 'Steady review pattern' },
-      { metric: 'Duplicate Content', value: '2%', status: 'good', description: 'Minimal duplicates detected' }
+      {
+        metric: 'Verified Purchases',
+        value: '82%',
+        status: 'good',
+        description: 'High verification rate'
+      },
+      {
+        metric: 'Review Length',
+        value: 'Good',
+        status: 'good',
+        description: 'Detailed user reviews'
+      },
+      {
+        metric: 'Review Velocity',
+        value: 'Normal',
+        status: 'good',
+        description: 'Steady review pattern'
+      },
+      {
+        metric: 'Duplicate Content',
+        value: '2%',
+        status: 'good',
+        description: 'Minimal duplicates detected'
+      }
     ]
   };
 
   const getSentimentColor = (sentiment) => {
     switch (sentiment) {
-      case 'positive': return 'text-success';
-      case 'negative': return 'text-error';
-      case 'neutral': return 'text-warning';
-      default: return 'text-muted-foreground';
+      case 'positive':
+        return 'text-success';
+      case 'negative':
+        return 'text-error';
+      case 'neutral':
+        return 'text-warning';
+      default:
+        return 'text-muted-foreground';
     }
   };
 
   const getSentimentBg = (sentiment) => {
     switch (sentiment) {
-      case 'positive': return 'bg-success/10';
-      case 'negative': return 'bg-error/10';
-      case 'neutral': return 'bg-warning/10';
-      default: return 'bg-muted/10';
+      case 'positive':
+        return 'bg-success/10';
+      case 'negative':
+        return 'bg-error/10';
+      case 'neutral':
+        return 'bg-warning/10';
+      default:
+        return 'bg-muted/10';
     }
   };
 
@@ -126,9 +173,7 @@ const ReviewAnalysis = ({ products }) => {
           <Icon name="Brain" size={16} className="text-accent" />
           <h4 className="font-medium text-foreground">AI Summary</h4>
         </div>
-        <p className="text-sm text-muted-foreground">
-          {reviewAnalysis?.aiSummary}
-        </p>
+        <p className="text-sm text-muted-foreground">{reviewAnalysis?.aiSummary}</p>
       </div>
     </div>
   );
@@ -137,7 +182,10 @@ const ReviewAnalysis = ({ products }) => {
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-4">
         {Object.entries(reviewAnalysis?.sentimentBreakdown)?.map(([sentiment, data]) => (
-          <div key={sentiment} className={`${getSentimentBg(sentiment)} rounded-lg p-4 text-center`}>
+          <div
+            key={sentiment}
+            className={`${getSentimentBg(sentiment)} rounded-lg p-4 text-center`}
+          >
             <div className={`text-2xl font-bold ${getSentimentColor(sentiment)}`}>
               {data?.percentage}%
             </div>
@@ -154,10 +202,16 @@ const ReviewAnalysis = ({ products }) => {
         {reviewAnalysis?.sentimentTrends?.map((trend, index) => (
           <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
             <div className="flex items-center space-x-3">
-              <Icon 
-                name={trend?.sentiment === 'positive' ? 'TrendingUp' : trend?.sentiment === 'negative' ? 'TrendingDown' : 'Minus'} 
-                size={16} 
-                className={getSentimentColor(trend?.sentiment)} 
+              <Icon
+                name={
+                  trend?.sentiment === 'positive'
+                    ? 'TrendingUp'
+                    : trend?.sentiment === 'negative'
+                      ? 'TrendingDown'
+                      : 'Minus'
+                }
+                size={16}
+                className={getSentimentColor(trend?.sentiment)}
               />
               <div>
                 <div className="text-sm font-medium text-foreground">{trend?.period}</div>
@@ -179,7 +233,10 @@ const ReviewAnalysis = ({ products }) => {
         <h4 className="font-medium text-foreground mb-3">Most Mentioned Features</h4>
         <div className="flex flex-wrap gap-2">
           {reviewAnalysis?.topKeywords?.map((keyword, index) => (
-            <div key={index} className="flex items-center space-x-2 bg-muted/30 rounded-full px-3 py-1">
+            <div
+              key={index}
+              className="flex items-center space-x-2 bg-muted/30 rounded-full px-3 py-1"
+            >
               <span className="text-sm text-foreground">{keyword?.word}</span>
               <div className="text-xs text-muted-foreground bg-muted rounded-full px-2 py-0.5">
                 {keyword?.mentions}
@@ -203,7 +260,11 @@ const ReviewAnalysis = ({ products }) => {
                         key={i}
                         name="Star"
                         size={12}
-                        className={i < Math.floor(feature?.rating) ? 'text-warning fill-current' : 'text-muted-foreground'}
+                        className={
+                          i < Math.floor(feature?.rating)
+                            ? 'text-warning fill-current'
+                            : 'text-muted-foreground'
+                        }
                       />
                     ))}
                   </div>
@@ -211,7 +272,7 @@ const ReviewAnalysis = ({ products }) => {
                 </div>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
-                <div 
+                <div
                   className="bg-primary h-2 rounded-full transition-all duration-300"
                   style={{ width: `${(feature?.rating / 5) * 100}%` }}
                 ></div>
@@ -262,20 +323,37 @@ const ReviewAnalysis = ({ products }) => {
         {reviewAnalysis?.qualityIndicators?.map((indicator, index) => (
           <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
             <div className="flex items-center space-x-3">
-              <Icon 
-                name={indicator?.status === 'good' ? 'CheckCircle' : indicator?.status === 'warning' ? 'AlertCircle' : 'XCircle'} 
-                size={16} 
-                className={indicator?.status === 'good' ? 'text-success' : indicator?.status === 'warning' ? 'text-warning' : 'text-error'} 
+              <Icon
+                name={
+                  indicator?.status === 'good'
+                    ? 'CheckCircle'
+                    : indicator?.status === 'warning'
+                      ? 'AlertCircle'
+                      : 'XCircle'
+                }
+                size={16}
+                className={
+                  indicator?.status === 'good'
+                    ? 'text-success'
+                    : indicator?.status === 'warning'
+                      ? 'text-warning'
+                      : 'text-error'
+                }
               />
               <div>
                 <div className="text-sm font-medium text-foreground">{indicator?.metric}</div>
                 <div className="text-xs text-muted-foreground">{indicator?.description}</div>
               </div>
             </div>
-            <div className={`text-sm font-medium ${
-              indicator?.status === 'good' ? 'text-success' : 
-              indicator?.status === 'warning' ? 'text-warning' : 'text-error'
-            }`}>
+            <div
+              className={`text-sm font-medium ${
+                indicator?.status === 'good'
+                  ? 'text-success'
+                  : indicator?.status === 'warning'
+                    ? 'text-warning'
+                    : 'text-error'
+              }`}
+            >
               {indicator?.value}
             </div>
           </div>
@@ -301,7 +379,7 @@ const ReviewAnalysis = ({ products }) => {
           {products?.map((product) => (
             <Button
               key={product?.id}
-              variant={selectedProduct === product?.id ? "default" : "outline"}
+              variant={selectedProduct === product?.id ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedProduct(product?.id)}
               className="text-xs"
@@ -320,7 +398,8 @@ const ReviewAnalysis = ({ products }) => {
               onClick={() => setActiveTab(tab?.id)}
               className={`flex items-center space-x-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === tab?.id
-                  ? 'border-primary text-primary bg-primary/5' :'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                  ? 'border-primary text-primary bg-primary/5'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
               }`}
             >
               <Icon name={tab?.icon} size={16} />

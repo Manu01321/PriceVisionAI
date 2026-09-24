@@ -4,30 +4,29 @@ const path = require('path');
 
 async function installDependencies() {
   console.log('🚀 Installing Price Vision Backend Dependencies...\n');
-  
+
   try {
     // Install npm dependencies
     console.log('📦 Installing Node.js packages...');
     await runCommand('npm install');
-    
+
     // Install Playwright browsers
     console.log('🌐 Installing Playwright browsers...');
     await runCommand('npx playwright install chromium');
-    
+
     // Create necessary directories
     console.log('📁 Creating directories...');
     await createDirectories();
-    
+
     // Copy environment file
     console.log('🔧 Setting up environment...');
     await setupEnvironment();
-    
+
     console.log('\n✅ Installation completed successfully!');
     console.log('\n📋 Next steps:');
     console.log('1. Update .env file with your API keys');
     console.log('2. Run: node server.js');
     console.log('3. Visit: http://localhost:5000/api/health');
-    
   } catch (error) {
     console.error('❌ Installation failed:', error.message);
     process.exit(1);
@@ -41,23 +40,18 @@ function runCommand(command) {
         reject(error);
         return;
       }
-      
+
       if (stdout) console.log(stdout);
       if (stderr) console.log(stderr);
-      
+
       resolve();
     });
   });
 }
 
 async function createDirectories() {
-  const directories = [
-    'data',
-    'temp', 
-    'logs',
-    'uploads'
-  ];
-  
+  const directories = ['data', 'temp', 'logs', 'uploads'];
+
   for (const dir of directories) {
     try {
       await fs.mkdir(dir, { recursive: true });
@@ -112,7 +106,7 @@ ENCRYPTION_KEY=your_encryption_key_here
 LOG_LEVEL=info
 LOG_FILE=logs/app.log
 `;
-    
+
     await fs.writeFile('.env', envTemplate);
     console.log('  ✓ Created .env file from template');
   }
@@ -159,7 +153,7 @@ if (require.main === module) {
 
 module.exports = { testBackend };
 `;
-  
+
   await fs.writeFile('test.js', testScript);
   console.log('  ✓ Created test.js script');
 }
@@ -182,7 +176,7 @@ node server.js
 
 pause
 `;
-  
+
   await fs.writeFile('start.bat', startScript);
   console.log('  ✓ Created start.bat script');
 }

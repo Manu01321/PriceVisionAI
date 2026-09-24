@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Icon from '../../../components/AppIcon';
 
-const AIProcessingIndicator = ({ 
+const AIProcessingIndicator = ({
   isProcessing = false,
   processingStage = 'analyzing',
   onComplete,
   showCancelButton = false,
   onCancel,
-  className = "" 
+  className = ''
 }) => {
   const [currentStage, setCurrentStage] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -68,14 +68,14 @@ const AIProcessingIndicator = ({
     const advanceStage = () => {
       if (stageIndex < processingStages?.length - 1) {
         setCurrentStage(stageIndex);
-        
+
         const stageDuration = processingStages?.[stageIndex]?.duration;
-        const progressIncrement = 100 / stageDuration * 50; // Update every 50ms
-        
+        const progressIncrement = (100 / stageDuration) * 50; // Update every 50ms
+
         const progressInterval = setInterval(() => {
           progressValue += progressIncrement;
           setProgress(Math.min(progressValue, (stageIndex + 1) * 20));
-          
+
           if (progressValue >= 20) {
             clearInterval(progressInterval);
             stageIndex++;
@@ -105,26 +105,24 @@ const AIProcessingIndicator = ({
         {/* Header */}
         <div className="text-center mb-6">
           <div className="relative inline-block">
-            <div className={`w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mb-3 ${currentStageData?.color}`}>
-              <Icon 
-                name={currentStageData?.icon} 
-                size={32} 
+            <div
+              className={`w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mb-3 ${currentStageData?.color}`}
+            >
+              <Icon
+                name={currentStageData?.icon}
+                size={32}
                 className={`${currentStageData?.color} ${isProcessing ? 'animate-pulse' : ''}`}
               />
             </div>
-            
+
             {/* Spinning Ring */}
             {isProcessing && (
               <div className="absolute inset-0 border-4 border-transparent border-t-primary rounded-full animate-spin"></div>
             )}
           </div>
-          
-          <h3 className="text-lg font-semibold text-foreground mb-1">
-            {currentStageData?.name}
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            {currentStageData?.description}
-          </p>
+
+          <h3 className="text-lg font-semibold text-foreground mb-1">{currentStageData?.name}</h3>
+          <p className="text-sm text-muted-foreground">{currentStageData?.description}</p>
         </div>
 
         {/* Progress Bar */}
@@ -134,7 +132,7 @@ const AIProcessingIndicator = ({
             <span>{Math.round(progress)}%</span>
           </div>
           <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-            <div 
+            <div
               className="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-300 ease-out"
               style={{ width: `${progress}%` }}
             />
@@ -145,10 +143,11 @@ const AIProcessingIndicator = ({
         <div className="flex items-center justify-between mb-4">
           {processingStages?.slice(0, -1)?.map((stage, index) => (
             <div key={stage?.id} className="flex flex-col items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all duration-300 ${
-                index <= currentStage 
-                  ? 'bg-primary text-white' :'bg-muted text-muted-foreground'
-              }`}>
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all duration-300 ${
+                  index <= currentStage ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'
+                }`}
+              >
                 {index < currentStage ? (
                   <Icon name="Check" size={16} />
                 ) : index === currentStage ? (
@@ -157,9 +156,11 @@ const AIProcessingIndicator = ({
                   <Icon name={stage?.icon} size={16} />
                 )}
               </div>
-              <span className={`text-xs text-center ${
-                index <= currentStage ? 'text-foreground' : 'text-muted-foreground'
-              }`}>
+              <span
+                className={`text-xs text-center ${
+                  index <= currentStage ? 'text-foreground' : 'text-muted-foreground'
+                }`}
+              >
                 {stage?.name?.split(' ')?.[0]}
               </span>
             </div>

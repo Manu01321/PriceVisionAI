@@ -2,12 +2,12 @@ import React from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const CategoryTabs = ({ 
-  categories = [], 
-  activeCategory = 'all', 
+const CategoryTabs = ({
+  categories = [],
+  activeCategory = 'all',
   onCategoryChange,
   onAddCategory,
-  onEditCategory 
+  onEditCategory
 }) => {
   const defaultCategories = [
     { id: 'all', name: 'All Items', count: 24, icon: 'Grid3X3' },
@@ -39,21 +39,25 @@ const CategoryTabs = ({
             onClick={() => onCategoryChange(category?.id)}
             className={`
               flex items-center space-x-2 px-4 py-2 rounded-lg border transition-all duration-200
-              ${activeCategory === category?.id 
-                ? 'bg-primary text-primary-foreground border-primary' 
-                : 'bg-background text-foreground border-border hover:bg-muted'
+              ${
+                activeCategory === category?.id
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-background text-foreground border-border hover:bg-muted'
               }
             `}
           >
             <Icon name={category?.icon} size={16} />
             <span className="font-medium">{category?.name}</span>
-            <div className={`
+            <div
+              className={`
               px-2 py-1 rounded-full text-xs font-medium
-              ${activeCategory === category?.id 
-                ? 'bg-primary-foreground/20 text-primary-foreground' 
-                : 'bg-muted text-muted-foreground'
+              ${
+                activeCategory === category?.id
+                  ? 'bg-primary-foreground/20 text-primary-foreground'
+                  : 'bg-muted text-muted-foreground'
               }
-            `}>
+            `}
+            >
               {category?.count}
             </div>
           </button>

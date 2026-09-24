@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine
+} from 'recharts';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
@@ -14,7 +23,7 @@ const PriceHistoryChart = ({ products }) => {
     { value: '1y', label: '1 Year' }
   ];
 
-  const selectedProductData = products?.find(p => p?.id === selectedProduct);
+  const selectedProductData = products?.find((p) => p?.id === selectedProduct);
 
   const formatPrice = (value) => `₹${value}`;
 
@@ -37,9 +46,7 @@ const PriceHistoryChart = ({ products }) => {
             </div>
           )}
           {data?.seasonalPattern && (
-            <p className="text-xs text-muted-foreground mt-1">
-              {data?.seasonalPattern}
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">{data?.seasonalPattern}</p>
           )}
         </div>
       );
@@ -58,26 +65,35 @@ const PriceHistoryChart = ({ products }) => {
 
   const currentPrice = Number(selectedProductData?.currentPrice || 0);
   const rawHistory = selectedProductData?.priceHistory || [];
-  const normalizedHistory = rawHistory.length > 0 
-    ? rawHistory.map((item, idx) => {
-        if (typeof item === 'number') {
-          const d = new Date();
-          d.setDate(d.getDate() - (rawHistory.length - 1 - idx) * 7);
-          return {
-            date: d.toISOString().split('T')[0],
-            price: item,
-            bestTimeToBuy: idx === rawHistory.length - 1
-          };
-        }
-        return item;
-      })
-    : [
-        { date: new Date(Date.now() - 30*86400000).toISOString().split('T')[0], price: Math.round(currentPrice * 1.1) },
-        { date: new Date(Date.now() - 15*86400000).toISOString().split('T')[0], price: Math.round(currentPrice * 1.05) },
-        { date: new Date().toISOString().split('T')[0], price: currentPrice, bestTimeToBuy: true }
-      ];
+  const normalizedHistory =
+    rawHistory.length > 0
+      ? rawHistory.map((item, idx) => {
+          if (typeof item === 'number') {
+            const d = new Date();
+            d.setDate(d.getDate() - (rawHistory.length - 1 - idx) * 7);
+            return {
+              date: d.toISOString().split('T')[0],
+              price: item,
+              bestTimeToBuy: idx === rawHistory.length - 1
+            };
+          }
+          return item;
+        })
+      : [
+          {
+            date: new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0],
+            price: Math.round(currentPrice * 1.1)
+          },
+          {
+            date: new Date(Date.now() - 15 * 86400000).toISOString().split('T')[0],
+            price: Math.round(currentPrice * 1.05)
+          },
+          { date: new Date().toISOString().split('T')[0], price: currentPrice, bestTimeToBuy: true }
+        ];
 
-  const priceValues = normalizedHistory.map(p => Number(p?.price || 0)).filter(p => !isNaN(p) && p > 0);
+  const priceValues = normalizedHistory
+    .map((p) => Number(p?.price || 0))
+    .filter((p) => !isNaN(p) && p > 0);
   const lowestPrice = priceValues.length ? Math.min(...priceValues) : currentPrice;
   const highestPrice = priceValues.length ? Math.max(...priceValues) : currentPrice;
 
@@ -98,7 +114,7 @@ const PriceHistoryChart = ({ products }) => {
           {products?.map((product) => (
             <Button
               key={product?.id}
-              variant={selectedProduct === product?.id ? "default" : "outline"}
+              variant={selectedProduct === product?.id ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedProduct(product?.id)}
               className="text-xs"
@@ -113,7 +129,7 @@ const PriceHistoryChart = ({ products }) => {
           {timeRanges?.map((range) => (
             <Button
               key={range?.value}
-              variant={timeRange === range?.value ? "default" : "ghost"}
+              variant={timeRange === range?.value ? 'default' : 'ghost'}
               size="sm"
               onClick={() => setTimeRange(range?.value)}
               className="text-xs"
@@ -152,33 +168,33 @@ const PriceHistoryChart = ({ products }) => {
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={normalizedHistory}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis 
-                dataKey="date" 
+              <XAxis
+                dataKey="date"
                 tickFormatter={formatDate}
                 stroke="var(--color-muted-foreground)"
                 fontSize={12}
               />
-              <YAxis 
+              <YAxis
                 tickFormatter={formatPrice}
                 stroke="var(--color-muted-foreground)"
                 fontSize={12}
               />
               <Tooltip content={<CustomTooltip />} />
-              
+
               {/* Reference lines */}
-              <ReferenceLine 
-                y={currentPrice} 
-                stroke="var(--color-primary)" 
+              <ReferenceLine
+                y={currentPrice}
+                stroke="var(--color-primary)"
                 strokeDasharray="5 5"
-                label={{ value: "Current", position: "topRight" }}
+                label={{ value: 'Current', position: 'topRight' }}
               />
-              <ReferenceLine 
-                y={lowestPrice} 
-                stroke="var(--color-success)" 
+              <ReferenceLine
+                y={lowestPrice}
+                stroke="var(--color-success)"
                 strokeDasharray="3 3"
-                label={{ value: "Lowest", position: "topRight" }}
+                label={{ value: 'Lowest', position: 'topRight' }}
               />
-              
+
               <Line
                 type="monotone"
                 dataKey="price"
@@ -198,7 +214,7 @@ const PriceHistoryChart = ({ products }) => {
             <Icon name="Brain" size={16} className="text-accent" />
             <h4 className="font-medium text-foreground">AI Price Insights</h4>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
@@ -209,7 +225,7 @@ const PriceHistoryChart = ({ products }) => {
                 Expected to drop by 8-12% in the next 30 days based on seasonal patterns
               </p>
             </div>
-            
+
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Icon name="Calendar" size={14} className="text-warning" />
@@ -219,7 +235,7 @@ const PriceHistoryChart = ({ products }) => {
                 Wait 2-3 weeks for Black Friday deals. Potential savings: ₹4,150-6,640
               </p>
             </div>
-            
+
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Icon name="BarChart3" size={14} className="text-primary" />
@@ -229,7 +245,7 @@ const PriceHistoryChart = ({ products }) => {
                 Current price is 15% above average. Consider waiting or checking alternatives
               </p>
             </div>
-            
+
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Icon name="Zap" size={14} className="text-accent" />

@@ -102,15 +102,10 @@ const SearchFilters = ({ onFiltersChange, activeFilters = {} }) => {
             </div>
           )}
         </div>
-        
+
         <div className="flex items-center space-x-2">
           {getActiveFilterCount() > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearAllFilters}
-              className="text-xs"
-            >
+            <Button variant="ghost" size="sm" onClick={clearAllFilters} className="text-xs">
               Clear All
             </Button>
           )}
@@ -120,7 +115,7 @@ const SearchFilters = ({ onFiltersChange, activeFilters = {} }) => {
             onClick={() => setIsExpanded(!isExpanded)}
             className="lg:hidden"
           >
-            <Icon name={isExpanded ? "ChevronUp" : "ChevronDown"} size={16} />
+            <Icon name={isExpanded ? 'ChevronUp' : 'ChevronDown'} size={16} />
           </Button>
         </div>
       </div>
@@ -132,7 +127,7 @@ const SearchFilters = ({ onFiltersChange, activeFilters = {} }) => {
           value={filters?.sortBy}
           onChange={(value) => handleFilterChange('sortBy', value)}
         />
-        
+
         <Select
           label="Category"
           options={categoryOptions}
@@ -239,9 +234,9 @@ const SearchFilters = ({ onFiltersChange, activeFilters = {} }) => {
           background: var(--color-primary);
           cursor: pointer;
           border: 2px solid white;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        
+
         .slider::-moz-range-thumb {
           height: 16px;
           width: 16px;
@@ -249,7 +244,7 @@ const SearchFilters = ({ onFiltersChange, activeFilters = {} }) => {
           background: var(--color-primary);
           cursor: pointer;
           border: 2px solid white;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
       `}</style>
     </div>

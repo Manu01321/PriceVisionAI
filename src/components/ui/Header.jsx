@@ -97,12 +97,14 @@ const Header = () => {
 
         {/* AI Search Bar - Desktop */}
         <div className="hidden md:flex flex-1 max-w-2xl mx-8">
-          <div className={`relative w-full transition-all duration-300 ${isSearchExpanded ? 'scale-105' : ''}`}>
+          <div
+            className={`relative w-full transition-all duration-300 ${isSearchExpanded ? 'scale-105' : ''}`}
+          >
             <div className="relative">
-              <Icon 
-                name="Search" 
-                size={20} 
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" 
+              <Icon
+                name="Search"
+                size={20}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
               />
               <input
                 type="text"
@@ -155,7 +157,7 @@ const Header = () => {
               <span>{item?.label}</span>
             </Button>
           ))}
-          
+
           {/* More Menu */}
           <div className="relative">
             <Button
@@ -166,7 +168,7 @@ const Header = () => {
               <Icon name="MoreHorizontal" size={18} />
               <span>More</span>
             </Button>
-            
+
             {isMenuOpen && (
               <div className="absolute right-0 top-full mt-2 w-56 bg-surface border border-border rounded-lg shadow-elevated animate-slide-up z-200">
                 <div className="py-2">
@@ -174,7 +176,10 @@ const Header = () => {
                     <button
                       key={item?.path}
                       className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-smooth"
-                      onClick={() => { navigate(item?.path); setIsMenuOpen(false); }}
+                      onClick={() => {
+                        navigate(item?.path);
+                        setIsMenuOpen(false);
+                      }}
                     >
                       <Icon name={item?.icon} size={16} />
                       <span>{item?.label}</span>
@@ -188,20 +193,11 @@ const Header = () => {
 
         {/* Mobile Menu Button & Search */}
         <div className="flex items-center space-x-2 lg:hidden">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleVoiceSearch}
-            className="md:hidden"
-          >
+          <Button variant="ghost" size="icon" onClick={handleVoiceSearch} className="md:hidden">
             <Icon name="Search" size={20} />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <Icon name={isMenuOpen ? "X" : "Menu"} size={20} />
+          <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <Icon name={isMenuOpen ? 'X' : 'Menu'} size={20} />
           </Button>
         </div>
 
@@ -225,7 +221,7 @@ const Header = () => {
               </div>
             </Button>
           </div>
-          
+
           {user ? (
             <div className="flex items-center gap-2">
               <div
@@ -235,7 +231,13 @@ const Header = () => {
               >
                 <span className="text-white text-xs font-bold uppercase">{user.name?.[0]}</span>
               </div>
-              <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout" className="h-8 w-8">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleLogout}
+                title="Logout"
+                className="h-8 w-8"
+              >
                 <Icon name="LogOut" size={16} />
               </Button>
             </div>
@@ -257,10 +259,10 @@ const Header = () => {
           {/* Mobile Search */}
           <div className="p-4 border-b border-border">
             <div className="relative">
-              <Icon 
-                name="Search" 
-                size={20} 
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" 
+              <Icon
+                name="Search"
+                size={20}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
               />
               <input
                 type="text"
@@ -271,7 +273,12 @@ const Header = () => {
                 <Button variant="ghost" size="icon" onClick={handleVoiceSearch} className="h-8 w-8">
                   <Icon name="Mic" size={16} />
                 </Button>
-                <Button variant="ghost" size="icon" onClick={handleCameraSearch} className="h-8 w-8">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleCameraSearch}
+                  className="h-8 w-8"
+                >
                   <Icon name="Camera" size={16} />
                 </Button>
               </div>
@@ -284,7 +291,10 @@ const Header = () => {
               <button
                 key={item?.path}
                 className="w-full flex items-center space-x-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-smooth"
-                onClick={() => { navigate(item?.path); setIsMenuOpen(false); }}
+                onClick={() => {
+                  navigate(item?.path);
+                  setIsMenuOpen(false);
+                }}
               >
                 <Icon name={item?.icon} size={18} />
                 <span>{item?.label}</span>
@@ -300,19 +310,32 @@ const Header = () => {
                   <>
                     <div
                       className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center cursor-pointer"
-                      onClick={() => { navigate('/user-profile-and-settings'); setIsMenuOpen(false); }}
+                      onClick={() => {
+                        navigate('/user-profile-and-settings');
+                        setIsMenuOpen(false);
+                      }}
                     >
-                      <span className="text-white text-xs font-bold uppercase">{user.name?.[0]}</span>
+                      <span className="text-white text-xs font-bold uppercase">
+                        {user.name?.[0]}
+                      </span>
                     </div>
                     <button
                       className="text-sm font-medium text-foreground hover:text-primary transition-smooth"
-                      onClick={() => { navigate('/user-profile-and-settings'); setIsMenuOpen(false); }}
-                    >{user.name}</button>
+                      onClick={() => {
+                        navigate('/user-profile-and-settings');
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      {user.name}
+                    </button>
                   </>
                 ) : (
                   <button
                     className="flex items-center gap-1.5 text-sm font-medium text-foreground hover:text-primary transition-smooth"
-                    onClick={() => { navigate('/login'); setIsMenuOpen(false); }}
+                    onClick={() => {
+                      navigate('/login');
+                      setIsMenuOpen(false);
+                    }}
                   >
                     <Icon name="LogIn" size={16} />
                     Login
@@ -320,7 +343,12 @@ const Header = () => {
                 )}
               </div>
               <div className="flex items-center space-x-3">
-                <Button variant="ghost" size="icon" onClick={toggleTheme} title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleTheme}
+                  title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                >
                   <Icon name={theme === 'dark' ? 'Sun' : 'Moon'} size={18} />
                 </Button>
                 <div className="relative">

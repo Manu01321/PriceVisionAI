@@ -17,7 +17,8 @@ class SQLiteClient {
       const jsonPath = this.dbPath + '.json';
       if (fs.existsSync(jsonPath)) {
         this._data = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-        this._historyId = (this._data.price_history || []).reduce((m, r) => Math.max(m, r.id || 0), 0) + 1;
+        this._historyId =
+          (this._data.price_history || []).reduce((m, r) => Math.max(m, r.id || 0), 0) + 1;
       }
       this.ready = true;
       this.logger.info('SQLite (JSON fallback) ready');
@@ -48,15 +49,15 @@ class SQLiteClient {
 
   deleteTrackedProduct(id) {
     const key = Object.keys(this._data.tracked_products).find(
-      k => this._data.tracked_products[k].id === id || k === id
+      (k) => this._data.tracked_products[k].id === id || k === id
     );
     if (key) delete this._data.tracked_products[key];
-    this._data.price_history = this._data.price_history.filter(r => r.trackingId !== id);
+    this._data.price_history = this._data.price_history.filter((r) => r.trackingId !== id);
     this._persist();
   }
 
   listTrackedProducts() {
-    return Object.values(this._data.tracked_products).map(row => ({
+    return Object.values(this._data.tracked_products).map((row) => ({
       ...row,
       initialData: row.initialData ? JSON.parse(row.initialData) : {},
       priceHistory: this.getPriceHistory(row.id)
@@ -78,9 +79,9 @@ class SQLiteClient {
 
   getPriceHistory(trackingId) {
     return (this._data.price_history || [])
-      .filter(r => r.trackingId === trackingId)
+      .filter((r) => r.trackingId === trackingId)
       .sort((a, b) => a.timestamp.localeCompare(b.timestamp))
-      .map(row => ({
+      .map((row) => ({
         timestamp: row.timestamp,
         price: row.price,
         availability: row.availability,

@@ -75,7 +75,7 @@ const AlertFilters = ({ onFilterChange, alertCounts }) => {
   };
 
   const getActiveFilterCount = () => {
-    return Object.values(activeFilters)?.filter(value => value !== 'all')?.length;
+    return Object.values(activeFilters)?.filter((value) => value !== 'all')?.length;
   };
 
   return (
@@ -91,7 +91,7 @@ const AlertFilters = ({ onFilterChange, alertCounts }) => {
             </div>
           )}
         </div>
-        
+
         {getActiveFilterCount() > 0 && (
           <Button
             variant="ghost"
@@ -146,37 +146,45 @@ const AlertFilters = ({ onFilterChange, alertCounts }) => {
         <Button
           variant={activeFilters?.urgency === 'high' ? 'default' : 'outline'}
           size="sm"
-          onClick={() => handleFilterChange('urgency', activeFilters?.urgency === 'high' ? 'all' : 'high')}
+          onClick={() =>
+            handleFilterChange('urgency', activeFilters?.urgency === 'high' ? 'all' : 'high')
+          }
           iconName="AlertTriangle"
           iconPosition="left"
         >
           High Priority
         </Button>
-        
+
         <Button
           variant={activeFilters?.type === 'price_drop' ? 'default' : 'outline'}
           size="sm"
-          onClick={() => handleFilterChange('type', activeFilters?.type === 'price_drop' ? 'all' : 'price_drop')}
+          onClick={() =>
+            handleFilterChange('type', activeFilters?.type === 'price_drop' ? 'all' : 'price_drop')
+          }
           iconName="TrendingDown"
           iconPosition="left"
         >
           Price Drops
         </Button>
-        
+
         <Button
           variant={activeFilters?.status === 'unread' ? 'default' : 'outline'}
           size="sm"
-          onClick={() => handleFilterChange('status', activeFilters?.status === 'unread' ? 'all' : 'unread')}
+          onClick={() =>
+            handleFilterChange('status', activeFilters?.status === 'unread' ? 'all' : 'unread')
+          }
           iconName="Mail"
           iconPosition="left"
         >
           Unread
         </Button>
-        
+
         <Button
           variant={activeFilters?.timeRange === '1d' ? 'default' : 'outline'}
           size="sm"
-          onClick={() => handleFilterChange('timeRange', activeFilters?.timeRange === '1d' ? '7d' : '1d')}
+          onClick={() =>
+            handleFilterChange('timeRange', activeFilters?.timeRange === '1d' ? '7d' : '1d')
+          }
           iconName="Clock"
           iconPosition="left"
         >

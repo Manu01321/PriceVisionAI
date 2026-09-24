@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import Icon from '../AppIcon';
 import Button from './Button';
 
-const QuickActionMenu = ({ 
-  onVoiceSearch, 
-  onCameraSearch, 
-  onQuickAdd, 
+const QuickActionMenu = ({
+  onVoiceSearch,
+  onCameraSearch,
+  onQuickAdd,
   onPriceAlert,
-  className = "" 
+  className = ''
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -58,7 +58,7 @@ const QuickActionMenu = ({
       if (action?.onClick) {
         await action?.onClick();
       }
-      
+
       // Simulate processing time
       setTimeout(() => {
         setIsProcessing(false);
@@ -91,11 +91,9 @@ const QuickActionMenu = ({
             >
               {/* Label */}
               <div className="bg-surface border border-border px-3 py-2 rounded-lg shadow-soft opacity-0 animate-fade-in whitespace-nowrap">
-                <span className="text-sm font-medium text-foreground">
-                  {action?.label}
-                </span>
+                <span className="text-sm font-medium text-foreground">{action?.label}</span>
               </div>
-              
+
               {/* Action Button */}
               <button
                 onClick={() => handleActionClick(action)}
@@ -133,24 +131,19 @@ const QuickActionMenu = ({
         {isProcessing ? (
           <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
         ) : (
-          <Icon 
-            name={isOpen ? "X" : "Plus"} 
-            size={24} 
-            color="white" 
+          <Icon
+            name={isOpen ? 'X' : 'Plus'}
+            size={24}
+            color="white"
             className="transition-transform duration-200"
           />
         )}
       </button>
       {/* Ripple Effect */}
-      {isOpen && (
-        <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping"></div>
-      )}
+      {isOpen && <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping"></div>}
       {/* Backdrop for mobile */}
       {isOpen && (
-        <div 
-          className="fixed inset-0 bg-transparent -z-10"
-          onClick={() => setIsOpen(false)}
-        />
+        <div className="fixed inset-0 bg-transparent -z-10" onClick={() => setIsOpen(false)} />
       )}
     </div>
   );

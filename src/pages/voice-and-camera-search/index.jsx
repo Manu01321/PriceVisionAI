@@ -296,7 +296,6 @@ const VoiceAndCameraSearch = () => {
     }
   };
 
-
   // (removed duplicate handleProcessingComplete)
   const formatTimestamp = (timestamp) => {
     const now = new Date();
@@ -324,7 +323,8 @@ const VoiceAndCameraSearch = () => {
             <h1 className="text-3xl font-bold text-foreground">Voice & Camera Search</h1>
           </div>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Discover products using AI-powered multimodal search. Speak, scan, or capture to find exactly what you're looking for.
+            Discover products using AI-powered multimodal search. Speak, scan, or capture to find
+            exactly what you're looking for.
           </p>
         </div>
 
@@ -332,44 +332,42 @@ const VoiceAndCameraSearch = () => {
           {/* Main Search Interface */}
           <div className="lg:col-span-2 space-y-6">
             {/* Search Mode Selector */}
-            <SearchModeSelector
-              activeMode={activeMode}
-              onModeChange={handleModeChange} />
-
+            <SearchModeSelector activeMode={activeMode} onModeChange={handleModeChange} />
 
             {/* Search Interface */}
             <div className="bg-surface border border-border rounded-lg p-6">
-              {activeMode === 'voice' &&
-              <VoiceSearchInterface
-                onVoiceResult={handleVoiceResult}
-                onTranscriptionUpdate={(transcript) => {}}
-                isProcessing={isProcessing} />
-              }
+              {activeMode === 'voice' && (
+                <VoiceSearchInterface
+                  onVoiceResult={handleVoiceResult}
+                  onTranscriptionUpdate={(transcript) => {}}
+                  isProcessing={isProcessing}
+                />
+              )}
 
-              {(activeMode === 'camera' || activeMode === 'barcode') &&
-              <CameraViewfinder
-                mode={activeMode}
-                onCapture={handleCameraCapture}
-                onBarcodeDetected={handleBarcodeDetected}
-                isProcessing={isProcessing} />
-              }
+              {(activeMode === 'camera' || activeMode === 'barcode') && (
+                <CameraViewfinder
+                  mode={activeMode}
+                  onCapture={handleCameraCapture}
+                  onBarcodeDetected={handleBarcodeDetected}
+                  isProcessing={isProcessing}
+                />
+              )}
 
-              {activeMode === 'upload' &&
-              <ImageUploadZone
-                onImageAnalysis={handleImageUpload}
-                isProcessing={isProcessing} />
-              }
+              {activeMode === 'upload' && (
+                <ImageUploadZone onImageAnalysis={handleImageUpload} isProcessing={isProcessing} />
+              )}
             </div>
 
             {/* AI Processing Indicator - Enhanced for Gemini */}
-            {isAnalyzing &&
-            <AIProcessingIndicator
-              isProcessing={isAnalyzing}
-              processingStage={analysisStage || 'Analyzing with Gemini AI...'}
-              onComplete={handleProcessingComplete}
-              showCancelButton={true}
-              onCancel={cancelAnalysis} />
-            }
+            {isAnalyzing && (
+              <AIProcessingIndicator
+                isProcessing={isAnalyzing}
+                processingStage={analysisStage || 'Analyzing with Gemini AI...'}
+                onComplete={handleProcessingComplete}
+                showCancelButton={true}
+                onCancel={cancelAnalysis}
+              />
+            )}
 
             {/* Analysis Error Display */}
             {analysisError && (
@@ -381,12 +379,7 @@ const VoiceAndCameraSearch = () => {
                     <p className="text-sm text-error/80">{analysisError}</p>
                   </div>
                 </div>
-                <Button
-                  onClick={clearAnalysis}
-                  size="sm"
-                  variant="outline"
-                  className="mt-3"
-                >
+                <Button onClick={clearAnalysis} size="sm" variant="outline" className="mt-3">
                   Try Again
                 </Button>
               </div>
@@ -404,16 +397,27 @@ const VoiceAndCameraSearch = () => {
                     {Math.round((analysisResults?.confidence || 0) * 100)}% confident
                   </span>
                 </div>
-                
+
                 <div className="space-y-2 text-sm">
-                  <p><span className="font-medium">Product:</span> {analysisResults?.extractedData?.productName}</p>
+                  <p>
+                    <span className="font-medium">Product:</span>{' '}
+                    {analysisResults?.extractedData?.productName}
+                  </p>
                   {analysisResults?.extractedData?.brand && (
-                    <p><span className="font-medium">Brand:</span> {analysisResults?.extractedData?.brand}</p>
+                    <p>
+                      <span className="font-medium">Brand:</span>{' '}
+                      {analysisResults?.extractedData?.brand}
+                    </p>
                   )}
                   {analysisResults?.extractedData?.category && (
-                    <p><span className="font-medium">Category:</span> {analysisResults?.extractedData?.category}</p>
+                    <p>
+                      <span className="font-medium">Category:</span>{' '}
+                      {analysisResults?.extractedData?.category}
+                    </p>
                   )}
-                  <p className="text-muted-foreground">{analysisResults?.products?.length} products found</p>
+                  <p className="text-muted-foreground">
+                    {analysisResults?.products?.length} products found
+                  </p>
                 </div>
               </div>
             )}
@@ -424,40 +428,48 @@ const VoiceAndCameraSearch = () => {
                 <Icon name="Lightbulb" size={20} className="mr-3 text-warning" />
                 Pro Tips for Better Results
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
                     <Icon name="Mic" size={16} className="text-primary mt-1" />
                     <div>
                       <h4 className="font-medium text-foreground">Voice Search</h4>
-                      <p className="text-sm text-muted-foreground">Use specific brand names and model numbers for best results</p>
+                      <p className="text-sm text-muted-foreground">
+                        Use specific brand names and model numbers for best results
+                      </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start space-x-3">
                     <Icon name="Camera" size={16} className="text-secondary mt-1" />
                     <div>
                       <h4 className="font-medium text-foreground">Photo Search</h4>
-                      <p className="text-sm text-muted-foreground">Ensure good lighting and focus on product details</p>
+                      <p className="text-sm text-muted-foreground">
+                        Ensure good lighting and focus on product details
+                      </p>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
                     <Icon name="Scan" size={16} className="text-success mt-1" />
                     <div>
                       <h4 className="font-medium text-foreground">Barcode Scan</h4>
-                      <p className="text-sm text-muted-foreground">Hold steady and align barcode within the frame</p>
+                      <p className="text-sm text-muted-foreground">
+                        Hold steady and align barcode within the frame
+                      </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start space-x-3">
                     <Icon name="Upload" size={16} className="text-warning mt-1" />
                     <div>
                       <h4 className="font-medium text-foreground">Image Upload</h4>
-                      <p className="text-sm text-muted-foreground">Multiple angles improve AI recognition accuracy</p>
+                      <p className="text-sm text-muted-foreground">
+                        Multiple angles improve AI recognition accuracy
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -473,37 +485,49 @@ const VoiceAndCameraSearch = () => {
                 <Icon name="History" size={20} className="mr-3" />
                 Recent Searches
               </h3>
-              
-              {searchHistory?.length > 0 ?
-              <div className="space-y-3">
-                  {searchHistory?.map((search) =>
-                <button
-                  key={search?.id}
-                  onClick={() => navigate('/ai-search-results', {
-                    state: {
-                      searchQuery: search?.query,
-                      searchType: search?.type,
-                      confidence: search?.confidence
-                    }
-                  })}
-                  className="w-full text-left p-3 hover:bg-muted rounded-lg transition-smooth border border-border/50 hover:border-border">
 
+              {searchHistory?.length > 0 ? (
+                <div className="space-y-3">
+                  {searchHistory?.map((search) => (
+                    <button
+                      key={search?.id}
+                      onClick={() =>
+                        navigate('/ai-search-results', {
+                          state: {
+                            searchQuery: search?.query,
+                            searchType: search?.type,
+                            confidence: search?.confidence
+                          }
+                        })
+                      }
+                      className="w-full text-left p-3 hover:bg-muted rounded-lg transition-smooth border border-border/50 hover:border-border"
+                    >
                       <div className="flex items-start space-x-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    search?.type === 'voice' ? 'bg-primary/10 text-primary' :
-                    search?.type === 'camera' ? 'bg-secondary/10 text-secondary' :
-                    search?.type === 'barcode' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`
-                    }>
+                        <div
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                            search?.type === 'voice'
+                              ? 'bg-primary/10 text-primary'
+                              : search?.type === 'camera'
+                                ? 'bg-secondary/10 text-secondary'
+                                : search?.type === 'barcode'
+                                  ? 'bg-success/10 text-success'
+                                  : 'bg-warning/10 text-warning'
+                          }`}
+                        >
                           <Icon
-                        name={
-                        search?.type === 'voice' ? 'Mic' :
-                        search?.type === 'camera' ? 'Camera' :
-                        search?.type === 'barcode' ? 'Scan' : 'Upload'
-                        }
-                        size={16} />
-
+                            name={
+                              search?.type === 'voice'
+                                ? 'Mic'
+                                : search?.type === 'camera'
+                                  ? 'Camera'
+                                  : search?.type === 'barcode'
+                                    ? 'Scan'
+                                    : 'Upload'
+                            }
+                            size={16}
+                          />
                         </div>
-                        
+
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-foreground text-sm truncate">
                             {search?.query}
@@ -519,14 +543,14 @@ const VoiceAndCameraSearch = () => {
                         </div>
                       </div>
                     </button>
-                )}
-                </div> :
-
-              <div className="text-center py-6">
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6">
                   <Icon name="Search" size={32} className="text-muted-foreground mx-auto mb-2" />
                   <p className="text-sm text-muted-foreground">No recent searches</p>
                 </div>
-              }
+              )}
             </div>
 
             {/* Enhanced AI Features */}
@@ -535,37 +559,47 @@ const VoiceAndCameraSearch = () => {
                 <Icon name="Brain" size={20} className="mr-3 text-accent" />
                 Powered by Google Gemini AI
               </h3>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
                   <Icon name="Eye" size={16} className="text-primary" />
                   <div>
-                    <p className="font-medium text-foreground text-sm">Advanced Vision Recognition</p>
-                    <p className="text-xs text-muted-foreground">Multi-modal AI understands products from images</p>
+                    <p className="font-medium text-foreground text-sm">
+                      Advanced Vision Recognition
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Multi-modal AI understands products from images
+                    </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-3">
                   <Icon name="Zap" size={16} className="text-secondary" />
                   <div>
                     <p className="font-medium text-foreground text-sm">Real-time Analysis</p>
-                    <p className="text-xs text-muted-foreground">Instant product identification and feature extraction</p>
+                    <p className="text-xs text-muted-foreground">
+                      Instant product identification and feature extraction
+                    </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-3">
                   <Icon name="Target" size={16} className="text-success" />
                   <div>
                     <p className="font-medium text-foreground text-sm">High Accuracy</p>
-                    <p className="text-xs text-muted-foreground">Confidence scoring for reliable results</p>
+                    <p className="text-xs text-muted-foreground">
+                      Confidence scoring for reliable results
+                    </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-3">
                   <Icon name="Shield" size={16} className="text-warning" />
                   <div>
                     <p className="font-medium text-foreground text-sm">Content Safety</p>
-                    <p className="text-xs text-muted-foreground">Built-in safety filters and content moderation</p>
+                    <p className="text-xs text-muted-foreground">
+                      Built-in safety filters and content moderation
+                    </p>
                   </div>
                 </div>
               </div>
@@ -583,40 +617,40 @@ const VoiceAndCameraSearch = () => {
             {/* Quick Actions */}
             <div className="bg-surface border border-border rounded-lg p-6">
               <h3 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
-              
+
               <div className="space-y-3">
                 <Button
                   onClick={() => navigate('/dashboard')}
                   variant="outline"
-                  className="w-full justify-start">
-
+                  className="w-full justify-start"
+                >
                   <Icon name="Home" size={16} className="mr-3" />
                   Back to Dashboard
                 </Button>
-                
+
                 <Button
                   onClick={() => navigate('/product-comparison')}
                   variant="outline"
-                  className="w-full justify-start">
-
+                  className="w-full justify-start"
+                >
                   <Icon name="BarChart3" size={16} className="mr-3" />
                   Compare Products
                 </Button>
-                
+
                 <Button
                   onClick={() => navigate('/watchlist-management')}
                   variant="outline"
-                  className="w-full justify-start">
-
+                  className="w-full justify-start"
+                >
                   <Icon name="Heart" size={16} className="mr-3" />
                   My Watchlist
                 </Button>
-                
+
                 <Button
                   onClick={() => setShowAIAssistant(true)}
                   variant="outline"
-                  className="w-full justify-start">
-
+                  className="w-full justify-start"
+                >
                   <Icon name="MessageCircle" size={16} className="mr-3" />
                   AI Assistant
                 </Button>
@@ -631,7 +665,8 @@ const VoiceAndCameraSearch = () => {
         onToggle={() => setShowAIAssistant(!showAIAssistant)}
         onClose={() => setShowAIAssistant(false)}
         contextData={{ pageName: 'Voice and Camera Search' }}
-        className="fixed right-4 bottom-20 lg:bottom-4 z-300" />
+        className="fixed right-4 bottom-20 lg:bottom-4 z-300"
+      />
       {/* Quick Action Menu */}
       <QuickActionMenu
         onVoiceSearch={() => {
@@ -643,10 +678,10 @@ const VoiceAndCameraSearch = () => {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onQuickAdd={() => navigate('/watchlist-management')}
-        onPriceAlert={() => navigate('/deal-alerts-and-notifications')} />
+        onPriceAlert={() => navigate('/deal-alerts-and-notifications')}
+      />
     </div>
   );
-
 };
 
 export default VoiceAndCameraSearch;

@@ -41,7 +41,7 @@ const FilterPanel = ({ onFiltersChange, isOpen, onToggle }) => {
 
   const handleRetailerToggle = (retailerId) => {
     const newRetailers = filters?.retailers?.includes(retailerId)
-      ? filters?.retailers?.filter(id => id !== retailerId)
+      ? filters?.retailers?.filter((id) => id !== retailerId)
       : [...filters?.retailers, retailerId];
     handleFilterChange('retailers', newRetailers);
   };
@@ -108,7 +108,7 @@ const FilterPanel = ({ onFiltersChange, isOpen, onToggle }) => {
             </div>
           )}
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <Button
             variant="ghost"
@@ -119,11 +119,7 @@ const FilterPanel = ({ onFiltersChange, isOpen, onToggle }) => {
           >
             Reset
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onToggle}
-          >
+          <Button variant="ghost" size="icon" onClick={onToggle}>
             <Icon name="X" size={16} />
           </Button>
         </div>
@@ -138,26 +134,19 @@ const FilterPanel = ({ onFiltersChange, isOpen, onToggle }) => {
               onClick={() => handleFilterChange('dateRange', option?.value)}
               className={`p-2 text-sm rounded-md border transition-smooth ${
                 filters?.dateRange === option?.value
-                  ? 'border-primary bg-primary/10 text-primary' :'border-border hover:border-primary/50 text-foreground'
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-border hover:border-primary/50 text-foreground'
               }`}
             >
               {option?.label}
             </button>
           ))}
         </div>
-        
+
         {filters?.dateRange === 'custom' && (
           <div className="grid grid-cols-2 gap-2 mt-3">
-            <Input
-              type="date"
-              label="From"
-              className="text-sm"
-            />
-            <Input
-              type="date"
-              label="To"
-              className="text-sm"
-            />
+            <Input type="date" label="From" className="text-sm" />
+            <Input type="date" label="To" className="text-sm" />
           </div>
         )}
       </div>
@@ -170,14 +159,17 @@ const FilterPanel = ({ onFiltersChange, isOpen, onToggle }) => {
             size="sm"
             onClick={() => {
               const allSelected = filters?.retailers?.length === retailerOptions?.length;
-              handleFilterChange('retailers', allSelected ? [] : retailerOptions?.map(r => r?.id));
+              handleFilterChange(
+                'retailers',
+                allSelected ? [] : retailerOptions?.map((r) => r?.id)
+              );
             }}
             className="text-xs"
           >
             {filters?.retailers?.length === retailerOptions?.length ? 'Deselect All' : 'Select All'}
           </Button>
         </div>
-        
+
         <div className="space-y-2">
           {retailerOptions?.map((retailer) => (
             <div key={retailer?.id} className="flex items-center space-x-3">
@@ -186,7 +178,7 @@ const FilterPanel = ({ onFiltersChange, isOpen, onToggle }) => {
                 onChange={() => handleRetailerToggle(retailer?.id)}
               />
               <div className="flex items-center space-x-2 flex-1">
-                <div 
+                <div
                   className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: retailer?.color }}
                 />
@@ -230,7 +222,7 @@ const FilterPanel = ({ onFiltersChange, isOpen, onToggle }) => {
               <p className="text-xs text-muted-foreground">Display future price predictions</p>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-3">
             <Checkbox
               checked={filters?.showDeals}
@@ -285,13 +277,7 @@ const FilterPanel = ({ onFiltersChange, isOpen, onToggle }) => {
       </div>
       {/* Apply Button */}
       <div className="pt-4 border-t border-border">
-        <Button
-          variant="default"
-          fullWidth
-          iconName="Check"
-          iconPosition="left"
-          onClick={onToggle}
-        >
+        <Button variant="default" fullWidth iconName="Check" iconPosition="left" onClick={onToggle}>
           Apply Filters
         </Button>
       </div>

@@ -3,11 +3,11 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Image from '../../../components/AppImage';
 
-const ImageUploadZone = ({ 
+const ImageUploadZone = ({
   onImageAnalysis,
   isProcessing = false,
   maxFiles = 5,
-  className = "" 
+  className = ''
 }) => {
   const [dragActive, setDragActive] = useState(false);
   const [uploadedImages, setUploadedImages] = useState([]);
@@ -30,9 +30,9 @@ const ImageUploadZone = ({
   const handleDrag = (e) => {
     e?.preventDefault();
     e?.stopPropagation();
-    if (e?.type === "dragenter" || e?.type === "dragover") {
+    if (e?.type === 'dragenter' || e?.type === 'dragover') {
       setDragActive(true);
-    } else if (e?.type === "dragleave") {
+    } else if (e?.type === 'dragleave') {
       setDragActive(false);
     }
   };
@@ -41,7 +41,7 @@ const ImageUploadZone = ({
     e?.preventDefault();
     e?.stopPropagation();
     setDragActive(false);
-    
+
     const files = Array.from(e?.dataTransfer?.files);
     handleFiles(files);
   };
@@ -53,30 +53,36 @@ const ImageUploadZone = ({
 
   const handleFiles = (files) => {
     setAnalysisError(''); // Clear previous errors
-    
-    const validFiles = files?.filter(file => {
+
+    const validFiles = files?.filter((file) => {
       if (!supportedFormats?.includes(file?.type)) {
-        setAnalysisError(`Unsupported file type: ${file?.name}. Please use JPG, PNG, WebP, or GIF.`);
+        setAnalysisError(
+          `Unsupported file type: ${file?.name}. Please use JPG, PNG, WebP, or GIF.`
+        );
         return false;
       }
       if (file?.size > maxFileSize) {
-        setAnalysisError(`File too large: ${file?.name} (${(file?.size / 1024 / 1024)?.toFixed(1)}MB). Maximum size is 10MB.`);
+        setAnalysisError(
+          `File too large: ${file?.name} (${(file?.size / 1024 / 1024)?.toFixed(1)}MB). Maximum size is 10MB.`
+        );
         return false;
       }
       return true;
     });
 
     if (uploadedImages?.length + validFiles?.length > maxFiles) {
-      setAnalysisError(`Maximum ${maxFiles} files allowed. You can upload ${maxFiles - uploadedImages?.length} more.`);
+      setAnalysisError(
+        `Maximum ${maxFiles} files allowed. You can upload ${maxFiles - uploadedImages?.length} more.`
+      );
       return;
     }
 
-    validFiles?.forEach(file => {
+    validFiles?.forEach((file) => {
       const fileId = Date.now() + Math.random();
-      
+
       // Initialize progress
-      setUploadProgress(prev => ({ ...prev, [fileId]: 0 }));
-      
+      setUploadProgress((prev) => ({ ...prev, [fileId]: 0 }));
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const imageData = {
@@ -93,48 +99,48 @@ const ImageUploadZone = ({
         let progress = 0;
         const progressInterval = setInterval(() => {
           progress += Math.random() * 15 + 5; // 5-20% increments
-          
+
           if (progress >= 100) {
             progress = 100;
             cleanupProgress(fileId);
-            
+
             // Remove from upload progress after completion
             setTimeout(() => {
-              setUploadProgress(prev => {
+              setUploadProgress((prev) => {
                 const newProgress = { ...prev };
                 delete newProgress?.[fileId];
                 return newProgress;
               });
             }, 500);
           }
-          
-          setUploadProgress(prev => ({ ...prev, [fileId]: Math.min(progress, 100) }));
+
+          setUploadProgress((prev) => ({ ...prev, [fileId]: Math.min(progress, 100) }));
         }, 150);
 
         // Store interval reference for cleanup
         progressIntervalRefs.current[fileId] = progressInterval;
-        
-        setUploadedImages(prev => [...prev, imageData]);
+
+        setUploadedImages((prev) => [...prev, imageData]);
       };
-      
+
       reader.onerror = () => {
         cleanupProgress(fileId);
         setAnalysisError(`Failed to read file: ${file?.name}`);
-        setUploadProgress(prev => {
+        setUploadProgress((prev) => {
           const newProgress = { ...prev };
           delete newProgress?.[fileId];
           return newProgress;
         });
       };
-      
+
       reader?.readAsDataURL(file);
     });
   };
 
   const removeImage = (imageId) => {
     cleanupProgress(imageId);
-    setUploadedImages(prev => prev?.filter(img => img?.id !== imageId));
-    setUploadProgress(prev => {
+    setUploadedImages((prev) => prev?.filter((img) => img?.id !== imageId));
+    setUploadProgress((prev) => {
       const newProgress = { ...prev };
       delete newProgress?.[imageId];
       return newProgress;
@@ -143,12 +149,12 @@ const ImageUploadZone = ({
 
   const analyzeImages = async () => {
     if (!onImageAnalysis || !uploadedImages?.length) return;
-    
+
     setAnalysisError(''); // Clear previous errors
-    
+
     try {
       // Pass the actual File objects for Gemini AI analysis
-      const imageFiles = uploadedImages?.map(img => img?.file);
+      const imageFiles = uploadedImages?.map((img) => img?.file);
       await onImageAnalysis(imageFiles);
     } catch (error) {
       console.error('Analysis initiation failed:', error);
@@ -163,7 +169,7 @@ const ImageUploadZone = ({
   // Cleanup on unmount
   React.useEffect(() => {
     return () => {
-      Object.values(progressIntervalRefs?.current)?.forEach(interval => {
+      Object.values(progressIntervalRefs?.current)?.forEach((interval) => {
         clearInterval(interval);
       });
     };
@@ -174,8 +180,9 @@ const ImageUploadZone = ({
       {/* Upload Zone */}
       <div
         className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 ${
-          dragActive 
-            ? 'border-primary bg-primary/5 scale-105' :'border-border hover:border-primary/50 hover:bg-muted/30'
+          dragActive
+            ? 'border-primary bg-primary/5 scale-105'
+            : 'border-border hover:border-primary/50 hover:bg-muted/30'
         } ${isProcessing ? 'opacity-50 pointer-events-none' : ''}`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -184,12 +191,14 @@ const ImageUploadZone = ({
       >
         {/* Upload Icon and Text */}
         <div className="space-y-4">
-          <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center transition-colors ${
-            dragActive ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'
-          }`}>
-            <Icon name={dragActive ? "Download" : "Upload"} size={32} />
+          <div
+            className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center transition-colors ${
+              dragActive ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'
+            }`}
+          >
+            <Icon name={dragActive ? 'Download' : 'Upload'} size={32} />
           </div>
-          
+
           <div>
             <h3 className="text-lg font-semibold text-foreground mb-2">
               {dragActive ? 'Drop images here' : 'Upload Product Images'}
@@ -197,16 +206,12 @@ const ImageUploadZone = ({
             <p className="text-sm text-muted-foreground mb-4">
               Drag and drop images or click to browse. AI will analyze your products automatically.
             </p>
-            
-            <Button 
-              onClick={openFileDialog}
-              disabled={isProcessing}
-              className="mb-4"
-            >
+
+            <Button onClick={openFileDialog} disabled={isProcessing} className="mb-4">
               <Icon name="FolderOpen" size={16} className="mr-2" />
               Choose Files
             </Button>
-            
+
             <div className="text-xs text-muted-foreground space-y-1">
               <p>Supported: JPG, PNG, WebP, GIF</p>
               <p>Max size: 10MB per file</p>
@@ -235,7 +240,7 @@ const ImageUploadZone = ({
           </div>
         </div>
       )}
-      
+
       {/* Uploaded Images Grid */}
       {uploadedImages?.length > 0 && (
         <div className="mt-6">
@@ -263,7 +268,7 @@ const ImageUploadZone = ({
                     alt={`Uploaded product image: ${image?.name}`}
                     className="w-full h-full object-cover"
                   />
-                  
+
                   {/* Enhanced Upload Progress */}
                   {uploadProgress?.[image?.id] !== undefined && (
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
@@ -272,13 +277,11 @@ const ImageUploadZone = ({
                         <div className="text-white text-sm font-medium">
                           {Math.round(uploadProgress?.[image?.id])}%
                         </div>
-                        <div className="text-white/80 text-xs mt-1">
-                          Uploading...
-                        </div>
+                        <div className="text-white/80 text-xs mt-1">Uploading...</div>
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Remove Button */}
                   <button
                     onClick={() => removeImage(image?.id)}
@@ -288,12 +291,10 @@ const ImageUploadZone = ({
                     <Icon name="X" size={12} />
                   </button>
                 </div>
-                
+
                 {/* Image Info */}
                 <div className="mt-2">
-                  <p className="text-xs font-medium text-foreground truncate">
-                    {image?.name}
-                  </p>
+                  <p className="text-xs font-medium text-foreground truncate">{image?.name}</p>
                   <p className="text-xs text-muted-foreground">
                     {(image?.size / 1024 / 1024)?.toFixed(1)} MB
                   </p>
@@ -303,7 +304,7 @@ const ImageUploadZone = ({
           </div>
         </div>
       )}
-      
+
       {/* Enhanced Processing State */}
       {isProcessing && (
         <div className="mt-6 bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 rounded-lg p-4">
@@ -311,12 +312,14 @@ const ImageUploadZone = ({
             <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
             <div>
               <h4 className="text-sm font-medium text-primary">AI Analysis in Progress</h4>
-              <p className="text-sm text-primary/80">Gemini AI is analyzing your product images. This may take a moment...</p>
+              <p className="text-sm text-primary/80">
+                Gemini AI is analyzing your product images. This may take a moment...
+              </p>
             </div>
           </div>
         </div>
       )}
-      
+
       {/* Enhanced Tips with AI Focus */}
       <div className="mt-6 bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/20 rounded-lg p-4">
         <h4 className="text-sm font-medium text-foreground mb-2 flex items-center">

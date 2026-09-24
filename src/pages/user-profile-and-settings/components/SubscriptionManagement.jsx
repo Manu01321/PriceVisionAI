@@ -75,7 +75,7 @@ const SubscriptionManagement = ({ subscription, onUpgrade, onDowngrade, onCancel
     dataExports: { used: 0, limit: 1 }
   };
 
-  const currentPlan = plans?.find(plan => plan?.id === subscription?.currentPlan) || plans?.[0];
+  const currentPlan = plans?.find((plan) => plan?.id === subscription?.currentPlan) || plans?.[0];
 
   const formatPrice = (price) => {
     if (price === 0) return 'Free';
@@ -95,11 +95,11 @@ const SubscriptionManagement = ({ subscription, onUpgrade, onDowngrade, onCancel
 
   const handlePlanChange = (planId) => {
     if (planId === subscription?.currentPlan) return;
-    
-    const newPlan = plans?.find(plan => plan?.id === planId);
-    const currentPlanIndex = plans?.findIndex(plan => plan?.id === subscription?.currentPlan);
-    const newPlanIndex = plans?.findIndex(plan => plan?.id === planId);
-    
+
+    const newPlan = plans?.find((plan) => plan?.id === planId);
+    const currentPlanIndex = plans?.findIndex((plan) => plan?.id === subscription?.currentPlan);
+    const newPlanIndex = plans?.findIndex((plan) => plan?.id === planId);
+
     if (newPlanIndex > currentPlanIndex) {
       onUpgrade(planId, billingCycle);
     } else {
@@ -123,7 +123,8 @@ const SubscriptionManagement = ({ subscription, onUpgrade, onDowngrade, onCancel
             <p className="text-sm text-muted-foreground">{currentPlan?.description}</p>
             {subscription?.currentPlan !== 'free' && (
               <p className="text-xs text-muted-foreground mt-1">
-                Next billing: {subscription?.nextBilling} • Auto-renewal: {subscription?.autoRenewal ? 'On' : 'Off'}
+                Next billing: {subscription?.nextBilling} • Auto-renewal:{' '}
+                {subscription?.autoRenewal ? 'On' : 'Off'}
               </p>
             )}
           </div>
@@ -147,17 +148,30 @@ const SubscriptionManagement = ({ subscription, onUpgrade, onDowngrade, onCancel
             <div className="p-4 border border-border rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-foreground">Price Alerts</span>
-                <span className={`text-sm font-medium ${getUsageColor(getUsagePercentage(usageStats?.priceAlerts?.used, usageStats?.priceAlerts?.limit))}`}>
+                <span
+                  className={`text-sm font-medium ${getUsageColor(getUsagePercentage(usageStats?.priceAlerts?.used, usageStats?.priceAlerts?.limit))}`}
+                >
                   {usageStats?.priceAlerts?.used}/{usageStats?.priceAlerts?.limit}
                 </span>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
-                <div 
+                <div
                   className={`h-2 rounded-full transition-all ${
-                    getUsagePercentage(usageStats?.priceAlerts?.used, usageStats?.priceAlerts?.limit) >= 90 ? 'bg-error' :
-                    getUsagePercentage(usageStats?.priceAlerts?.used, usageStats?.priceAlerts?.limit) >= 70 ? 'bg-warning': 'bg-success'
+                    getUsagePercentage(
+                      usageStats?.priceAlerts?.used,
+                      usageStats?.priceAlerts?.limit
+                    ) >= 90
+                      ? 'bg-error'
+                      : getUsagePercentage(
+                            usageStats?.priceAlerts?.used,
+                            usageStats?.priceAlerts?.limit
+                          ) >= 70
+                        ? 'bg-warning'
+                        : 'bg-success'
                   }`}
-                  style={{ width: `${getUsagePercentage(usageStats?.priceAlerts?.used, usageStats?.priceAlerts?.limit)}%` }}
+                  style={{
+                    width: `${getUsagePercentage(usageStats?.priceAlerts?.used, usageStats?.priceAlerts?.limit)}%`
+                  }}
                 ></div>
               </div>
             </div>
@@ -165,17 +179,30 @@ const SubscriptionManagement = ({ subscription, onUpgrade, onDowngrade, onCancel
             <div className="p-4 border border-border rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-foreground">Watchlist Items</span>
-                <span className={`text-sm font-medium ${getUsageColor(getUsagePercentage(usageStats?.watchlistItems?.used, usageStats?.watchlistItems?.limit))}`}>
+                <span
+                  className={`text-sm font-medium ${getUsageColor(getUsagePercentage(usageStats?.watchlistItems?.used, usageStats?.watchlistItems?.limit))}`}
+                >
                   {usageStats?.watchlistItems?.used}/{usageStats?.watchlistItems?.limit}
                 </span>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
-                <div 
+                <div
                   className={`h-2 rounded-full transition-all ${
-                    getUsagePercentage(usageStats?.watchlistItems?.used, usageStats?.watchlistItems?.limit) >= 90 ? 'bg-error' :
-                    getUsagePercentage(usageStats?.watchlistItems?.used, usageStats?.watchlistItems?.limit) >= 70 ? 'bg-warning': 'bg-success'
+                    getUsagePercentage(
+                      usageStats?.watchlistItems?.used,
+                      usageStats?.watchlistItems?.limit
+                    ) >= 90
+                      ? 'bg-error'
+                      : getUsagePercentage(
+                            usageStats?.watchlistItems?.used,
+                            usageStats?.watchlistItems?.limit
+                          ) >= 70
+                        ? 'bg-warning'
+                        : 'bg-success'
                   }`}
-                  style={{ width: `${getUsagePercentage(usageStats?.watchlistItems?.used, usageStats?.watchlistItems?.limit)}%` }}
+                  style={{
+                    width: `${getUsagePercentage(usageStats?.watchlistItems?.used, usageStats?.watchlistItems?.limit)}%`
+                  }}
                 ></div>
               </div>
             </div>
@@ -188,7 +215,9 @@ const SubscriptionManagement = ({ subscription, onUpgrade, onDowngrade, onCancel
           <button
             onClick={() => setBillingCycle('monthly')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              billingCycle === 'monthly' ?'bg-surface text-foreground shadow-soft' :'text-muted-foreground hover:text-foreground'
+              billingCycle === 'monthly'
+                ? 'bg-surface text-foreground shadow-soft'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Monthly
@@ -196,11 +225,15 @@ const SubscriptionManagement = ({ subscription, onUpgrade, onDowngrade, onCancel
           <button
             onClick={() => setBillingCycle('yearly')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              billingCycle === 'yearly' ?'bg-surface text-foreground shadow-soft' :'text-muted-foreground hover:text-foreground'
+              billingCycle === 'yearly'
+                ? 'bg-surface text-foreground shadow-soft'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Yearly
-            <span className="ml-1 px-2 py-1 bg-success/10 text-success text-xs rounded-full">Save 17%</span>
+            <span className="ml-1 px-2 py-1 bg-success/10 text-success text-xs rounded-full">
+              Save 17%
+            </span>
           </button>
         </div>
       </div>
@@ -217,7 +250,9 @@ const SubscriptionManagement = ({ subscription, onUpgrade, onDowngrade, onCancel
           >
             {plan?.popular && (
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <span className="px-3 py-1 bg-primary text-white text-xs rounded-full">Most Popular</span>
+                <span className="px-3 py-1 bg-primary text-white text-xs rounded-full">
+                  Most Popular
+                </span>
               </div>
             )}
 
@@ -253,8 +288,11 @@ const SubscriptionManagement = ({ subscription, onUpgrade, onDowngrade, onCancel
               onClick={() => handlePlanChange(plan?.id)}
               disabled={plan?.id === subscription?.currentPlan}
             >
-              {plan?.id === subscription?.currentPlan ? 'Current Plan' : 
-               plan?.price?.[billingCycle] === 0 ? 'Downgrade' : 'Upgrade'}
+              {plan?.id === subscription?.currentPlan
+                ? 'Current Plan'
+                : plan?.price?.[billingCycle] === 0
+                  ? 'Downgrade'
+                  : 'Upgrade'}
             </Button>
           </div>
         ))}
@@ -284,8 +322,10 @@ const SubscriptionManagement = ({ subscription, onUpgrade, onDowngrade, onCancel
               <h5 className="text-sm font-medium text-foreground mb-2">Billing Address</h5>
               <div className="p-3 border border-border rounded-lg">
                 <div className="text-sm text-foreground">
-                  123 Main Street<br />
-                  New York, NY 10001<br />
+                  123 Main Street
+                  <br />
+                  New York, NY 10001
+                  <br />
                   United States
                 </div>
                 <Button variant="ghost" size="sm" iconName="Edit" className="mt-2">
@@ -304,7 +344,7 @@ const SubscriptionManagement = ({ subscription, onUpgrade, onDowngrade, onCancel
                 Billing Settings
               </Button>
             </div>
-            
+
             {subscription?.currentPlan !== 'free' && (
               <Button variant="destructive" onClick={onCancel} iconName="X" iconPosition="left">
                 Cancel Subscription

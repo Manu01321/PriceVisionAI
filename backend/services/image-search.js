@@ -29,31 +29,31 @@ class ImageSearchService {
 
   async searchByImage(options = {}) {
     const { imageUrl, imageBase64, confidence = 0.7, limit = 20 } = options;
-    
+
     try {
       this.logger.info('Starting image-based product search');
-      
+
       // Process the image
       const processedImage = await this.processImage(imageUrl, imageBase64);
-      
+
       // Extract product information using AI
       const productInfo = await this.extractProductInfoFromImage(processedImage);
-      
+
       if (!productInfo || !productInfo.searchTerms) {
         throw new Error('Unable to extract product information from image');
       }
-      
+
       this.logger.info(`Extracted product info: ${JSON.stringify(productInfo)}`);
-      
+
       // Search across e-commerce sites using extracted information
       const searchResults = await this.searchWithExtractedInfo(productInfo, {
         confidence,
         limit
       });
-      
+
       // Clean up temporary files
       await this.cleanup(processedImage.tempPath);
-      
+
       return {
         extractedInfo: productInfo,
         aiAnalysis: productInfo,
@@ -62,7 +62,6 @@ class ImageSearchService {
         searchConfidence: productInfo.confidence || confidence,
         searchMethod: 'ai_image_analysis'
       };
-      
     } catch (error) {
       this.logger.error('Image search failed:', error);
       throw error;
@@ -72,7 +71,7 @@ class ImageSearchService {
   async processImage(imageUrl, imageBase64) {
     let imageBuffer;
     let tempPath;
-    
+
     try {
       if (imageUrl) {
         const response = await axios.get(imageUrl, {
@@ -87,13 +86,16 @@ class ImageSearchService {
       } else {
         throw new Error('No image provided');
       }
-      
+
       if (imageBuffer.length === 0) throw new Error('Invalid image data');
 
       // Resize without sharp — use raw buffer directly
-      tempPath = path.join(this.tempDir, `search_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`);
+      tempPath = path.join(
+        this.tempDir,
+        `search_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`
+      );
       await fs.writeFile(tempPath, imageBuffer);
-      
+
       return {
         buffer: imageBuffer,
         base64: imageBuffer.toString('base64'),
@@ -119,7 +121,9 @@ class ImageSearchService {
       return await this.analyzeImageWithOpenAI(processedImage);
     } catch (error) {
       this.logger.error('AI image analysis failed:', error);
-      return await this.analyzeImageWithOpenAI(processedImage).catch(() => this.basicImageAnalysis());
+      return await this.analyzeImageWithOpenAI(processedImage).catch(() =>
+        this.basicImageAnalysis()
+      );
     }
   }
 
@@ -161,10 +165,7 @@ class ImageSearchService {
         contents: [
           {
             role: 'user',
-            parts: [
-              { text: prompt },
-              { inlineData: { data: base64Image, mimeType: 'image/jpeg' } }
-            ]
+            parts: [{ text: prompt }, { inlineData: { data: base64Image, mimeType: 'image/jpeg' } }]
           }
         ],
         generationConfig: {
@@ -178,7 +179,10 @@ class ImageSearchService {
         throw new Error('No candidates returned from Gemini');
       }
 
-      const text = candidate.content.parts.map(p => p.text || '').join('').trim();
+      const text = candidate.content.parts
+        .map((p) => p.text || '')
+        .join('')
+        .trim();
       return text;
     } catch (error) {
       this.logger.error('Gemini analysis failed:', error);
@@ -189,7 +193,7 @@ class ImageSearchService {
   parseAIAnalysis(analysisResult) {
     try {
       const parsed = JSON.parse(analysisResult);
-      
+
       return {
         productName: parsed.productName || '',
         brand: parsed.brand || '',
@@ -201,7 +205,6 @@ class ImageSearchService {
         modelNumber: parsed.modelNumber || '',
         rawAnalysis: parsed
       };
-      
     } catch (error) {
       this.logger.error('Failed to parse AI analysis:', error);
       return this.basicImageAnalysis();
@@ -225,10 +228,10 @@ class ImageSearchService {
 
   async searchWithExtractedInfo(productInfo, options = {}) {
     const { confidence = 0.7, limit = 20 } = options;
-    
+
     try {
       const searchResults = [];
-      
+
       // Try different search strategies based on confidence
       if (productInfo.confidence >= confidence) {
         // High confidence - use specific search terms
@@ -238,14 +241,14 @@ class ImageSearchService {
               limit: Math.ceil(limit / 3),
               category: productInfo.category !== 'general' ? productInfo.category : undefined
             });
-            
+
             // Add image search metadata
-            results.forEach(result => {
+            results.forEach((result) => {
               result.searchMethod = 'image_to_text';
               result.imageConfidence = productInfo.confidence;
               result.extractedTerm = searchTerm;
             });
-            
+
             searchResults.push(...results);
           } catch (error) {
             this.logger.warn(`Search failed for term: ${searchTerm}`, error.message);
@@ -253,29 +256,29 @@ class ImageSearchService {
         }
       } else {
         // Lower confidence - use broader search
-        const broadSearchTerm = `${productInfo.brand} ${productInfo.productName}`.trim() || 
-                               productInfo.searchTerms[0] || 
-                               'product';
-        
+        const broadSearchTerm =
+          `${productInfo.brand} ${productInfo.productName}`.trim() ||
+          productInfo.searchTerms[0] ||
+          'product';
+
         const results = await this.productSearchService.searchByText(broadSearchTerm, {
           limit: limit
         });
-        
-        results.forEach(result => {
+
+        results.forEach((result) => {
           result.searchMethod = 'image_to_text_broad';
           result.imageConfidence = productInfo.confidence;
           result.extractedTerm = broadSearchTerm;
         });
-        
+
         searchResults.push(...results);
       }
-      
+
       // Remove duplicates and sort by relevance
       const uniqueResults = this.removeDuplicateResults(searchResults);
       const enhancedResults = this.enhanceImageSearchResults(uniqueResults, productInfo);
-      
+
       return enhancedResults.slice(0, limit);
-      
     } catch (error) {
       this.logger.error('Search with extracted info failed:', error);
       throw error;
@@ -284,7 +287,7 @@ class ImageSearchService {
 
   removeDuplicateResults(results) {
     const seen = new Set();
-    return results.filter(result => {
+    return results.filter((result) => {
       const key = `${result.title}_${result.price}_${result.source}`;
       if (seen.has(key)) {
         return false;
@@ -295,61 +298,68 @@ class ImageSearchService {
   }
 
   enhanceImageSearchResults(results, productInfo) {
-    return results.map(result => {
-      // Calculate image match score based on extracted info
-      let imageMatchScore = 0;
-      
-      // Brand match
-      if (productInfo.brand && result.brand && 
-          result.brand.toLowerCase().includes(productInfo.brand.toLowerCase())) {
-        imageMatchScore += 30;
-      }
-      
-      // Title relevance
-      if (productInfo.productName) {
-        const productWords = productInfo.productName.toLowerCase().split(' ');
-        const titleWords = result.title.toLowerCase().split(' ');
-        
-        const matchingWords = productWords.filter(word => 
-          titleWords.some(titleWord => titleWord.includes(word) || word.includes(titleWord))
-        );
-        
-        imageMatchScore += (matchingWords.length / productWords.length) * 40;
-      }
-      
-      // Feature matches
-      if (productInfo.features && productInfo.features.length > 0) {
-        const featureMatches = productInfo.features.filter(feature =>
-          result.title.toLowerCase().includes(feature.toLowerCase()) ||
-          (result.description && result.description.toLowerCase().includes(feature.toLowerCase()))
-        );
-        
-        imageMatchScore += (featureMatches.length / productInfo.features.length) * 20;
-      }
-      
-      // Color match
-      if (productInfo.color && productInfo.color !== 'unknown') {
-        if (result.title.toLowerCase().includes(productInfo.color.toLowerCase())) {
-          imageMatchScore += 10;
+    return results
+      .map((result) => {
+        // Calculate image match score based on extracted info
+        let imageMatchScore = 0;
+
+        // Brand match
+        if (
+          productInfo.brand &&
+          result.brand &&
+          result.brand.toLowerCase().includes(productInfo.brand.toLowerCase())
+        ) {
+          imageMatchScore += 30;
         }
-      }
-      
-      return {
-        ...result,
-        imageMatchScore: Math.min(imageMatchScore, 100),
-        extractedProductInfo: {
-          name: productInfo.productName,
-          brand: productInfo.brand,
-          category: productInfo.category,
-          confidence: productInfo.confidence
+
+        // Title relevance
+        if (productInfo.productName) {
+          const productWords = productInfo.productName.toLowerCase().split(' ');
+          const titleWords = result.title.toLowerCase().split(' ');
+
+          const matchingWords = productWords.filter((word) =>
+            titleWords.some((titleWord) => titleWord.includes(word) || word.includes(titleWord))
+          );
+
+          imageMatchScore += (matchingWords.length / productWords.length) * 40;
         }
-      };
-    }).sort((a, b) => {
-      // Sort by combined score of image match and original relevance
-      const scoreA = (a.imageMatchScore * 0.6) + (a.relevanceScore * 0.4);
-      const scoreB = (b.imageMatchScore * 0.6) + (b.relevanceScore * 0.4);
-      return scoreB - scoreA;
-    });
+
+        // Feature matches
+        if (productInfo.features && productInfo.features.length > 0) {
+          const featureMatches = productInfo.features.filter(
+            (feature) =>
+              result.title.toLowerCase().includes(feature.toLowerCase()) ||
+              (result.description &&
+                result.description.toLowerCase().includes(feature.toLowerCase()))
+          );
+
+          imageMatchScore += (featureMatches.length / productInfo.features.length) * 20;
+        }
+
+        // Color match
+        if (productInfo.color && productInfo.color !== 'unknown') {
+          if (result.title.toLowerCase().includes(productInfo.color.toLowerCase())) {
+            imageMatchScore += 10;
+          }
+        }
+
+        return {
+          ...result,
+          imageMatchScore: Math.min(imageMatchScore, 100),
+          extractedProductInfo: {
+            name: productInfo.productName,
+            brand: productInfo.brand,
+            category: productInfo.category,
+            confidence: productInfo.confidence
+          }
+        };
+      })
+      .sort((a, b) => {
+        // Sort by combined score of image match and original relevance
+        const scoreA = a.imageMatchScore * 0.6 + a.relevanceScore * 0.4;
+        const scoreB = b.imageMatchScore * 0.6 + b.relevanceScore * 0.4;
+        return scoreB - scoreA;
+      });
   }
 
   async cleanup(tempPath) {
@@ -365,20 +375,19 @@ class ImageSearchService {
   // Batch image search for multiple images
   async batchImageSearch(imageRequests, options = {}) {
     const results = [];
-    
+
     for (const request of imageRequests) {
       try {
         const result = await this.searchByImage({
           ...request,
           ...options
         });
-        
+
         results.push({
           success: true,
           requestId: request.id || `req_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
           result
         });
-        
       } catch (error) {
         results.push({
           success: false,
@@ -387,7 +396,7 @@ class ImageSearchService {
         });
       }
     }
-    
+
     return results;
   }
 

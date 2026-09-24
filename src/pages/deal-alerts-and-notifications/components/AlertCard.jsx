@@ -56,21 +56,31 @@ const AlertCard = ({ alert, onMarkAsRead, onArchive, onQuickAction }) => {
   };
 
   return (
-    <div className={`bg-surface border border-border rounded-lg p-4 transition-all duration-200 hover:shadow-soft ${getUrgencyColor(alert?.urgency)} border-l-4`}>
+    <div
+      className={`bg-surface border border-border rounded-lg p-4 transition-all duration-200 hover:shadow-soft ${getUrgencyColor(alert?.urgency)} border-l-4`}
+    >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-start space-x-3 flex-1">
           {/* Alert Icon */}
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-            alert?.urgency === 'high' ? 'bg-error/10' :
-            alert?.urgency === 'medium'? 'bg-warning/10' : 'bg-success/10'
-          }`}>
-            <Icon 
-              name={getAlertIcon(alert?.type)} 
-              size={20} 
+          <div
+            className={`w-10 h-10 rounded-full flex items-center justify-center ${
+              alert?.urgency === 'high'
+                ? 'bg-error/10'
+                : alert?.urgency === 'medium'
+                  ? 'bg-warning/10'
+                  : 'bg-success/10'
+            }`}
+          >
+            <Icon
+              name={getAlertIcon(alert?.type)}
+              size={20}
               className={
-                alert?.urgency === 'high' ? 'text-error' :
-                alert?.urgency === 'medium'? 'text-warning' : 'text-success'
+                alert?.urgency === 'high'
+                  ? 'text-error'
+                  : alert?.urgency === 'medium'
+                    ? 'text-warning'
+                    : 'text-success'
               }
             />
           </div>
@@ -79,19 +89,22 @@ const AlertCard = ({ alert, onMarkAsRead, onArchive, onQuickAction }) => {
           <div className="flex-1 min-w-0">
             <div className="flex items-center space-x-2 mb-1">
               <h3 className="font-semibold text-foreground text-sm">{alert?.title}</h3>
-              {!alert?.isRead && (
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-              )}
-              <span className={`px-2 py-1 text-xs rounded-full ${
-                alert?.urgency === 'high' ? 'bg-error/10 text-error' :
-                alert?.urgency === 'medium'? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
-              }`}>
+              {!alert?.isRead && <div className="w-2 h-2 bg-primary rounded-full"></div>}
+              <span
+                className={`px-2 py-1 text-xs rounded-full ${
+                  alert?.urgency === 'high'
+                    ? 'bg-error/10 text-error'
+                    : alert?.urgency === 'medium'
+                      ? 'bg-warning/10 text-warning'
+                      : 'bg-success/10 text-success'
+                }`}
+              >
                 {alert?.urgency?.toUpperCase()}
               </span>
             </div>
-            
+
             <p className="text-sm text-muted-foreground mb-2">{alert?.message}</p>
-            
+
             <div className="flex items-center space-x-4 text-xs text-muted-foreground">
               <span>{formatTimestamp(alert?.timestamp)}</span>
               <span className="flex items-center space-x-1">
@@ -110,9 +123,9 @@ const AlertCard = ({ alert, onMarkAsRead, onArchive, onQuickAction }) => {
             onClick={() => setIsExpanded(!isExpanded)}
             className="h-8 w-8"
           >
-            <Icon name={isExpanded ? "ChevronUp" : "ChevronDown"} size={16} />
+            <Icon name={isExpanded ? 'ChevronUp' : 'ChevronDown'} size={16} />
           </Button>
-          
+
           <Button
             variant="ghost"
             size="icon"
@@ -131,11 +144,9 @@ const AlertCard = ({ alert, onMarkAsRead, onArchive, onQuickAction }) => {
             alt={alert?.product?.imageAlt}
             className="w-12 h-12 rounded-lg object-cover"
           />
-          
+
           <div className="flex-1 min-w-0">
-            <h4 className="font-medium text-sm text-foreground truncate">
-              {alert?.product?.name}
-            </h4>
+            <h4 className="font-medium text-sm text-foreground truncate">{alert?.product?.name}</h4>
             <p className="text-xs text-muted-foreground">{alert?.product?.brand}</p>
           </div>
 
@@ -146,13 +157,9 @@ const AlertCard = ({ alert, onMarkAsRead, onArchive, onQuickAction }) => {
                 <span className="text-xs text-muted-foreground line-through">
                   ₹{alert?.priceInfo?.oldPrice}
                 </span>
-                <span className="font-semibold text-success">
-                  ₹{alert?.priceInfo?.newPrice}
-                </span>
+                <span className="font-semibold text-success">₹{alert?.priceInfo?.newPrice}</span>
               </div>
-              <div className="text-xs text-success">
-                Save {alert?.priceInfo?.savings}%
-              </div>
+              <div className="text-xs text-success">Save {alert?.priceInfo?.savings}%</div>
             </div>
           )}
         </div>
@@ -182,7 +189,7 @@ const AlertCard = ({ alert, onMarkAsRead, onArchive, onQuickAction }) => {
             >
               View Product
             </Button>
-            
+
             <Button
               variant="outline"
               size="sm"
@@ -192,7 +199,7 @@ const AlertCard = ({ alert, onMarkAsRead, onArchive, onQuickAction }) => {
             >
               Add to Watchlist
             </Button>
-            
+
             <Button
               variant="outline"
               size="sm"
@@ -202,7 +209,7 @@ const AlertCard = ({ alert, onMarkAsRead, onArchive, onQuickAction }) => {
             >
               Compare Prices
             </Button>
-            
+
             <Button
               variant="outline"
               size="sm"
@@ -238,7 +245,9 @@ const AlertCard = ({ alert, onMarkAsRead, onArchive, onQuickAction }) => {
               {alert?.details?.confidence && (
                 <div>
                   <span className="text-muted-foreground">AI Confidence:</span>
-                  <span className="ml-2 font-medium text-success">{alert?.details?.confidence}%</span>
+                  <span className="ml-2 font-medium text-success">
+                    {alert?.details?.confidence}%
+                  </span>
                 </div>
               )}
             </div>

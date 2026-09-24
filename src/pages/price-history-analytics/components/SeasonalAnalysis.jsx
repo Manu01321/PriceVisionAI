@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell
+} from 'recharts';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
@@ -103,7 +114,7 @@ const SeasonalAnalysis = ({ productCategory }) => {
             Historical patterns and seasonal trends for {productCategory || 'Electronics'}
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <Button
             variant={activeView === 'monthly' ? 'default' : 'outline'}
@@ -130,22 +141,14 @@ const SeasonalAnalysis = ({ productCategory }) => {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={monthlyData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                  <XAxis 
-                    dataKey="month" 
-                    stroke="var(--color-muted-foreground)"
-                    fontSize={12}
-                  />
-                  <YAxis 
+                  <XAxis dataKey="month" stroke="var(--color-muted-foreground)" fontSize={12} />
+                  <YAxis
                     tickFormatter={formatPrice}
                     stroke="var(--color-muted-foreground)"
                     fontSize={12}
                   />
                   <Tooltip content={<CustomTooltip />} />
-                  <Bar 
-                    dataKey="avgPrice" 
-                    fill="var(--color-primary)"
-                    radius={[4, 4, 0, 0]}
-                  />
+                  <Bar dataKey="avgPrice" fill="var(--color-primary)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -170,10 +173,10 @@ const SeasonalAnalysis = ({ productCategory }) => {
                       <Cell key={`cell-${index}`} fill={entry?.color} />
                     ))}
                   </Pie>
-                  <Tooltip 
+                  <Tooltip
                     formatter={(value) => [`${value}%`, 'Share']}
                     labelStyle={{ color: 'var(--color-foreground)' }}
-                    contentStyle={{ 
+                    contentStyle={{
                       backgroundColor: 'var(--color-surface)',
                       border: '1px solid var(--color-border)',
                       borderRadius: '8px'
@@ -182,15 +185,12 @@ const SeasonalAnalysis = ({ productCategory }) => {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            
+
             {/* Legend */}
             <div className="grid grid-cols-2 gap-2 mt-4">
               {dealFrequencyData?.map((item) => (
                 <div key={item?.name} className="flex items-center space-x-2">
-                  <div 
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: item?.color }}
-                  />
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item?.color }} />
                   <span className="text-xs text-muted-foreground">{item?.name}</span>
                   <span className="text-xs font-medium text-foreground">{item?.value}%</span>
                 </div>
@@ -204,7 +204,7 @@ const SeasonalAnalysis = ({ productCategory }) => {
             <div key={season?.season} className="bg-surface border border-border rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
-                  <div 
+                  <div
                     className="w-4 h-4 rounded-full"
                     style={{ backgroundColor: season?.color }}
                   />
@@ -212,24 +212,24 @@ const SeasonalAnalysis = ({ productCategory }) => {
                 </div>
                 <span className="text-sm text-muted-foreground">{season?.months}</span>
               </div>
-              
+
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Average Discount</span>
                   <span className="text-lg font-semibold text-success">{season?.avgDiscount}</span>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Best Month</span>
                   <span className="text-sm font-medium text-foreground">{season?.bestMonth}</span>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Pattern</span>
                   <span className="text-sm text-foreground">{season?.pattern}</span>
                 </div>
               </div>
-              
+
               {/* Progress bar for discount level */}
               <div className="mt-4">
                 <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
@@ -237,9 +237,9 @@ const SeasonalAnalysis = ({ productCategory }) => {
                   <span>{season?.avgDiscount}</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
-                  <div 
+                  <div
                     className="h-2 rounded-full"
-                    style={{ 
+                    style={{
                       backgroundColor: season?.color,
                       width: `${parseInt(season?.avgDiscount)}%`
                     }}

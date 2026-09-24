@@ -1,5 +1,9 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
-import { analyzeProductImages, generateProductRecommendations, handleGeminiError } from '../utils/geminiImageAnalysis';
+import {
+  analyzeProductImages,
+  generateProductRecommendations,
+  handleGeminiError
+} from '../utils/geminiImageAnalysis';
 
 /**
  * React hook for managing Gemini image analysis requests.
@@ -9,7 +13,7 @@ export function useGeminiImageAnalysis() {
   const abortControllerRef = useRef(null);
   const progressIntervalRef = useRef(null);
   const timeoutRef = useRef(null);
-  
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStage, setProcessingStage] = useState('');
   const [processingProgress, setProcessingProgress] = useState(0);
@@ -40,7 +44,9 @@ export function useGeminiImageAnalysis() {
 
     // Validate API key first
     if (!import.meta.env?.VITE_GEMINI_API_KEY) {
-      setError('Gemini API key is not configured. Please add VITE_GEMINI_API_KEY to your environment variables.');
+      setError(
+        'Gemini API key is not configured. Please add VITE_GEMINI_API_KEY to your environment variables.'
+      );
       return null;
     }
 
@@ -49,7 +55,7 @@ export function useGeminiImageAnalysis() {
 
     // Create new abort controller
     abortControllerRef.current = new AbortController();
-    
+
     // Reset states
     setIsProcessing(true);
     setProcessingProgress(0);
@@ -62,7 +68,9 @@ export function useGeminiImageAnalysis() {
       const TIMEOUT_DURATION = 30000;
       timeoutRef.current = setTimeout(() => {
         cleanup();
-        setError('Request timed out. Please try again with smaller images or check your internet connection.');
+        setError(
+          'Request timed out. Please try again with smaller images or check your internet connection.'
+        );
         setIsProcessing(false);
         setProcessingProgress(0);
         setProcessingStage('Timeout');
@@ -84,14 +92,17 @@ export function useGeminiImageAnalysis() {
       let totalDelay = 0;
 
       const updateProgress = () => {
-        if (currentStageIndex < progressStages?.length && !abortControllerRef?.current?.signal?.aborted) {
+        if (
+          currentStageIndex < progressStages?.length &&
+          !abortControllerRef?.current?.signal?.aborted
+        ) {
           const stage = progressStages?.[currentStageIndex];
           setProcessingStage(stage?.stage);
           setProcessingProgress(stage?.progress);
-          
+
           totalDelay += stage?.delay;
           currentStageIndex++;
-          
+
           progressIntervalRef.current = setTimeout(updateProgress, stage?.delay);
         }
       };
@@ -100,13 +111,10 @@ export function useGeminiImageAnalysis() {
       updateProgress();
 
       // Execute the actual analysis with proper timing
-      const analysisPromise = analyzeProductImages(
-        imageFiles,
-        abortControllerRef?.current?.signal
-      );
+      const analysisPromise = analyzeProductImages(imageFiles, abortControllerRef?.current?.signal);
 
       const analysisResult = await analysisPromise;
-      
+
       // Clean up progress simulation
       cleanup();
 
@@ -117,20 +125,23 @@ export function useGeminiImageAnalysis() {
       // Complete progress
       setProcessingProgress(100);
       setProcessingStage('Analysis complete!');
-      
+
       // Small delay to show completion
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       setAnalysisResults(analysisResult);
-      
+
       return analysisResult;
-      
     } catch (err) {
       console.error('Image analysis failed:', err);
-      
+
       cleanup();
-      
-      if (err?.name === 'AbortError' || err?.message?.includes('cancelled') || err?.message?.includes('aborted')) {
+
+      if (
+        err?.name === 'AbortError' ||
+        err?.message?.includes('cancelled') ||
+        err?.message?.includes('aborted')
+      ) {
         setError('Analysis was cancelled.');
         setProcessingStage('Cancelled');
       } else if (err?.message?.includes('timeout')) {
@@ -141,7 +152,7 @@ export function useGeminiImageAnalysis() {
         setError(friendlyError);
         setProcessingStage('Analysis failed');
       }
-      
+
       setProcessingProgress(0);
       return null;
     } finally {
@@ -204,14 +215,14 @@ export function useGeminiImageAnalysis() {
     generateRecommendations,
     cancelAnalysis,
     clearResults,
-    
+
     // State
     isProcessing,
     processingStage,
     processingProgress,
     analysisResults,
     error,
-    
+
     // Computed states
     hasResults: !!analysisResults,
     canCancel: isProcessing && !!abortControllerRef?.current,

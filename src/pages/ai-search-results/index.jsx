@@ -27,19 +27,28 @@ const AISearchResults = () => {
   // Initialize search from URL params or location state
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
-    const query = urlParams?.get('q') || location?.state?.searchQuery || location?.state?.query || '';
+    const query =
+      urlParams?.get('q') || location?.state?.searchQuery || location?.state?.query || '';
 
     // Check if we have results passed from image/voice search
     if (location?.state?.results && location?.state?.results?.length > 0) {
       const passedResults = location.state.results;
       setProducts(passedResults);
       setSearchQuery(location?.state?.searchQuery || 'Uploaded product');
-      setAiSource(location?.state?.searchType === 'upload' || location?.state?.searchType === 'camera' ? 'AI Vision' : 'AI Search');
+      setAiSource(
+        location?.state?.searchType === 'upload' || location?.state?.searchType === 'camera'
+          ? 'AI Vision'
+          : 'AI Search'
+      );
       const stats = {
         totalResults: passedResults?.length,
-        avgConfidence: passedResults?.length > 0
-          ? Math.round(passedResults?.reduce((sum, p) => sum + (p?.confidence || 85), 0) / passedResults?.length)
-          : 0,
+        avgConfidence:
+          passedResults?.length > 0
+            ? Math.round(
+                passedResults?.reduce((sum, p) => sum + (p?.confidence || 85), 0) /
+                  passedResults?.length
+              )
+            : 0,
         hotDeals: passedResults?.filter((p) => (p?.dealUrgency || 0) >= 80)?.length,
         searchTime: 0.38
       };
@@ -51,25 +60,28 @@ const AISearchResults = () => {
     } else {
       performSearch('', {});
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key]);
 
   const performSearch = async (query, newFilters = {}) => {
     setLoading(true);
     const startTime = Date.now();
-    
+
     try {
       console.log('Performing AI-powered search for:', query || 'featured products');
-      
+
       let searchResults = [];
-      
+
       // Use AI Product Service for real AI-powered results
       if (aiProductService.isAvailable()) {
         try {
-          searchResults = await aiProductService.searchProducts(query || 'trending electronics deals', {
-            ...newFilters,
-            limit: 12
-          });
+          searchResults = await aiProductService.searchProducts(
+            query || 'trending electronics deals',
+            {
+              ...newFilters,
+              limit: 12
+            }
+          );
           setAiSource('OpenAI/Gemini');
         } catch (aiError) {
           console.error('AI search failed:', aiError);
@@ -85,14 +97,18 @@ const AISearchResults = () => {
       if (newFilters && Object.keys(newFilters).length > 0) {
         searchResults = applyFilters(searchResults, newFilters);
       }
-      
+
       // Calculate search statistics
       const searchTime = (Date.now() - startTime) / 1000;
       const stats = {
         totalResults: searchResults?.length,
-        avgConfidence: searchResults?.length > 0 
-          ? Math.round(searchResults?.reduce((sum, p) => sum + (p?.confidence || 85), 0) / searchResults?.length)
-          : 0,
+        avgConfidence:
+          searchResults?.length > 0
+            ? Math.round(
+                searchResults?.reduce((sum, p) => sum + (p?.confidence || 85), 0) /
+                  searchResults?.length
+              )
+            : 0,
         hotDeals: searchResults?.filter((p) => (p?.dealUrgency || 0) >= 80)?.length,
         searchTime: searchTime
       };
@@ -100,7 +116,6 @@ const AISearchResults = () => {
       setProducts(searchResults);
       setSearchStats(stats);
       setHasMore(false);
-
     } catch (error) {
       console.error('Search failed:', error);
       setProducts([]);
@@ -192,9 +207,9 @@ const AISearchResults = () => {
     switch (action) {
       case 'watchlist':
         // Toggle watchlist status for products
-        setProducts(prevProducts => 
-          prevProducts?.map(product => 
-            productIds?.includes(product?.id) 
+        setProducts((prevProducts) =>
+          prevProducts?.map((product) =>
+            productIds?.includes(product?.id)
               ? { ...product, isWishlisted: !product?.isWishlisted }
               : product
           )
@@ -202,25 +217,27 @@ const AISearchResults = () => {
         console.log('Toggle watchlist for products:', productIds);
         break;
       case 'compare': {
-        const selectedToCompare = products?.filter(product => productIds?.includes(product?.id)) || [];
+        const selectedToCompare =
+          products?.filter((product) => productIds?.includes(product?.id)) || [];
         // If a single product is selected for comparison, pair it with the next relevant search product
         if (selectedToCompare.length === 1 && products?.length > 1) {
-          const alternative = products.find(p => p?.id !== selectedToCompare[0]?.id);
+          const alternative = products.find((p) => p?.id !== selectedToCompare[0]?.id);
           if (alternative) {
             selectedToCompare.push(alternative);
           }
         }
         navigate('/product-comparison', {
-          state: { 
-            products: selectedToCompare, 
-            productIds, 
+          state: {
+            products: selectedToCompare,
+            productIds,
             fromSearch: true,
-            searchQuery 
+            searchQuery
           }
         });
         break;
       }
-      case 'view_details': console.log('View details for product:', productIds?.[0]);
+      case 'view_details':
+        console.log('View details for product:', productIds?.[0]);
         // Could navigate to a product detail page
         break;
       default:
@@ -248,7 +265,7 @@ const AISearchResults = () => {
   // Generate search suggestions based on current query
   const getSearchSuggestions = () => {
     if (!searchQuery) return [];
-    
+
     const suggestions = [
       `${searchQuery} deals`,
       `${searchQuery} review`,
@@ -256,7 +273,7 @@ const AISearchResults = () => {
       `best ${searchQuery}`,
       `cheap ${searchQuery}`
     ];
-    
+
     return suggestions;
   };
 
@@ -316,7 +333,7 @@ const AISearchResults = () => {
                   <span>{searchStats?.searchTime?.toFixed(2)}s</span>
                 </div>
               </div>
-              
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -353,9 +370,7 @@ const AISearchResults = () => {
                   </Button>
                 ))}
               </div>
-              <Button onClick={() => handleNewSearch('')}>
-                Browse All Products
-              </Button>
+              <Button onClick={() => handleNewSearch('')}>Browse All Products</Button>
             </div>
           )}
         </div>
@@ -369,7 +384,7 @@ const AISearchResults = () => {
                 activeFilters={filters}
                 resultCount={products?.length}
               />
-              
+
               <AIRefinementPanel
                 searchQuery={searchQuery}
                 onRefinementSelect={handleRefinementSelect}

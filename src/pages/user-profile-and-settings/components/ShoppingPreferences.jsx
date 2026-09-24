@@ -19,9 +19,24 @@ const ShoppingPreferences = ({ preferences, onUpdatePreferences }) => {
   ];
 
   const priceSensitivityLevels = [
-    { id: 'low', label: 'Low', description: 'I prioritize quality over price', color: 'text-error' },
-    { id: 'medium', label: 'Medium', description: 'I balance quality and price', color: 'text-warning' },
-    { id: 'high', label: 'High', description: 'I always look for the best deals', color: 'text-success' }
+    {
+      id: 'low',
+      label: 'Low',
+      description: 'I prioritize quality over price',
+      color: 'text-error'
+    },
+    {
+      id: 'medium',
+      label: 'Medium',
+      description: 'I balance quality and price',
+      color: 'text-warning'
+    },
+    {
+      id: 'high',
+      label: 'High',
+      description: 'I always look for the best deals',
+      color: 'text-success'
+    }
   ];
 
   const notificationTiming = [
@@ -32,10 +47,10 @@ const ShoppingPreferences = ({ preferences, onUpdatePreferences }) => {
 
   const handleCategoryToggle = (categoryId) => {
     const updatedCategories = localPreferences?.favoriteCategories?.includes(categoryId)
-      ? localPreferences?.favoriteCategories?.filter(id => id !== categoryId)
+      ? localPreferences?.favoriteCategories?.filter((id) => id !== categoryId)
       : [...localPreferences?.favoriteCategories, categoryId];
-    
-    setLocalPreferences(prev => ({
+
+    setLocalPreferences((prev) => ({
       ...prev,
       favoriteCategories: updatedCategories
     }));
@@ -43,7 +58,7 @@ const ShoppingPreferences = ({ preferences, onUpdatePreferences }) => {
   };
 
   const handlePriceSensitivityChange = (level) => {
-    setLocalPreferences(prev => ({
+    setLocalPreferences((prev) => ({
       ...prev,
       priceSensitivity: level
     }));
@@ -51,7 +66,7 @@ const ShoppingPreferences = ({ preferences, onUpdatePreferences }) => {
   };
 
   const handleNotificationTimingChange = (timing) => {
-    setLocalPreferences(prev => ({
+    setLocalPreferences((prev) => ({
       ...prev,
       notificationTiming: timing
     }));
@@ -59,7 +74,7 @@ const ShoppingPreferences = ({ preferences, onUpdatePreferences }) => {
   };
 
   const handleBudgetRangeChange = (field, value) => {
-    setLocalPreferences(prev => ({
+    setLocalPreferences((prev) => ({
       ...prev,
       budgetRange: {
         ...prev?.budgetRange,
@@ -110,7 +125,8 @@ const ShoppingPreferences = ({ preferences, onUpdatePreferences }) => {
                 onClick={() => handleCategoryToggle(category?.id)}
                 className={`p-3 rounded-lg border cursor-pointer transition-all ${
                   localPreferences?.favoriteCategories?.includes(category?.id)
-                    ? 'border-primary bg-primary/5 text-primary' :'border-border hover:border-primary/50 text-muted-foreground hover:text-foreground'
+                    ? 'border-primary bg-primary/5 text-primary'
+                    : 'border-border hover:border-primary/50 text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <div className="flex flex-col items-center space-y-2">
@@ -132,14 +148,18 @@ const ShoppingPreferences = ({ preferences, onUpdatePreferences }) => {
                 onClick={() => handlePriceSensitivityChange(level?.id)}
                 className={`p-4 rounded-lg border cursor-pointer transition-all ${
                   localPreferences?.priceSensitivity === level?.id
-                    ? 'border-primary bg-primary/5' :'border-border hover:border-primary/50'
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary/50'
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <div className={`w-4 h-4 rounded-full border-2 ${
-                    localPreferences?.priceSensitivity === level?.id
-                      ? 'border-primary bg-primary' :'border-muted-foreground'
-                  }`}>
+                  <div
+                    className={`w-4 h-4 rounded-full border-2 ${
+                      localPreferences?.priceSensitivity === level?.id
+                        ? 'border-primary bg-primary'
+                        : 'border-muted-foreground'
+                    }`}
+                  >
                     {localPreferences?.priceSensitivity === level?.id && (
                       <div className="w-full h-full rounded-full bg-white scale-50"></div>
                     )}
@@ -191,14 +211,18 @@ const ShoppingPreferences = ({ preferences, onUpdatePreferences }) => {
                 onClick={() => handleNotificationTimingChange(timing?.id)}
                 className={`p-3 rounded-lg border cursor-pointer transition-all ${
                   localPreferences?.notificationTiming === timing?.id
-                    ? 'border-primary bg-primary/5' :'border-border hover:border-primary/50'
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary/50'
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <div className={`w-4 h-4 rounded-full border-2 ${
-                    localPreferences?.notificationTiming === timing?.id
-                      ? 'border-primary bg-primary' :'border-muted-foreground'
-                  }`}>
+                  <div
+                    className={`w-4 h-4 rounded-full border-2 ${
+                      localPreferences?.notificationTiming === timing?.id
+                        ? 'border-primary bg-primary'
+                        : 'border-muted-foreground'
+                    }`}
+                  >
                     {localPreferences?.notificationTiming === timing?.id && (
                       <div className="w-full h-full rounded-full bg-white scale-50"></div>
                     )}
@@ -222,7 +246,7 @@ const ShoppingPreferences = ({ preferences, onUpdatePreferences }) => {
               description="Let AI suggest products based on your shopping history"
               checked={localPreferences?.aiPersonalization?.recommendations}
               onChange={(e) => {
-                setLocalPreferences(prev => ({
+                setLocalPreferences((prev) => ({
                   ...prev,
                   aiPersonalization: {
                     ...prev?.aiPersonalization,
@@ -237,7 +261,7 @@ const ShoppingPreferences = ({ preferences, onUpdatePreferences }) => {
               description="Get notified when AI predicts optimal buying times"
               checked={localPreferences?.aiPersonalization?.pricePrediction}
               onChange={(e) => {
-                setLocalPreferences(prev => ({
+                setLocalPreferences((prev) => ({
                   ...prev,
                   aiPersonalization: {
                     ...prev?.aiPersonalization,
@@ -252,7 +276,7 @@ const ShoppingPreferences = ({ preferences, onUpdatePreferences }) => {
               description="Allow AI to learn from your browsing and purchase patterns"
               checked={localPreferences?.aiPersonalization?.behavioralLearning}
               onChange={(e) => {
-                setLocalPreferences(prev => ({
+                setLocalPreferences((prev) => ({
                   ...prev,
                   aiPersonalization: {
                     ...prev?.aiPersonalization,

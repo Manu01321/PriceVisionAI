@@ -23,29 +23,31 @@ async function main() {
     // Frontend configuration
     console.log('🖥️  Frontend Configuration:');
     console.log(`   Status: ${report.frontend.validation.valid ? '✅ Valid' : '❌ Invalid'}`);
-    
+
     if (report.frontend.validation.errors.length > 0) {
       console.log('   ❌ Errors:');
-      report.frontend.validation.errors.forEach(error => {
+      report.frontend.validation.errors.forEach((error) => {
         console.log(`      • ${error}`);
       });
     }
 
     if (report.frontend.validation.warnings.length > 0) {
       console.log('   ⚠️  Warnings:');
-      report.frontend.validation.warnings.forEach(warning => {
+      report.frontend.validation.warnings.forEach((warning) => {
         console.log(`      • ${warning}`);
       });
     }
 
     // Backend connectivity
     console.log('\n🌐 Backend Connectivity:');
-    console.log(`   Status: ${report.backend.connectionTest.connected ? '✅ Connected' : '❌ Disconnected'}`);
+    console.log(
+      `   Status: ${report.backend.connectionTest.connected ? '✅ Connected' : '❌ Disconnected'}`
+    );
     console.log(`   API URL: ${report.frontend.config.apiBaseUrl}`);
 
     if (report.backend.connectionTest.errors.length > 0) {
       console.log('   ❌ Connection Errors:');
-      report.backend.connectionTest.errors.forEach(error => {
+      report.backend.connectionTest.errors.forEach((error) => {
         console.log(`      • ${error}`);
       });
     }
@@ -76,19 +78,23 @@ async function main() {
     // Compatibility check
     if (report.compatibility) {
       console.log('\n🔄 Frontend-Backend Compatibility:');
-      console.log(`   Status: ${report.compatibility.compatible ? '✅ Compatible' : '❌ Issues Found'}`);
+      console.log(
+        `   Status: ${report.compatibility.compatible ? '✅ Compatible' : '❌ Issues Found'}`
+      );
 
       if (report.compatibility.mismatches && report.compatibility.mismatches.length > 0) {
         console.log('   ❌ Configuration Mismatches:');
-        report.compatibility.mismatches.forEach(mismatch => {
-          console.log(`      • ${mismatch.setting}: Frontend(${mismatch.frontend}) vs Backend(${mismatch.backend})`);
+        report.compatibility.mismatches.forEach((mismatch) => {
+          console.log(
+            `      • ${mismatch.setting}: Frontend(${mismatch.frontend}) vs Backend(${mismatch.backend})`
+          );
           console.log(`        Issue: ${mismatch.issue}`);
         });
       }
 
       if (report.compatibility.recommendations && report.compatibility.recommendations.length > 0) {
         console.log('   💡 Recommendations:');
-        report.compatibility.recommendations.forEach(rec => {
+        report.compatibility.recommendations.forEach((rec) => {
           console.log(`      • ${rec.feature}: ${rec.message}`);
         });
       }
@@ -97,22 +103,26 @@ async function main() {
     // Overall status
     console.log('\n🏁 Overall Status:');
     console.log('==================');
-    
-    const statusIcon = report.overall.status === 'success' ? '✅' : 
-                      report.overall.status === 'warning' ? '⚠️' : '❌';
+
+    const statusIcon =
+      report.overall.status === 'success'
+        ? '✅'
+        : report.overall.status === 'warning'
+          ? '⚠️'
+          : '❌';
     console.log(`Status: ${statusIcon} ${report.overall.status.toUpperCase()}`);
     console.log(`Ready for Use: ${report.overall.readyForUse ? '✅ Yes' : '❌ No'}`);
 
     if (report.overall.criticalIssues.length > 0) {
       console.log('\n❌ Critical Issues to Fix:');
-      report.overall.criticalIssues.forEach(issue => {
+      report.overall.criticalIssues.forEach((issue) => {
         console.log(`   • ${issue}`);
       });
     }
 
     if (report.overall.recommendations.length > 0) {
       console.log('\n💡 Recommendations:');
-      report.overall.recommendations.forEach(rec => {
+      report.overall.recommendations.forEach((rec) => {
         console.log(`   • ${rec}`);
       });
     }
@@ -155,13 +165,14 @@ async function main() {
 
     // Save report to file
     const reportPath = './validation-report.json';
-    await import('fs').then(fs => {
-      fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
-      console.log(`\n💾 Detailed report saved to: ${reportPath}`);
-    }).catch(() => {
-      console.log('\n💾 Could not save detailed report to file');
-    });
-
+    await import('fs')
+      .then((fs) => {
+        fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
+        console.log(`\n💾 Detailed report saved to: ${reportPath}`);
+      })
+      .catch(() => {
+        console.log('\n💾 Could not save detailed report to file');
+      });
   } catch (error) {
     console.error('\n❌ Validation failed with error:', error);
     console.log('\nThis might indicate a serious configuration issue.');

@@ -17,8 +17,14 @@ export const normalizeProductForComparison = (product, index = 0) => {
   if (!product) return null;
 
   const currentPrice = Number(product.currentPrice || product.price || 0);
-  const originalPrice = Number(product.originalPrice || Math.round(currentPrice * 1.25) || currentPrice);
-  const discount = product.discount || (originalPrice > currentPrice ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : 0);
+  const originalPrice = Number(
+    product.originalPrice || Math.round(currentPrice * 1.25) || currentPrice
+  );
+  const discount =
+    product.discount ||
+    (originalPrice > currentPrice
+      ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
+      : 0);
   const rating = Number(product.rating || 4.5);
   const reviewCount = Number(product.reviewCount || product.reviews || 2400);
 
@@ -55,13 +61,18 @@ export const normalizeProductForComparison = (product, index = 0) => {
   if (!aiAnalysis || !aiAnalysis.pros) {
     const featurePros = (product.features || []).slice(0, 3);
     aiAnalysis = {
-      pros: featurePros.length > 0 ? featurePros : [
-        `Competitive price point at ₹${currentPrice.toLocaleString('en-IN')}`,
-        `Verified user satisfaction (${rating}/5 rating)`,
-        `Available with fast shipping and multi-store deals`
-      ],
+      pros:
+        featurePros.length > 0
+          ? featurePros
+          : [
+              `Competitive price point at ₹${currentPrice.toLocaleString('en-IN')}`,
+              `Verified user satisfaction (${rating}/5 rating)`,
+              `Available with fast shipping and multi-store deals`
+            ],
       cons: [
-        discount > 50 ? 'High seasonal demand with fast-selling stock' : 'Price varies between e-commerce stores',
+        discount > 50
+          ? 'High seasonal demand with fast-selling stock'
+          : 'Price varies between e-commerce stores',
         'Standard manufacturer warranty applies'
       ]
     };
@@ -85,21 +96,31 @@ export const normalizeProductForComparison = (product, index = 0) => {
     }
   } else {
     priceHistory = [
-      { date: new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0], price: Math.round(currentPrice * 1.15) },
-      { date: new Date(Date.now() - 20 * 86400000).toISOString().split('T')[0], price: Math.round(currentPrice * 1.10) },
-      { date: new Date(Date.now() - 10 * 86400000).toISOString().split('T')[0], price: Math.round(currentPrice * 1.05) },
+      {
+        date: new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0],
+        price: Math.round(currentPrice * 1.15)
+      },
+      {
+        date: new Date(Date.now() - 20 * 86400000).toISOString().split('T')[0],
+        price: Math.round(currentPrice * 1.1)
+      },
+      {
+        date: new Date(Date.now() - 10 * 86400000).toISOString().split('T')[0],
+        price: Math.round(currentPrice * 1.05)
+      },
       { date: new Date().toISOString().split('T')[0], price: currentPrice, bestTimeToBuy: true }
     ];
   }
 
   // Retailers
-  const retailers = Array.isArray(product.retailers) && product.retailers.length > 0
-    ? product.retailers
-    : [
-        { name: 'Amazon India', price: currentPrice },
-        { name: 'Flipkart', price: Math.round(currentPrice * 1.03) },
-        { name: 'Reliance Digital', price: Math.round(currentPrice * 1.05) }
-      ];
+  const retailers =
+    Array.isArray(product.retailers) && product.retailers.length > 0
+      ? product.retailers
+      : [
+          { name: 'Amazon India', price: currentPrice },
+          { name: 'Flipkart', price: Math.round(currentPrice * 1.03) },
+          { name: 'Reliance Digital', price: Math.round(currentPrice * 1.05) }
+        ];
 
   return {
     id: String(product.id || `prod-${Date.now()}-${index}`),
@@ -134,44 +155,58 @@ export const createSmartCompetitor = (mainProduct) => {
   let compImage = 'https://images.unsplash.com/photo-1546868871-7041f2a55e12';
 
   if (nameLower.includes('watch')) {
-    compName = nameLower.includes('boat') 
+    compName = nameLower.includes('boat')
       ? 'Noise ColorFit Pro 4 AMOLED Smartwatch'
       : 'boAt Wave Call 2 Bluetooth Calling Smartwatch';
     compBrand = nameLower.includes('boat') ? 'Noise' : 'boAt';
     compPrice = nameLower.includes('boat') ? Math.round(price * 1.15) : Math.round(price * 0.85);
     compImage = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30';
-  } else if (nameLower.includes('phone') || nameLower.includes('iphone') || nameLower.includes('galaxy')) {
-    compName = nameLower.includes('apple') || nameLower.includes('iphone')
-      ? 'Samsung Galaxy S24 Ultra'
-      : 'Apple iPhone 15 Pro';
+  } else if (
+    nameLower.includes('phone') ||
+    nameLower.includes('iphone') ||
+    nameLower.includes('galaxy')
+  ) {
+    compName =
+      nameLower.includes('apple') || nameLower.includes('iphone')
+        ? 'Samsung Galaxy S24 Ultra'
+        : 'Apple iPhone 15 Pro';
     compBrand = compName.includes('Samsung') ? 'Samsung' : 'Apple';
     compPrice = Math.round(price * 1.05);
     compImage = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9';
   } else if (nameLower.includes('laptop') || nameLower.includes('macbook')) {
-    compName = nameLower.includes('macbook')
-      ? 'Dell XPS 13 OLED Laptop'
-      : 'Apple MacBook Air M2';
+    compName = nameLower.includes('macbook') ? 'Dell XPS 13 OLED Laptop' : 'Apple MacBook Air M2';
     compBrand = compName.includes('Apple') ? 'Apple' : 'Dell';
     compPrice = Math.round(price * 0.98);
     compImage = 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853';
-  } else if (nameLower.includes('headphone') || nameLower.includes('earbud') || nameLower.includes('audio')) {
+  } else if (
+    nameLower.includes('headphone') ||
+    nameLower.includes('earbud') ||
+    nameLower.includes('audio')
+  ) {
     compName = 'Sony WH-1000XM4 Wireless Noise Cancelling Headphones';
     compBrand = 'Sony';
     compPrice = Math.round(price * 1.1);
     compImage = 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e';
   }
 
-  return normalizeProductForComparison({
-    id: `competitor-${Date.now()}`,
-    name: compName,
-    brand: compBrand,
-    currentPrice: compPrice,
-    originalPrice: Math.round(compPrice * 1.3),
-    rating: 4.5,
-    reviewCount: 8400,
-    image: compImage,
-    features: ['Direct market alternative match', 'Verified customer choice', 'Competitive pricing across major stores']
-  }, 1);
+  return normalizeProductForComparison(
+    {
+      id: `competitor-${Date.now()}`,
+      name: compName,
+      brand: compBrand,
+      currentPrice: compPrice,
+      originalPrice: Math.round(compPrice * 1.3),
+      rating: 4.5,
+      reviewCount: 8400,
+      image: compImage,
+      features: [
+        'Direct market alternative match',
+        'Verified customer choice',
+        'Competitive pricing across major stores'
+      ]
+    },
+    1
+  );
 };
 
 // Baseline mock products used only as fallback if no query or state is present
@@ -180,25 +215,35 @@ const fallbackMockProducts = [
     id: 'iphone-15-pro',
     name: 'iPhone 15 Pro 128GB',
     brand: 'Apple',
-    image: "https://images.unsplash.com/photo-1572538194597-42aeefa26482",
+    image: 'https://images.unsplash.com/photo-1572538194597-42aeefa26482',
     imageAlt: 'iPhone 15 Pro in natural titanium color',
     currentPrice: 99990,
     originalPrice: 119900,
     rating: 4.7,
     reviewCount: 12450,
-    features: ['A17 Pro Chip', '48MP Main Camera', '6.1" Super Retina XDR Display', 'Titanium Frame']
+    features: [
+      'A17 Pro Chip',
+      '48MP Main Camera',
+      '6.1" Super Retina XDR Display',
+      'Titanium Frame'
+    ]
   },
   {
     id: 'samsung-s24-ultra',
     name: 'Samsung Galaxy S24 Ultra 256GB',
     brand: 'Samsung',
-    image: "https://images.unsplash.com/photo-1707410420102-faff6eb0e033",
+    image: 'https://images.unsplash.com/photo-1707410420102-faff6eb0e033',
     imageAlt: 'Samsung Galaxy S24 Ultra in titanium gray',
     currentPrice: 119999,
     originalPrice: 134999,
     rating: 4.6,
     reviewCount: 9870,
-    features: ['Snapdragon 8 Gen 3', '200MP Quad Telephoto', '6.8" Dynamic AMOLED 2X', 'S-Pen Included']
+    features: [
+      'Snapdragon 8 Gen 3',
+      '200MP Quad Telephoto',
+      '6.8" Dynamic AMOLED 2X',
+      'S-Pen Included'
+    ]
   }
 ];
 
@@ -228,7 +273,11 @@ const ProductComparison = () => {
   useEffect(() => {
     let initialList = [];
 
-    if (location?.state?.products && Array.isArray(location.state.products) && location.state.products.length > 0) {
+    if (
+      location?.state?.products &&
+      Array.isArray(location.state.products) &&
+      location.state.products.length > 0
+    ) {
       initialList = location.state.products.map(normalizeProductForComparison);
       // If only 1 product came in, add a smart competitor so side-by-side comparison works immediately
       if (initialList.length === 1) {
@@ -311,7 +360,7 @@ const ProductComparison = () => {
     setSearchError('');
     try {
       const results = await aiProductService.searchProducts(q);
-      const products = Array.isArray(results) ? results : (results.products || []);
+      const products = Array.isArray(results) ? results : results.products || [];
       setModalSearchResults(products.map(normalizeProductForComparison));
     } catch (err) {
       console.error('Modal search failed:', err);
@@ -327,7 +376,9 @@ const ProductComparison = () => {
 
     const sortedByPrice = [...selectedProducts].sort((a, b) => a.currentPrice - b.currentPrice);
     const sortedByRating = [...selectedProducts].sort((a, b) => b.rating - a.rating);
-    const sortedByValue = [...selectedProducts].sort((a, b) => (b.aiScores?.value || 0) - (a.aiScores?.value || 0));
+    const sortedByValue = [...selectedProducts].sort(
+      (a, b) => (b.aiScores?.value || 0) - (a.aiScores?.value || 0)
+    );
 
     const cheapest = sortedByPrice[0];
     const mostExpensive = sortedByPrice[sortedByPrice.length - 1];
@@ -376,8 +427,12 @@ const ProductComparison = () => {
                     <Icon name="DollarSign" size={18} className="text-success" />
                     <div>
                       <div className="text-xs text-muted-foreground font-medium">Best Budget</div>
-                      <div className="text-xs font-semibold text-foreground line-clamp-1">{aiVerdict.cheapest.name}</div>
-                      <div className="text-xs text-success font-bold">₹{aiVerdict.cheapest.currentPrice.toLocaleString('en-IN')}</div>
+                      <div className="text-xs font-semibold text-foreground line-clamp-1">
+                        {aiVerdict.cheapest.name}
+                      </div>
+                      <div className="text-xs text-success font-bold">
+                        ₹{aiVerdict.cheapest.currentPrice.toLocaleString('en-IN')}
+                      </div>
                     </div>
                   </div>
 
@@ -385,17 +440,28 @@ const ProductComparison = () => {
                     <Icon name="Star" size={18} className="text-warning fill-current" />
                     <div>
                       <div className="text-xs text-muted-foreground font-medium">Highest Rated</div>
-                      <div className="text-xs font-semibold text-foreground line-clamp-1">{aiVerdict.topRated.name}</div>
-                      <div className="text-xs text-warning font-bold">{aiVerdict.topRated.rating} ★ ({aiVerdict.topRated.reviewCount.toLocaleString()} reviews)</div>
+                      <div className="text-xs font-semibold text-foreground line-clamp-1">
+                        {aiVerdict.topRated.name}
+                      </div>
+                      <div className="text-xs text-warning font-bold">
+                        {aiVerdict.topRated.rating} ★ (
+                        {aiVerdict.topRated.reviewCount.toLocaleString()} reviews)
+                      </div>
                     </div>
                   </div>
 
                   <div className="flex items-center space-x-3 p-2 bg-surface/80 rounded-lg border border-border/50">
                     <Icon name="Award" size={18} className="text-primary" />
                     <div>
-                      <div className="text-xs text-muted-foreground font-medium">Top AI Value Score</div>
-                      <div className="text-xs font-semibold text-foreground line-clamp-1">{aiVerdict.bestValue.name}</div>
-                      <div className="text-xs text-primary font-bold">{aiVerdict.bestValue.aiScores?.value}/100 Score</div>
+                      <div className="text-xs text-muted-foreground font-medium">
+                        Top AI Value Score
+                      </div>
+                      <div className="text-xs font-semibold text-foreground line-clamp-1">
+                        {aiVerdict.bestValue.name}
+                      </div>
+                      <div className="text-xs text-primary font-bold">
+                        {aiVerdict.bestValue.aiScores?.value}/100 Score
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -434,12 +500,16 @@ const ProductComparison = () => {
       <Header />
       <div className="flex">
         {/* Main Content */}
-        <div className={`flex-1 transition-all duration-300 ${isAIAssistantOpen ? 'lg:mr-80' : ''}`}>
+        <div
+          className={`flex-1 transition-all duration-300 ${isAIAssistantOpen ? 'lg:mr-80' : ''}`}
+        >
           <div className="p-4 lg:p-6 space-y-6">
             {/* Page Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Product Comparison</h1>
+                <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
+                  Product Comparison
+                </h1>
                 <p className="text-muted-foreground mt-1">
                   Real-time multi-retailer price comparison and AI evaluation
                 </p>
@@ -489,9 +559,12 @@ const ProductComparison = () => {
             {selectedProducts.length === 0 && (
               <div className="bg-surface border border-border rounded-lg p-12 text-center">
                 <Icon name="Scale" size={64} className="text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-foreground mb-2">No Products in Comparison</h3>
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  No Products in Comparison
+                </h3>
                 <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                  Add products using the search button above or browse your search results to compare prices across stores.
+                  Add products using the search button above or browse your search results to
+                  compare prices across stores.
                 </p>
                 <div className="flex items-center justify-center space-x-3">
                   <Button
@@ -518,9 +591,7 @@ const ProductComparison = () => {
             {selectedProducts.length > 0 && (
               <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
                 {/* Primary Content */}
-                <div className="xl:col-span-3 space-y-6">
-                  {renderActiveView()}
-                </div>
+                <div className="xl:col-span-3 space-y-6">{renderActiveView()}</div>
 
                 {/* Sidebar */}
                 <div className="xl:col-span-1 space-y-6">
@@ -587,7 +658,11 @@ const ProductComparison = () => {
                 className="flex items-center space-x-2"
               >
                 <div className="relative flex-1">
-                  <Icon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Icon
+                    name="Search"
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  />
                   <input
                     type="text"
                     value={modalSearchQuery}
@@ -610,7 +685,13 @@ const ProductComparison = () => {
               {/* Quick Suggestion Chips */}
               <div className="flex items-center space-x-1.5 overflow-x-auto text-xs py-1">
                 <span className="text-muted-foreground whitespace-nowrap">Try:</span>
-                {['Noise ColorFit', 'boAt Wave Call 2', 'MacBook Air', 'OnePlus Nord', 'Sony Headphones'].map((chip) => (
+                {[
+                  'Noise ColorFit',
+                  'boAt Wave Call 2',
+                  'MacBook Air',
+                  'OnePlus Nord',
+                  'Sony Headphones'
+                ].map((chip) => (
                   <button
                     key={chip}
                     type="button"
@@ -631,7 +712,9 @@ const ProductComparison = () => {
               {isSearchingModal && (
                 <div className="py-12 text-center space-y-3">
                   <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-                  <p className="text-sm text-muted-foreground">Searching market prices and product specifications...</p>
+                  <p className="text-sm text-muted-foreground">
+                    Searching market prices and product specifications...
+                  </p>
                 </div>
               )}
 
@@ -647,7 +730,9 @@ const ProductComparison = () => {
                     Found {modalSearchResults.length} matching products:
                   </div>
                   {modalSearchResults.map((prod) => {
-                    const isAlreadyAdded = selectedProducts.some((p) => p.id === prod.id || p.name === prod.name);
+                    const isAlreadyAdded = selectedProducts.some(
+                      (p) => p.id === prod.id || p.name === prod.name
+                    );
                     return (
                       <div
                         key={prod.id}
@@ -659,14 +744,23 @@ const ProductComparison = () => {
                             alt={prod.name}
                             className="w-12 h-12 rounded object-cover bg-muted flex-shrink-0"
                             onError={(e) => {
-                              e.currentTarget.src = 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e';
+                              e.currentTarget.src =
+                                'https://images.unsplash.com/photo-1505740420928-5e560c06d30e';
                             }}
                           />
                           <div className="min-w-0">
-                            <h4 className="text-sm font-medium text-foreground line-clamp-1">{prod.name}</h4>
+                            <h4 className="text-sm font-medium text-foreground line-clamp-1">
+                              {prod.name}
+                            </h4>
                             <div className="flex items-center space-x-2 text-xs text-muted-foreground mt-0.5">
-                              <span className="font-semibold text-foreground">₹{prod.currentPrice.toLocaleString('en-IN')}</span>
-                              {prod.discount > 0 && <span className="text-success font-medium">({prod.discount}% off)</span>}
+                              <span className="font-semibold text-foreground">
+                                ₹{prod.currentPrice.toLocaleString('en-IN')}
+                              </span>
+                              {prod.discount > 0 && (
+                                <span className="text-success font-medium">
+                                  ({prod.discount}% off)
+                                </span>
+                              )}
                               <span>• {prod.rating} ★</span>
                             </div>
                           </div>
@@ -692,7 +786,10 @@ const ProductComparison = () => {
               {!isSearchingModal && modalSearchResults.length === 0 && !searchError && (
                 <div className="py-8 text-center text-muted-foreground text-sm">
                   <Icon name="Search" size={32} className="mx-auto mb-2 text-muted-foreground/60" />
-                  <p>Type a query or pick a suggestion above to search and compare products side-by-side.</p>
+                  <p>
+                    Type a query or pick a suggestion above to search and compare products
+                    side-by-side.
+                  </p>
                 </div>
               )}
             </div>

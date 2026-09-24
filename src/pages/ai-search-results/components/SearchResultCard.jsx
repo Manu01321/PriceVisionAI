@@ -55,20 +55,30 @@ const SearchResultCard = ({ product, onAddToWatchlist, onCompare, onViewDetails 
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           onLoad={() => setImageLoading(false)}
           onError={() => {
-            setImageSrc('https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=80');
+            setImageSrc(
+              'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=80'
+            );
             setImageLoading(false);
           }}
         />
-        
+
         {/* Confidence Badge */}
-        <div className={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-medium ${getConfidenceColor(product?.confidence)}`}>
+        <div
+          className={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-medium ${getConfidenceColor(product?.confidence)}`}
+        >
           {product?.confidence}% match
         </div>
 
         {/* Deal Urgency Badge */}
         {product?.dealUrgency > 50 && (
-          <div className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${getDealUrgencyColor(product?.dealUrgency)}`}>
-            {product?.dealUrgency >= 80 ? 'Hot Deal!' : product?.dealUrgency >= 60 ? 'Good Deal' : 'Fair Deal'}
+          <div
+            className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${getDealUrgencyColor(product?.dealUrgency)}`}
+          >
+            {product?.dealUrgency >= 80
+              ? 'Hot Deal!'
+              : product?.dealUrgency >= 60
+                ? 'Good Deal'
+                : 'Fair Deal'}
           </div>
         )}
 
@@ -81,11 +91,7 @@ const SearchResultCard = ({ product, onAddToWatchlist, onCompare, onViewDetails 
             isWishlisted ? 'text-error' : 'text-muted-foreground hover:text-error'
           }`}
         >
-          <Icon
-            name="Heart"
-            size={16}
-            className={isWishlisted ? 'fill-current text-error' : ''}
-          />
+          <Icon name="Heart" size={16} className={isWishlisted ? 'fill-current text-error' : ''} />
         </Button>
 
         {/* Loading Overlay */}
@@ -114,9 +120,13 @@ const SearchResultCard = ({ product, onAddToWatchlist, onCompare, onViewDetails 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <span className="text-lg font-bold text-foreground">{formatPrice(product?.currentPrice)}</span>
+              <span className="text-lg font-bold text-foreground">
+                {formatPrice(product?.currentPrice)}
+              </span>
               {product?.originalPrice && product?.originalPrice > product?.currentPrice && (
-                <span className="text-sm text-muted-foreground line-through">{formatPrice(product?.originalPrice)}</span>
+                <span className="text-sm text-muted-foreground line-through">
+                  {formatPrice(product?.originalPrice)}
+                </span>
               )}
             </div>
             {product?.discount && (
@@ -133,9 +143,12 @@ const SearchResultCard = ({ product, onAddToWatchlist, onCompare, onViewDetails 
               <div className="flex-1 h-6 bg-muted rounded overflow-hidden">
                 <svg className="w-full h-full" viewBox="0 0 100 20">
                   <polyline
-                    points={product?.priceHistory?.map((price, index) => 
-                      `${(index / (product?.priceHistory?.length - 1)) * 100},${20 - (price / Math.max(...product?.priceHistory)) * 15}`
-                    )?.join(' ')}
+                    points={product?.priceHistory
+                      ?.map(
+                        (price, index) =>
+                          `${(index / (product?.priceHistory?.length - 1)) * 100},${20 - (price / Math.max(...product?.priceHistory)) * 15}`
+                      )
+                      ?.join(' ')}
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="1"
@@ -152,11 +165,16 @@ const SearchResultCard = ({ product, onAddToWatchlist, onCompare, onViewDetails 
         <div className="space-y-2">
           <div className="flex items-center space-x-1">
             <Icon name="Store" size={12} className="text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">Available at {product?.retailers?.length} stores</span>
+            <span className="text-xs text-muted-foreground">
+              Available at {product?.retailers?.length} stores
+            </span>
           </div>
           <div className="flex flex-wrap gap-1">
             {product?.retailers?.slice(0, 3)?.map((retailer, index) => (
-              <div key={index} className="flex items-center space-x-1 px-2 py-1 bg-muted rounded text-xs">
+              <div
+                key={index}
+                className="flex items-center space-x-1 px-2 py-1 bg-muted rounded text-xs"
+              >
                 <span className="font-medium">{retailer?.name}</span>
                 <span className="text-muted-foreground">{formatPrice(retailer?.price)}</span>
               </div>

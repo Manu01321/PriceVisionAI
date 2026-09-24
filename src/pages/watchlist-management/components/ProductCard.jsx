@@ -3,13 +3,7 @@ import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 
-const ProductCard = ({ 
-  product, 
-  onRemove, 
-  onAdjustAlert, 
-  onViewDetails,
-  className = "" 
-}) => {
+const ProductCard = ({ product, onRemove, onAdjustAlert, onViewDetails, className = '' }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const {
@@ -52,7 +46,7 @@ const ProductCard = ({
     const diff = now - new Date(timestamp);
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
-    
+
     if (minutes < 60) return `${minutes}m ago`;
     if (hours < 24) return `${hours}h ago`;
     return new Date(timestamp)?.toLocaleDateString();
@@ -61,26 +55,32 @@ const ProductCard = ({
   // Generate simple sparkline data
   const generateSparklinePoints = () => {
     if (priceHistory?.length === 0) return '';
-    
+
     const width = 60;
     const height = 20;
     const max = Math.max(...priceHistory);
     const min = Math.min(...priceHistory);
     const range = max - min || 1;
-    
-    return priceHistory?.map((price, index) => {
-      const x = (index / (priceHistory?.length - 1)) * width;
-      const y = height - ((price - min) / range) * height;
-      return `${x},${y}`;
-    })?.join(' ');
+
+    return priceHistory
+      ?.map((price, index) => {
+        const x = (index / (priceHistory?.length - 1)) * width;
+        const y = height - ((price - min) / range) * height;
+        return `${x},${y}`;
+      })
+      ?.join(' ');
   };
 
   return (
-    <div className={`bg-surface border border-border rounded-lg p-4 hover:shadow-soft transition-all duration-200 ${className}`}>
+    <div
+      className={`bg-surface border border-border rounded-lg p-4 hover:shadow-soft transition-all duration-200 ${className}`}
+    >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center space-x-2">
-          <div className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(dealUrgency)}`}>
+          <div
+            className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(dealUrgency)}`}
+          >
             {getUrgencyLabel(dealUrgency)} ({dealUrgency})
           </div>
           {!inStock && (
@@ -89,7 +89,7 @@ const ProductCard = ({
             </div>
           )}
         </div>
-        
+
         <div className="relative">
           <Button
             variant="ghost"
@@ -99,7 +99,7 @@ const ProductCard = ({
           >
             <Icon name="MoreVertical" size={16} />
           </Button>
-          
+
           {isMenuOpen && (
             <div className="absolute right-0 top-full mt-1 w-48 bg-surface border border-border rounded-lg shadow-elevated z-200">
               <div className="py-1">
@@ -141,13 +141,9 @@ const ProductCard = ({
       {/* Product Info */}
       <div className="flex space-x-3 mb-4">
         <div className="w-16 h-16 bg-muted rounded-lg overflow-hidden flex-shrink-0">
-          <Image
-            src={image}
-            alt={imageAlt}
-            className="w-full h-full object-cover"
-          />
+          <Image src={image} alt={imageAlt} className="w-full h-full object-cover" />
         </div>
-        
+
         <div className="flex-1 min-w-0">
           <h3 className="font-medium text-foreground line-clamp-2 mb-1">{name}</h3>
           <div className="flex items-center space-x-2 text-sm text-muted-foreground">
@@ -166,14 +162,15 @@ const ProductCard = ({
               <span className="text-sm text-muted-foreground line-through">₹{originalPrice}</span>
             )}
           </div>
-          
+
           {priceChange !== 0 && (
-            <div className={`flex items-center space-x-1 text-sm font-medium ${getPriceChangeColor(priceChange)}`}>
-              <Icon 
-                name={priceChange < 0 ? "TrendingDown" : "TrendingUp"} 
-                size={14} 
-              />
-              <span>{priceChange < 0 ? '-' : '+'}₹{Math.abs(priceChange)} ({priceChangePercent}%)</span>
+            <div
+              className={`flex items-center space-x-1 text-sm font-medium ${getPriceChangeColor(priceChange)}`}
+            >
+              <Icon name={priceChange < 0 ? 'TrendingDown' : 'TrendingUp'} size={14} />
+              <span>
+                {priceChange < 0 ? '-' : '+'}₹{Math.abs(priceChange)} ({priceChangePercent}%)
+              </span>
             </div>
           )}
         </div>
@@ -198,7 +195,7 @@ const ProductCard = ({
         <span className="text-xs text-muted-foreground">
           Updated {formatTimestamp(lastChecked)}
         </span>
-        
+
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
@@ -208,12 +205,7 @@ const ProductCard = ({
           >
             Details
           </Button>
-          <Button
-            variant="default"
-            size="sm"
-            iconName="ExternalLink"
-            disabled={!inStock}
-          >
+          <Button variant="default" size="sm" iconName="ExternalLink" disabled={!inStock}>
             {inStock ? 'Buy Now' : 'Notify Me'}
           </Button>
         </div>

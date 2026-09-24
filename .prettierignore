@@ -1,0 +1,11 @@
+node_modules
+dist
+build
+.git
+backend/logs
+backend/node_modules
+package-lock.json
+*.webp
+*.png
+*.jpg
+*.ico

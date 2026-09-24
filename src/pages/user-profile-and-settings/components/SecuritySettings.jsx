@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-
 const SecuritySettings = ({ securityData, onUpdateSecurity }) => {
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
@@ -15,53 +14,53 @@ const SecuritySettings = ({ securityData, onUpdateSecurity }) => {
   const loginHistory = [
     {
       id: 1,
-      device: "Chrome on Windows",
-      location: "New York, NY",
-      timestamp: "2025-10-26 14:30:00",
-      ipAddress: "192.168.1.100",
-      status: "success"
+      device: 'Chrome on Windows',
+      location: 'New York, NY',
+      timestamp: '2025-10-26 14:30:00',
+      ipAddress: '192.168.1.100',
+      status: 'success'
     },
     {
       id: 2,
-      device: "Safari on iPhone",
-      location: "New York, NY",
-      timestamp: "2025-10-26 09:15:00",
-      ipAddress: "192.168.1.101",
-      status: "success"
+      device: 'Safari on iPhone',
+      location: 'New York, NY',
+      timestamp: '2025-10-26 09:15:00',
+      ipAddress: '192.168.1.101',
+      status: 'success'
     },
     {
       id: 3,
-      device: "Chrome on Android",
-      location: "Boston, MA",
-      timestamp: "2025-10-25 18:45:00",
-      ipAddress: "10.0.0.50",
-      status: "failed"
+      device: 'Chrome on Android',
+      location: 'Boston, MA',
+      timestamp: '2025-10-25 18:45:00',
+      ipAddress: '10.0.0.50',
+      status: 'failed'
     }
   ];
 
   const connectedDevices = [
     {
       id: 1,
-      name: "MacBook Pro",
-      type: "desktop",
-      lastActive: "Currently active",
-      location: "New York, NY",
+      name: 'MacBook Pro',
+      type: 'desktop',
+      lastActive: 'Currently active',
+      location: 'New York, NY',
       isCurrent: true
     },
     {
       id: 2,
-      name: "iPhone 15 Pro",
-      type: "mobile",
-      lastActive: "2 hours ago",
-      location: "New York, NY",
+      name: 'iPhone 15 Pro',
+      type: 'mobile',
+      lastActive: '2 hours ago',
+      location: 'New York, NY',
       isCurrent: false
     },
     {
       id: 3,
-      name: "iPad Air",
-      type: "tablet",
-      lastActive: "1 day ago",
-      location: "New York, NY",
+      name: 'iPad Air',
+      type: 'tablet',
+      lastActive: '1 day ago',
+      location: 'New York, NY',
       isCurrent: false
     }
   ];
@@ -87,16 +86,24 @@ const SecuritySettings = ({ securityData, onUpdateSecurity }) => {
 
   const getDeviceIcon = (type) => {
     switch (type) {
-      case 'desktop': return 'Monitor';
-      case 'mobile': return 'Smartphone';
-      case 'tablet': return 'Tablet';
-      default: return 'Monitor';
+      case 'desktop':
+        return 'Monitor';
+      case 'mobile':
+        return 'Smartphone';
+      case 'tablet':
+        return 'Tablet';
+      default:
+        return 'Monitor';
     }
   };
 
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
-    return date?.toLocaleDateString() + ' at ' + date?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return (
+      date?.toLocaleDateString() +
+      ' at ' +
+      date?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    );
   };
 
   return (
@@ -126,29 +133,41 @@ const SecuritySettings = ({ securityData, onUpdateSecurity }) => {
           {showChangePassword && (
             <div className="bg-muted/50 rounded-lg p-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Current Password</label>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Current Password
+                </label>
                 <input
                   type="password"
                   value={passwordData?.currentPassword}
-                  onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e?.target?.value }))}
+                  onChange={(e) =>
+                    setPasswordData((prev) => ({ ...prev, currentPassword: e?.target?.value }))
+                  }
                   className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">New Password</label>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  New Password
+                </label>
                 <input
                   type="password"
                   value={passwordData?.newPassword}
-                  onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e?.target?.value }))}
+                  onChange={(e) =>
+                    setPasswordData((prev) => ({ ...prev, newPassword: e?.target?.value }))
+                  }
                   className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Confirm New Password</label>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Confirm New Password
+                </label>
                 <input
                   type="password"
                   value={passwordData?.confirmPassword}
-                  onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e?.target?.value }))}
+                  onChange={(e) =>
+                    setPasswordData((prev) => ({ ...prev, confirmPassword: e?.target?.value }))
+                  }
                   className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 />
               </div>
@@ -169,13 +188,15 @@ const SecuritySettings = ({ securityData, onUpdateSecurity }) => {
           <h4 className="text-sm font-medium text-foreground mb-4">Two-Factor Authentication</h4>
           <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
             <div className="flex items-center space-x-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                twoFactorEnabled ? 'bg-success/10' : 'bg-warning/10'
-              }`}>
-                <Icon 
-                  name={twoFactorEnabled ? "ShieldCheck" : "ShieldAlert"} 
-                  size={18} 
-                  className={twoFactorEnabled ? 'text-success' : 'text-warning'} 
+              <div
+                className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                  twoFactorEnabled ? 'bg-success/10' : 'bg-warning/10'
+                }`}
+              >
+                <Icon
+                  name={twoFactorEnabled ? 'ShieldCheck' : 'ShieldAlert'}
+                  size={18}
+                  className={twoFactorEnabled ? 'text-success' : 'text-warning'}
                 />
               </div>
               <div>
@@ -183,14 +204,14 @@ const SecuritySettings = ({ securityData, onUpdateSecurity }) => {
                   {twoFactorEnabled ? 'Enabled' : 'Disabled'}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {twoFactorEnabled 
-                    ? 'Your account is protected with 2FA' :'Add an extra layer of security to your account'
-                  }
+                  {twoFactorEnabled
+                    ? 'Your account is protected with 2FA'
+                    : 'Add an extra layer of security to your account'}
                 </div>
               </div>
             </div>
             <Button
-              variant={twoFactorEnabled ? "outline" : "default"}
+              variant={twoFactorEnabled ? 'outline' : 'default'}
               size="sm"
               onClick={handleTwoFactorToggle}
             >
@@ -204,16 +225,25 @@ const SecuritySettings = ({ securityData, onUpdateSecurity }) => {
           <h4 className="text-sm font-medium text-foreground mb-4">Connected Devices</h4>
           <div className="space-y-3">
             {connectedDevices?.map((device) => (
-              <div key={device?.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
+              <div
+                key={device?.id}
+                className="flex items-center justify-between p-4 border border-border rounded-lg"
+              >
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
-                    <Icon name={getDeviceIcon(device?.type)} size={20} className="text-muted-foreground" />
+                    <Icon
+                      name={getDeviceIcon(device?.type)}
+                      size={20}
+                      className="text-muted-foreground"
+                    />
                   </div>
                   <div>
                     <div className="flex items-center space-x-2">
                       <span className="font-medium text-foreground">{device?.name}</span>
                       {device?.isCurrent && (
-                        <span className="px-2 py-1 bg-success/10 text-success text-xs rounded-full">Current</span>
+                        <span className="px-2 py-1 bg-success/10 text-success text-xs rounded-full">
+                          Current
+                        </span>
                       )}
                     </div>
                     <div className="text-sm text-muted-foreground">
@@ -241,15 +271,20 @@ const SecuritySettings = ({ securityData, onUpdateSecurity }) => {
           <h4 className="text-sm font-medium text-foreground mb-4">Recent Login Activity</h4>
           <div className="space-y-3">
             {loginHistory?.map((login) => (
-              <div key={login?.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
+              <div
+                key={login?.id}
+                className="flex items-center justify-between p-4 border border-border rounded-lg"
+              >
                 <div className="flex items-center space-x-3">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    login?.status === 'success' ? 'bg-success/10' : 'bg-error/10'
-                  }`}>
-                    <Icon 
-                      name={login?.status === 'success' ? "CheckCircle" : "XCircle"} 
-                      size={16} 
-                      className={login?.status === 'success' ? 'text-success' : 'text-error'} 
+                  <div
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                      login?.status === 'success' ? 'bg-success/10' : 'bg-error/10'
+                    }`}
+                  >
+                    <Icon
+                      name={login?.status === 'success' ? 'CheckCircle' : 'XCircle'}
+                      size={16}
+                      className={login?.status === 'success' ? 'text-success' : 'text-error'}
                     />
                   </div>
                   <div>

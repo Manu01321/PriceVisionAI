@@ -2,11 +2,7 @@ import React from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const SearchModeSelector = ({ 
-  activeMode, 
-  onModeChange, 
-  className = "" 
-}) => {
+const SearchModeSelector = ({ activeMode, onModeChange, className = '' }) => {
   const searchModes = [
     {
       id: 'voice',
@@ -57,25 +53,27 @@ const SearchModeSelector = ({
             }`}
           >
             {/* Icon */}
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${
-              activeMode === mode?.id ? mode?.color : 'bg-muted'
-            }`}>
-              <Icon 
-                name={mode?.icon} 
-                size={20} 
+            <div
+              className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${
+                activeMode === mode?.id ? mode?.color : 'bg-muted'
+              }`}
+            >
+              <Icon
+                name={mode?.icon}
+                size={20}
                 color={activeMode === mode?.id ? 'white' : 'currentColor'}
               />
             </div>
 
             {/* Content */}
-            <h3 className={`font-medium text-sm mb-1 ${
-              activeMode === mode?.id ? 'text-primary' : 'text-foreground'
-            }`}>
+            <h3
+              className={`font-medium text-sm mb-1 ${
+                activeMode === mode?.id ? 'text-primary' : 'text-foreground'
+              }`}
+            >
               {mode?.name}
             </h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {mode?.description}
-            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed">{mode?.description}</p>
 
             {/* Active Indicator */}
             {activeMode === mode?.id && (
@@ -90,35 +88,39 @@ const SearchModeSelector = ({
       {activeMode && (
         <div className="bg-surface border border-border rounded-lg p-4">
           <div className="flex items-start space-x-4">
-            <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-              searchModes?.find(m => m?.id === activeMode)?.color || 'bg-muted'
-            }`}>
-              <Icon 
-                name={searchModes?.find(m => m?.id === activeMode)?.icon || 'Search'} 
-                size={24} 
+            <div
+              className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                searchModes?.find((m) => m?.id === activeMode)?.color || 'bg-muted'
+              }`}
+            >
+              <Icon
+                name={searchModes?.find((m) => m?.id === activeMode)?.icon || 'Search'}
+                size={24}
                 color="white"
               />
             </div>
-            
+
             <div className="flex-1">
               <h3 className="font-semibold text-foreground mb-1">
-                {searchModes?.find(m => m?.id === activeMode)?.name}
+                {searchModes?.find((m) => m?.id === activeMode)?.name}
               </h3>
               <p className="text-sm text-muted-foreground mb-3">
-                {searchModes?.find(m => m?.id === activeMode)?.description}
+                {searchModes?.find((m) => m?.id === activeMode)?.description}
               </p>
-              
+
               {/* Features */}
               <div className="flex flex-wrap gap-2">
-                {searchModes?.find(m => m?.id === activeMode)?.features?.map((feature, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-2 py-1 bg-primary/10 text-primary text-xs rounded-full"
-                  >
-                    <Icon name="Check" size={12} className="mr-1" />
-                    {feature}
-                  </span>
-                ))}
+                {searchModes
+                  ?.find((m) => m?.id === activeMode)
+                  ?.features?.map((feature, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2 py-1 bg-primary/10 text-primary text-xs rounded-full"
+                    >
+                      <Icon name="Check" size={12} className="mr-1" />
+                      {feature}
+                    </span>
+                  ))}
               </div>
             </div>
           </div>
@@ -129,7 +131,7 @@ const SearchModeSelector = ({
               <Icon name="Lightbulb" size={14} className="mr-2 text-warning" />
               Tips for best results
             </h4>
-            
+
             {activeMode === 'voice' && (
               <ul className="text-sm text-muted-foreground space-y-1">
                 <li>• Speak clearly and at normal pace</li>
@@ -137,7 +139,7 @@ const SearchModeSelector = ({
                 <li>• Use natural language like "Find iPhone 15 Pro Max"</li>
               </ul>
             )}
-            
+
             {activeMode === 'camera' && (
               <ul className="text-sm text-muted-foreground space-y-1">
                 <li>• Ensure good lighting and clear focus</li>
@@ -145,7 +147,7 @@ const SearchModeSelector = ({
                 <li>• Avoid reflections and shadows</li>
               </ul>
             )}
-            
+
             {activeMode === 'barcode' && (
               <ul className="text-sm text-muted-foreground space-y-1">
                 <li>• Hold steady and align barcode in frame</li>
@@ -153,7 +155,7 @@ const SearchModeSelector = ({
                 <li>• Keep camera 4-6 inches from barcode</li>
               </ul>
             )}
-            
+
             {activeMode === 'upload' && (
               <ul className="text-sm text-muted-foreground space-y-1">
                 <li>• Use high-quality images for better results</li>
@@ -170,7 +172,7 @@ const SearchModeSelector = ({
           <Button
             key={mode?.id}
             onClick={() => onModeChange(mode?.id)}
-            variant={activeMode === mode?.id ? "default" : "outline"}
+            variant={activeMode === mode?.id ? 'default' : 'outline'}
             size="sm"
             className="flex items-center space-x-2"
           >

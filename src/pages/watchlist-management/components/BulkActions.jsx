@@ -4,16 +4,16 @@ import Button from '../../../components/ui/Button';
 import Select from '../../../components/ui/Select';
 import { Checkbox } from '../../../components/ui/Checkbox';
 
-const BulkActions = ({ 
-  selectedItems = [], 
-  onSelectAll, 
-  onDeselectAll, 
-  onBulkRemove, 
-  onBulkCategoryChange, 
+const BulkActions = ({
+  selectedItems = [],
+  onSelectAll,
+  onDeselectAll,
+  onBulkRemove,
+  onBulkCategoryChange,
   onBulkAlertChange,
   onExport,
   totalItems = 0,
-  className = "" 
+  className = ''
 }) => {
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [bulkCategory, setBulkCategory] = useState('');
@@ -85,21 +85,15 @@ const BulkActions = ({
               }}
             />
             <span className="text-sm text-foreground">
-              {selectedItems?.length > 0 
+              {selectedItems?.length > 0
                 ? `${selectedItems?.length} of ${totalItems} selected`
-                : `Select all ${totalItems} items`
-              }
+                : `Select all ${totalItems} items`}
             </span>
           </div>
 
           {selectedItems?.length > 0 && (
             <div className="flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                iconName="X"
-                onClick={onDeselectAll}
-              >
+              <Button variant="ghost" size="sm" iconName="X" onClick={onDeselectAll}>
                 Clear Selection
               </Button>
             </div>
@@ -118,7 +112,7 @@ const BulkActions = ({
               >
                 Bulk Actions
               </Button>
-              
+
               <Button
                 variant="destructive"
                 size="sm"
@@ -232,11 +226,7 @@ const BulkActions = ({
                 >
                   Move to Electronics
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleExport('csv')}
-                >
+                <Button variant="outline" size="sm" onClick={() => handleExport('csv')}>
                   Quick CSV Export
                 </Button>
               </div>

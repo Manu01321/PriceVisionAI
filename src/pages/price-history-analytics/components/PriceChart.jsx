@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Area,
+  AreaChart
+} from 'recharts';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
@@ -206,19 +216,16 @@ const PriceChart = ({ productData, selectedRetailers, dateRange, onDataPointClic
       return (
         <div className="bg-surface border border-border rounded-lg p-3 shadow-elevated">
           <p className="text-sm font-medium text-foreground mb-2">
-            {new Date(label)?.toLocaleDateString('en-US', { 
-              weekday: 'short', 
-              month: 'short', 
-              day: 'numeric' 
+            {new Date(label)?.toLocaleDateString('en-US', {
+              weekday: 'short',
+              month: 'short',
+              day: 'numeric'
             })}
           </p>
           {payload?.map((entry) => (
             <div key={entry?.dataKey} className="flex items-center justify-between space-x-4 mb-1">
               <div className="flex items-center space-x-2">
-                <div 
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: entry?.color }}
-                />
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry?.color }} />
                 <span className="text-sm text-muted-foreground capitalize">
                   {entry?.dataKey === 'predicted' ? 'AI Prediction' : entry?.dataKey}
                 </span>
@@ -258,7 +265,7 @@ const PriceChart = ({ productData, selectedRetailers, dateRange, onDataPointClic
             90-day historical data with AI-powered price predictions
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <Button
             variant={chartType === 'line' ? 'default' : 'outline'}
@@ -312,10 +319,7 @@ const PriceChart = ({ productData, selectedRetailers, dateRange, onDataPointClic
             if (retailer === 'predicted' && !showPrediction) return null;
             return (
               <div key={retailer} className="flex items-center space-x-2">
-                <div 
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: color }}
-                />
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
                 <span className="text-xs text-muted-foreground capitalize">
                   {retailer === 'predicted' ? 'AI Prediction' : retailer}
                 </span>
@@ -330,19 +334,19 @@ const PriceChart = ({ productData, selectedRetailers, dateRange, onDataPointClic
           {chartType === 'area' ? (
             <AreaChart data={mockPriceData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis 
-                dataKey="date" 
+              <XAxis
+                dataKey="date"
                 tickFormatter={formatDate}
                 stroke="var(--color-muted-foreground)"
                 fontSize={12}
               />
-              <YAxis 
+              <YAxis
                 tickFormatter={formatPrice}
                 stroke="var(--color-muted-foreground)"
                 fontSize={12}
               />
               <Tooltip content={<CustomTooltip />} />
-              
+
               {selectedRetailers?.includes('amazon') && (
                 <Area
                   type="monotone"
@@ -403,19 +407,19 @@ const PriceChart = ({ productData, selectedRetailers, dateRange, onDataPointClic
           ) : (
             <LineChart data={mockPriceData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis 
-                dataKey="date" 
+              <XAxis
+                dataKey="date"
                 tickFormatter={formatDate}
                 stroke="var(--color-muted-foreground)"
                 fontSize={12}
               />
-              <YAxis 
+              <YAxis
                 tickFormatter={formatPrice}
                 stroke="var(--color-muted-foreground)"
                 fontSize={12}
               />
               <Tooltip content={<CustomTooltip />} />
-              
+
               {selectedRetailers?.includes('amazon') && (
                 <Line
                   type="monotone"
@@ -478,9 +482,9 @@ const PriceChart = ({ productData, selectedRetailers, dateRange, onDataPointClic
           <div>
             <h4 className="text-sm font-medium text-foreground mb-1">AI Insights</h4>
             <p className="text-sm text-muted-foreground">
-              Price is trending downward with a predicted 23% drop during Black Friday week. 
-              Best time to buy is November 23rd with 92% confidence. Current Amazon price is 
-              the lowest among tracked retailers.
+              Price is trending downward with a predicted 23% drop during Black Friday week. Best
+              time to buy is November 23rd with 92% confidence. Current Amazon price is the lowest
+              among tracked retailers.
             </p>
           </div>
         </div>

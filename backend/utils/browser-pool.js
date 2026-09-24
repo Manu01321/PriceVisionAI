@@ -5,13 +5,17 @@ class BrowserPool {
   constructor(options = {}) {
     this.maxBrowsers = options.maxBrowsers || 3;
     this.timeout = options.timeout || 30000;
-    this.proxyList = (process.env.PROXY_LIST || '').split(',').map(p => p.trim()).filter(Boolean);
+    this.proxyList = (process.env.PROXY_LIST || '')
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean);
     this.rotateProxy = String(process.env.PROXY_ROTATION || '').toLowerCase() === 'true';
-    this.defaultProxy = process.env.USE_PROXY && process.env.USE_PROXY !== 'false' ? (process.env.PROXY_URL || '') : '';
+    this.defaultProxy =
+      process.env.USE_PROXY && process.env.USE_PROXY !== 'false' ? process.env.PROXY_URL || '' : '';
     this.browsers = [];
     this.activeSessions = new Map();
     this.isInitialized = false;
-    
+
     // Anti-detection configurations
     this.userAgents = [
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -19,7 +23,7 @@ class BrowserPool {
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0',
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     ];
-    
+
     this.viewports = [
       { width: 1920, height: 1080 },
       { width: 1366, height: 768 },
@@ -30,9 +34,9 @@ class BrowserPool {
 
   async initialize() {
     if (this.isInitialized) return;
-    
+
     console.log(`🔧 Initializing browser pool with ${this.maxBrowsers} browsers...`);
-    
+
     try {
       for (let i = 0; i < this.maxBrowsers; i++) {
         const browser = await this.createBrowser();
@@ -44,7 +48,7 @@ class BrowserPool {
           requestCount: 0
         });
       }
-      
+
       this.isInitialized = true;
       console.log(`✅ Browser pool initialized successfully`);
     } catch (error) {
@@ -57,7 +61,7 @@ class BrowserPool {
     const randomUserAgent = this.userAgents[Math.floor(Math.random() * this.userAgents.length)];
     const randomViewport = this.viewports[Math.floor(Math.random() * this.viewports.length)];
     const proxy = this.getProxy();
-    
+
     const browser = await chromium.launch({
       headless: true,
       args: [
@@ -101,11 +105,12 @@ class BrowserPool {
       timezoneId: 'Asia/Kolkata',
       permissions: [],
       extraHTTPHeaders: {
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        Accept:
+          'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
         'Accept-Language': 'en-IN,en;q=0.9,hi;q=0.8',
         'Accept-Encoding': 'gzip, deflate, br',
-        'DNT': '1',
-        'Connection': 'keep-alive',
+        DNT: '1',
+        Connection: 'keep-alive',
         'Upgrade-Insecure-Requests': '1',
         'Sec-Fetch-Dest': 'document',
         'Sec-Fetch-Mode': 'navigate',
@@ -159,8 +164,8 @@ class BrowserPool {
     }
 
     // Find available browser
-    const availableBrowser = this.browsers.find(b => !b.inUse);
-    
+    const availableBrowser = this.browsers.find((b) => !b.inUse);
+
     if (!availableBrowser) {
       // Wait for a browser to become available
       await this.waitForAvailableBrowser();
@@ -169,13 +174,15 @@ class BrowserPool {
 
     availableBrowser.inUse = true;
     availableBrowser.requestCount++;
-    
+
     if (sessionId) {
       this.activeSessions.set(sessionId, availableBrowser.id);
     }
 
-    console.log(`🌐 Browser ${availableBrowser.id} allocated (Request #${availableBrowser.requestCount})`);
-    
+    console.log(
+      `🌐 Browser ${availableBrowser.id} allocated (Request #${availableBrowser.requestCount})`
+    );
+
     return {
       browserId: availableBrowser.id,
       browser: availableBrowser.instance.browser,
@@ -186,24 +193,24 @@ class BrowserPool {
 
   async waitForAvailableBrowser(maxWait = 30000) {
     const startTime = Date.now();
-    
+
     while (Date.now() - startTime < maxWait) {
-      const availableBrowser = this.browsers.find(b => !b.inUse);
+      const availableBrowser = this.browsers.find((b) => !b.inUse);
       if (availableBrowser) return;
-      
-      await new Promise(resolve => setTimeout(resolve, 100));
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
-    
+
     throw new Error('No browsers available within timeout period');
   }
 
   releaseBrowser(browserId, sessionId = null) {
-    const browser = this.browsers.find(b => b.id === browserId);
-    
+    const browser = this.browsers.find((b) => b.id === browserId);
+
     if (browser) {
       browser.inUse = false;
       console.log(`🔓 Browser ${browserId} released`);
-      
+
       if (sessionId && this.activeSessions.has(sessionId)) {
         this.activeSessions.delete(sessionId);
       }
@@ -212,7 +219,7 @@ class BrowserPool {
 
   async createPage(browser) {
     const page = await browser.context.newPage();
-    
+
     // Set additional anti-detection measures
     await page.setExtraHTTPHeaders({
       'sec-ch-ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
@@ -223,7 +230,7 @@ class BrowserPool {
     // Block unnecessary resources for speed
     await page.route('**/*', (route) => {
       const resourceType = route.request().resourceType();
-      
+
       if (['image', 'stylesheet', 'font', 'media'].includes(resourceType)) {
         // Block images, CSS, fonts for faster loading
         route.abort();
@@ -234,11 +241,11 @@ class BrowserPool {
 
     // Set timeout
     page.setDefaultTimeout(this.timeout);
-    
+
     // Add random delays to mimic human behavior
     await page.evaluateOnNewDocument(() => {
       const originalAddEventListener = EventTarget.prototype.addEventListener;
-      EventTarget.prototype.addEventListener = function(type, listener, options) {
+      EventTarget.prototype.addEventListener = function (type, listener, options) {
         if (type === 'mousedown' || type === 'mouseup') {
           const delay = Math.random() * 50 + 10;
           setTimeout(() => originalAddEventListener.call(this, type, listener, options), delay);
@@ -253,21 +260,23 @@ class BrowserPool {
 
   async cleanup() {
     console.log('🧹 Cleaning up browser pool...');
-    
+
     try {
-      await Promise.all(this.browsers.map(async (browserObj) => {
-        try {
-          await browserObj.instance.context.close();
-          await browserObj.instance.browser.close();
-        } catch (error) {
-          console.error(`Error closing browser ${browserObj.id}:`, error);
-        }
-      }));
-      
+      await Promise.all(
+        this.browsers.map(async (browserObj) => {
+          try {
+            await browserObj.instance.context.close();
+            await browserObj.instance.browser.close();
+          } catch (error) {
+            console.error(`Error closing browser ${browserObj.id}:`, error);
+          }
+        })
+      );
+
       this.browsers = [];
       this.activeSessions.clear();
       this.isInitialized = false;
-      
+
       console.log('✅ Browser pool cleaned up successfully');
     } catch (error) {
       console.error('❌ Error during cleanup:', error);
@@ -277,8 +286,8 @@ class BrowserPool {
   getStats() {
     return {
       totalBrowsers: this.browsers.length,
-      activeBrowsers: this.browsers.filter(b => b.inUse).length,
-      availableBrowsers: this.browsers.filter(b => !b.inUse).length,
+      activeBrowsers: this.browsers.filter((b) => b.inUse).length,
+      availableBrowsers: this.browsers.filter((b) => !b.inUse).length,
       activeSessions: this.activeSessions.size,
       totalRequests: this.browsers.reduce((sum, b) => sum + b.requestCount, 0),
       isInitialized: this.isInitialized
@@ -288,7 +297,7 @@ class BrowserPool {
   // Utility method for random delays
   static async randomDelay(min = 1000, max = 3000) {
     const delay = Math.floor(Math.random() * (max - min + 1)) + min;
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
   }
 
   // Human-like mouse movement
@@ -299,7 +308,7 @@ class BrowserPool {
       if (box) {
         const x = box.x + box.width / 2 + (Math.random() - 0.5) * 10;
         const y = box.y + box.height / 2 + (Math.random() - 0.5) * 10;
-        
+
         await page.mouse.move(x, y, { steps: Math.floor(Math.random() * 5) + 5 });
         await this.randomDelay(50, 200);
       }

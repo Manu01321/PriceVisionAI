@@ -1,10 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: 'class',
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-    "./public/index.html"
-  ],
+  content: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
   theme: {
     extend: {
       colors: {
@@ -62,34 +59,34 @@ module.exports = {
         mono: ['JetBrains Mono', 'monospace']
       },
       fontSize: {
-        'xs': ['0.75rem', { lineHeight: '1rem' }],
-        'sm': ['0.875rem', { lineHeight: '1.25rem' }],
-        'base': ['1rem', { lineHeight: '1.5rem' }],
-        'lg': ['1.125rem', { lineHeight: '1.75rem' }],
-        'xl': ['1.25rem', { lineHeight: '1.75rem' }],
+        xs: ['0.75rem', { lineHeight: '1rem' }],
+        sm: ['0.875rem', { lineHeight: '1.25rem' }],
+        base: ['1rem', { lineHeight: '1.5rem' }],
+        lg: ['1.125rem', { lineHeight: '1.75rem' }],
+        xl: ['1.25rem', { lineHeight: '1.75rem' }],
         '2xl': ['1.5rem', { lineHeight: '2rem' }],
         '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
         '4xl': ['2.25rem', { lineHeight: '2.5rem' }]
       },
       borderRadius: {
-        'sm': '4px',
-        'DEFAULT': '8px',
-        'md': '8px',
-        'lg': '12px',
-        'xl': '16px'
+        sm: '4px',
+        DEFAULT: '8px',
+        md: '8px',
+        lg: '12px',
+        xl: '16px'
       },
       spacing: {
-        '18': '4.5rem',
-        '88': '22rem'
+        18: '4.5rem',
+        88: '22rem'
       },
       backdropBlur: {
-        'xs': '2px',
-        'sm': '4px'
+        xs: '2px',
+        sm: '4px'
       },
       animation: {
         'fade-in': 'fadeIn 200ms ease-out',
         'slide-up': 'slideUp 300ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-        'shimmer': 'shimmer 2s linear infinite'
+        shimmer: 'shimmer 2s linear infinite'
       },
       keyframes: {
         fadeIn: {
@@ -106,15 +103,12 @@ module.exports = {
         }
       },
       zIndex: {
-        '100': '100',
-        '200': '200',
-        '300': '300',
-        '400': '400'
+        100: '100',
+        200: '200',
+        300: '300',
+        400: '400'
       }
     }
   },
-  plugins: [
-    require('@tailwindcss/forms'),
-    require('tailwindcss-animate')
-  ]
-}
+  plugins: [require('@tailwindcss/forms'), require('tailwindcss-animate')]
+};

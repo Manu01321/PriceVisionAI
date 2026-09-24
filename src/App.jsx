@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import Routes from "./Routes";
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import Routes from './Routes';
 
 export const ThemeContext = createContext({ theme: 'light', toggleTheme: () => {} });
 
@@ -20,7 +20,7 @@ function App() {
     localStorage.setItem('pv_theme', theme);
   }, [theme]);
 
-  const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light');
+  const toggleTheme = () => setTheme((t) => (t === 'light' ? 'dark' : 'light'));
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>

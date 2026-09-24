@@ -1,11 +1,11 @@
 import React from 'react';
 import Icon from '../../../components/AppIcon';
 
-const WatchlistSummary = ({ 
-  totalItems = 0, 
-  activeAlerts = 0, 
-  potentialSavings = 0, 
-  achievementBadges = [] 
+const WatchlistSummary = ({
+  totalItems = 0,
+  activeAlerts = 0,
+  potentialSavings = 0,
+  achievementBadges = []
 }) => {
   const summaryStats = [
     {
@@ -46,7 +46,9 @@ const WatchlistSummary = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {summaryStats?.map((stat) => (
           <div key={stat?.id} className="flex items-center space-x-3 p-4 bg-muted/50 rounded-lg">
-            <div className={`w-10 h-10 ${stat?.bgColor} rounded-lg flex items-center justify-center`}>
+            <div
+              className={`w-10 h-10 ${stat?.bgColor} rounded-lg flex items-center justify-center`}
+            >
               <Icon name={stat?.icon} size={20} className={stat?.color} />
             </div>
             <div>

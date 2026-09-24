@@ -139,7 +139,7 @@ class OpenAIServiceClient {
     try {
       // First, get AI analysis of the query
       const aiAnalysis = await this.aiSearch(query, filters);
-      
+
       // Then perform traditional search with optimized terms
       const searchResponse = await apiClient.post('/search/text', {
         query: aiAnalysis.aiAnalysis?.optimizedKeywords || query,
@@ -174,7 +174,8 @@ class OpenAIServiceClient {
       const messages = [
         {
           role: 'system',
-          content: 'You are a product analysis expert. Provide brief, actionable insights about products.'
+          content:
+            'You are a product analysis expert. Provide brief, actionable insights about products.'
         },
         {
           role: 'user',
@@ -221,9 +222,12 @@ class OpenAIServiceClient {
    */
   async compareProducts(products) {
     try {
-      const productsText = products.map((p, i) => 
-        `Product ${i + 1}: ${p.name} - ₹${p.price} - Rating: ${p.rating || 'N/A'} (${p.site})`
-      ).join('\n');
+      const productsText = products
+        .map(
+          (p, i) =>
+            `Product ${i + 1}: ${p.name} - ₹${p.price} - Rating: ${p.rating || 'N/A'} (${p.site})`
+        )
+        .join('\n');
 
       const messages = [
         {

@@ -2,11 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const VoiceSearchInterface = ({ 
-  onVoiceResult, 
+const VoiceSearchInterface = ({
+  onVoiceResult,
   onTranscriptionUpdate,
   isProcessing = false,
-  className = "" 
+  className = ''
 }) => {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -15,7 +15,7 @@ const VoiceSearchInterface = ({
   const [hasPermission, setHasPermission] = useState(null);
   const [error, setError] = useState(null);
   const [waveformData, setWaveformData] = useState(Array(20).fill(0));
-  
+
   const recognitionRef = useRef(null);
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
@@ -25,7 +25,7 @@ const VoiceSearchInterface = ({
 
   useEffect(() => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      setError("Speech recognition not supported in this browser");
+      setError('Speech recognition not supported in this browser');
       return;
     }
 
@@ -40,14 +40,14 @@ const VoiceSearchInterface = ({
   const startListening = async () => {
     try {
       setError(null);
-      
+
       const stream = await navigator.mediaDevices?.getUserMedia({ audio: true });
       setHasPermission(true);
       setupAudioAnalysis(stream);
-      
+
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        setError("Speech recognition not supported in this browser");
+        setError('Speech recognition not supported in this browser');
         return;
       }
 
@@ -59,15 +59,15 @@ const VoiceSearchInterface = ({
       recognitionRef.current.onresult = (event) => {
         const lastResult = event.results[event.results.length - 1];
         if (!lastResult) return;
-        
+
         const text = lastResult[0]?.transcript?.trim() || '';
         const conf = lastResult[0]?.confidence || 0;
-        
+
         setTranscript(text);
         setConfidence(conf);
-        
+
         if (onTranscriptionUpdate) onTranscriptionUpdate(text, conf);
-        
+
         if (lastResult.isFinal && onVoiceResult) {
           onVoiceResult({ transcript: text, confidence: conf });
           isListeningRef.current = false;
@@ -91,9 +91,8 @@ const VoiceSearchInterface = ({
       setTranscript('');
       setConfidence(0);
       recognitionRef.current.start();
-      
     } catch (err) {
-      setError("Microphone access denied. Please enable microphone permissions.");
+      setError('Microphone access denied. Please enable microphone permissions.');
       setHasPermission(false);
     }
   };
@@ -110,32 +109,32 @@ const VoiceSearchInterface = ({
     try {
       audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
       analyserRef.current = audioContextRef.current.createAnalyser();
-      
+
       const source = audioContextRef.current.createMediaStreamSource(stream);
       source.connect(analyserRef.current);
-      
+
       analyserRef.current.fftSize = 256;
       const bufferLength = analyserRef.current.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
-      
+
       const updateWaveform = () => {
         // Use ref to avoid stale closure — fixes waveform never updating
         if (!isListeningRef.current) return;
-        
+
         analyserRef.current.getByteFrequencyData(dataArray);
-        
+
         const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
         setAudioLevel(average / 255);
-        
+
         const waveform = Array.from({ length: 20 }, (_, i) => {
           const index = Math.floor((i / 20) * bufferLength);
           return (dataArray[index] || 0) / 255;
         });
         setWaveformData(waveform);
-        
+
         animationRef.current = requestAnimationFrame(updateWaveform);
       };
-      
+
       updateWaveform();
     } catch (err) {
       console.error('Audio analysis setup failed:', err);
@@ -156,25 +155,25 @@ const VoiceSearchInterface = ({
             onClick={isListening ? stopListening : startListening}
             disabled={isProcessing || hasPermission === false}
             className={`w-24 h-24 rounded-full transition-all duration-300 ${
-              isListening 
-                ? 'bg-error hover:bg-error/90 animate-pulse' : 'bg-primary hover:bg-primary/90'
+              isListening
+                ? 'bg-error hover:bg-error/90 animate-pulse'
+                : 'bg-primary hover:bg-primary/90'
             }`}
           >
-            <Icon 
-              name={isListening ? "MicOff" : "Mic"} 
-              size={32} 
-              color="white"
-            />
+            <Icon name={isListening ? 'MicOff' : 'Mic'} size={32} color="white" />
           </Button>
-          
+
           {isListening && (
             <>
               <div className="absolute inset-0 rounded-full bg-error/30 animate-ping"></div>
-              <div className="absolute inset-0 rounded-full bg-error/20 animate-ping" style={{ animationDelay: '0.5s' }}></div>
+              <div
+                className="absolute inset-0 rounded-full bg-error/20 animate-ping"
+                style={{ animationDelay: '0.5s' }}
+              ></div>
             </>
           )}
         </div>
-        
+
         <p className="text-sm text-muted-foreground mt-3">
           {isListening ? 'Listening...' : 'Tap to start voice search'}
         </p>
@@ -205,7 +204,7 @@ const VoiceSearchInterface = ({
             <span>{Math.round(audioLevel * 100)}%</span>
           </div>
           <div className="w-full bg-muted rounded-full h-2">
-            <div 
+            <div
               className="bg-primary h-2 rounded-full transition-all duration-100"
               style={{ width: `${audioLevel * 100}%` }}
             />
@@ -220,10 +219,15 @@ const VoiceSearchInterface = ({
             <h4 className="text-sm font-medium text-foreground">Transcript</h4>
             <div className="flex items-center space-x-2">
               {confidence > 0 && (
-                <div className={`text-xs font-medium ${
-                  confidence >= 0.8 ? 'text-success' : 
-                  confidence >= 0.6 ? 'text-warning' : 'text-error'
-                }`}>
+                <div
+                  className={`text-xs font-medium ${
+                    confidence >= 0.8
+                      ? 'text-success'
+                      : confidence >= 0.6
+                        ? 'text-warning'
+                        : 'text-error'
+                  }`}
+                >
                   {Math.round(confidence * 100)}% confident
                 </div>
               )}
@@ -232,19 +236,18 @@ const VoiceSearchInterface = ({
               </Button>
             </div>
           </div>
-          
+
           <p className="text-foreground text-sm leading-relaxed">
             {transcript}
             {isListening && <span className="animate-pulse">|</span>}
           </p>
-          
+
           {confidence > 0 && (
             <div className="mt-3">
               <div className="w-full bg-muted rounded-full h-1">
-                <div 
+                <div
                   className={`h-1 rounded-full transition-all duration-300 ${
-                    confidence >= 0.8 ? 'bg-success' : 
-                    confidence >= 0.6 ? 'bg-warning' : 'bg-error'
+                    confidence >= 0.8 ? 'bg-success' : confidence >= 0.6 ? 'bg-warning' : 'bg-error'
                   }`}
                   style={{ width: `${confidence * 100}%` }}
                 />
@@ -286,9 +289,9 @@ const VoiceSearchInterface = ({
           <p className="text-xs text-muted-foreground text-center mb-3">Try saying:</p>
           <div className="grid grid-cols-1 gap-2">
             {[
-              "Find the best price for iPhone 15",
-              "Compare Samsung Galaxy phones",
-              "Show me gaming laptops under 50000"
+              'Find the best price for iPhone 15',
+              'Compare Samsung Galaxy phones',
+              'Show me gaming laptops under 50000'
             ].map((suggestion, index) => (
               <button
                 key={index}

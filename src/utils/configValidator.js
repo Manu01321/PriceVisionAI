@@ -1,6 +1,9 @@
 // Configuration validator to ensure frontend-backend connectivity
 
-const env = (typeof import.meta !== 'undefined' && import.meta.env) || (typeof process !== 'undefined' && process.env) || {};
+const env =
+  (typeof import.meta !== 'undefined' && import.meta.env) ||
+  (typeof process !== 'undefined' && process.env) ||
+  {};
 
 export class ConfigValidator {
   constructor() {
@@ -17,7 +20,7 @@ export class ConfigValidator {
       parallelSearch: env.VITE_PARALLEL_SEARCH === 'true',
       maxImageSizeMB: parseInt(env.VITE_MAX_IMAGE_SIZE_MB) || 10
     };
-    
+
     this.supportedSites = {
       amazon: env.VITE_ENABLE_AMAZON === 'true',
       flipkart: env.VITE_ENABLE_FLIPKART === 'true',
@@ -46,11 +49,15 @@ export class ConfigValidator {
 
     // Check timeout values
     if (this.config.apiTimeout < 5000) {
-      results.warnings.push('API timeout is very low (< 5 seconds). Consider increasing VITE_API_TIMEOUT.');
+      results.warnings.push(
+        'API timeout is very low (< 5 seconds). Consider increasing VITE_API_TIMEOUT.'
+      );
     }
 
     if (this.config.apiTimeout > 60000) {
-      results.warnings.push('API timeout is very high (> 60 seconds). Consider reducing VITE_API_TIMEOUT.');
+      results.warnings.push(
+        'API timeout is very high (> 60 seconds). Consider reducing VITE_API_TIMEOUT.'
+      );
     }
 
     // Check search settings
@@ -59,24 +66,32 @@ export class ConfigValidator {
     }
 
     if (this.config.searchDebounceMs < 200) {
-      results.warnings.push('Search debounce is very low (< 200ms). This might cause too many API requests.');
+      results.warnings.push(
+        'Search debounce is very low (< 200ms). This might cause too many API requests.'
+      );
     }
 
     // Check image settings
     if (this.config.maxImageSizeMB > 20) {
-      results.warnings.push('Max image size is very high (> 20MB). This might impact upload speed.');
+      results.warnings.push(
+        'Max image size is very high (> 20MB). This might impact upload speed.'
+      );
     }
 
     // Check at least one site is enabled
     const enabledSites = Object.values(this.supportedSites).filter(Boolean);
     if (enabledSites.length === 0) {
-      results.errors.push('No e-commerce sites are enabled. Enable at least one site in .env file.');
+      results.errors.push(
+        'No e-commerce sites are enabled. Enable at least one site in .env file.'
+      );
       results.valid = false;
     }
 
     // Check core features
     if (!this.config.enableRealTimeSearch && !this.config.enableImageSearch) {
-      results.warnings.push('Both real-time search and image search are disabled. Enable at least one search method.');
+      results.warnings.push(
+        'Both real-time search and image search are disabled. Enable at least one search method.'
+      );
     }
 
     return results;
@@ -179,12 +194,13 @@ export class ConfigValidator {
           error: error.message
         };
       }
-
     } catch (error) {
       results.errors.push(`Connection failed: ${error.message}`);
-      
+
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        results.errors.push('Backend server might not be running. Try starting it with: cd backend && node server.js');
+        results.errors.push(
+          'Backend server might not be running. Try starting it with: cd backend && node server.js'
+        );
       }
     }
 
@@ -236,10 +252,10 @@ export class ConfigValidator {
    */
   async generateReport() {
     console.log('🔍 Validating Price Vision Configuration...');
-    
+
     const configValidation = this.validateConfig();
     const connectionTest = await this.testBackendConnection();
-    
+
     const report = {
       timestamp: new Date().toISOString(),
       frontend: {
@@ -272,10 +288,7 @@ export class ConfigValidator {
 
     if (hasErrors || !hasConnection) {
       report.overall.status = 'error';
-      report.overall.criticalIssues = [
-        ...configValidation.errors,
-        ...connectionTest.errors
-      ];
+      report.overall.criticalIssues = [...configValidation.errors, ...connectionTest.errors];
     } else if (hasCompatibilityIssues) {
       report.overall.status = 'warning';
       report.overall.readyForUse = true;
@@ -287,7 +300,7 @@ export class ConfigValidator {
     // Collect recommendations
     report.overall.recommendations = [
       ...configValidation.warnings,
-      ...(report.compatibility?.recommendations?.map(r => r.message) || [])
+      ...(report.compatibility?.recommendations?.map((r) => r.message) || [])
     ];
 
     return report;
@@ -329,7 +342,12 @@ export class ConfigValidator {
     console.log(`🔍 Real-time Search: ${this.config.enableRealTimeSearch ? '✅' : '❌'}`);
     console.log(`🖼️  Image Search: ${this.config.enableImageSearch ? '✅' : '❌'}`);
     console.log(`📈 Price Tracking: ${this.config.enablePriceTracking ? '✅' : '❌'}`);
-    console.log(`🛍️  Enabled Sites: ${Object.entries(this.supportedSites).filter(([,enabled]) => enabled).map(([site]) => site).join(', ')}`);
+    console.log(
+      `🛍️  Enabled Sites: ${Object.entries(this.supportedSites)
+        .filter(([, enabled]) => enabled)
+        .map(([site]) => site)
+        .join(', ')}`
+    );
     console.log('=====================================\n');
   }
 }

@@ -15,10 +15,19 @@ const UserProfileAndSettings = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
   const [darkMode, setDarkMode] = useState(false);
-  const [userData, setUserData] = useState(() => getUser() || {
-    name: 'Guest User', email: '', phone: '', location: '',
-    memberSince: 'Today', totalSavings: '0', dealsFound: 0, watchlistItems: 0
-  });
+  const [userData, setUserData] = useState(
+    () =>
+      getUser() || {
+        name: 'Guest User',
+        email: '',
+        phone: '',
+        location: '',
+        memberSince: 'Today',
+        totalSavings: '0',
+        dealsFound: 0,
+        watchlistItems: 0
+      }
+  );
 
   const shoppingPreferences = {
     favoriteCategories: ['electronics', 'fashion', 'home'],
@@ -34,7 +43,7 @@ const UserProfileAndSettings = () => {
 
   const securityData = {
     twoFactorEnabled: true,
-    lastPasswordChange: "2025-10-15",
+    lastPasswordChange: '2025-10-15',
     connectedDevices: 3
   };
 
@@ -67,17 +76,17 @@ const UserProfileAndSettings = () => {
   };
 
   const tabs = [
-  { id: 'profile', label: 'Profile', icon: 'User' },
-  { id: 'preferences', label: 'Shopping', icon: 'ShoppingBag' },
-  { id: 'security', label: 'Security', icon: 'Shield' },
-  { id: 'privacy', label: 'Privacy', icon: 'Lock' },
-  { id: 'achievements', label: 'Achievements', icon: 'Trophy' },
-  { id: 'subscription', label: 'Subscription', icon: 'CreditCard' }];
-
+    { id: 'profile', label: 'Profile', icon: 'User' },
+    { id: 'preferences', label: 'Shopping', icon: 'ShoppingBag' },
+    { id: 'security', label: 'Security', icon: 'Shield' },
+    { id: 'privacy', label: 'Privacy', icon: 'Lock' },
+    { id: 'achievements', label: 'Achievements', icon: 'Trophy' },
+    { id: 'subscription', label: 'Subscription', icon: 'CreditCard' }
+  ];
 
   const handleUpdateProfile = (profileData) => {
     saveUser(profileData);
-    setUserData(prev => ({ ...prev, ...profileData }));
+    setUserData((prev) => ({ ...prev, ...profileData }));
   };
 
   const handleUploadAvatar = () => {};
@@ -124,36 +133,33 @@ const UserProfileAndSettings = () => {
           <ProfileHeader
             user={userData}
             onUpdateProfile={handleUpdateProfile}
-            onUploadAvatar={handleUploadAvatar} />);
-
+            onUploadAvatar={handleUploadAvatar}
+          />
+        );
 
       case 'preferences':
         return (
           <ShoppingPreferences
             preferences={shoppingPreferences}
-            onUpdatePreferences={handleUpdatePreferences} />);
-
+            onUpdatePreferences={handleUpdatePreferences}
+          />
+        );
 
       case 'security':
         return (
-          <SecuritySettings
-            securityData={securityData}
-            onUpdateSecurity={handleUpdateSecurity} />);
-
+          <SecuritySettings securityData={securityData} onUpdateSecurity={handleUpdateSecurity} />
+        );
 
       case 'privacy':
         return (
           <PrivacyControls
             privacySettings={privacySettings}
-            onUpdatePrivacy={handleUpdatePrivacy} />);
-
+            onUpdatePrivacy={handleUpdatePrivacy}
+          />
+        );
 
       case 'achievements':
-        return (
-          <AchievementsDisplay
-            achievements={[]}
-            userStats={userData} />);
-
+        return <AchievementsDisplay achievements={[]} userStats={userData} />;
 
       case 'subscription':
         return (
@@ -161,8 +167,9 @@ const UserProfileAndSettings = () => {
             subscription={subscriptionData}
             onUpgrade={handleUpgrade}
             onDowngrade={handleDowngrade}
-            onCancel={handleCancelSubscription} />);
-
+            onCancel={handleCancelSubscription}
+          />
+        );
 
       default:
         return null;
@@ -181,7 +188,7 @@ const UserProfileAndSettings = () => {
               Manage your profile, preferences, and account security
             </p>
           </div>
-          
+
           <div className="flex items-center space-x-4 mt-4 lg:mt-0">
             {/* Dark Mode Toggle */}
             <div className="flex items-center space-x-2">
@@ -189,25 +196,25 @@ const UserProfileAndSettings = () => {
               <button
                 onClick={toggleDarkMode}
                 className={`relative w-12 h-6 rounded-full transition-colors ${
-                darkMode ? 'bg-primary' : 'bg-muted'}`
-                }>
-
+                  darkMode ? 'bg-primary' : 'bg-muted'
+                }`}
+              >
                 <div
                   className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                  darkMode ? 'translate-x-7' : 'translate-x-1'}`
-                  }>
-                </div>
+                    darkMode ? 'translate-x-7' : 'translate-x-1'
+                  }`}
+                ></div>
               </button>
               <Icon name="Moon" size={16} className="text-muted-foreground" />
             </div>
-            
+
             {/* Quick Actions */}
             <Button
               variant="outline"
               onClick={() => navigate('/dashboard')}
               iconName="ArrowLeft"
-              iconPosition="left">
-
+              iconPosition="left"
+            >
               Back to Dashboard
             </Button>
           </div>
@@ -218,19 +225,20 @@ const UserProfileAndSettings = () => {
           <div className="lg:col-span-1">
             <div className="bg-surface rounded-lg border border-border p-4 sticky top-6">
               <nav className="space-y-2">
-                {tabs?.map((tab) =>
-                <button
-                  key={tab?.id}
-                  onClick={() => setActiveTab(tab?.id)}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all ${
-                  activeTab === tab?.id ?
-                  'bg-primary text-white' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`
-                  }>
-
+                {tabs?.map((tab) => (
+                  <button
+                    key={tab?.id}
+                    onClick={() => setActiveTab(tab?.id)}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all ${
+                      activeTab === tab?.id
+                        ? 'bg-primary text-white'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
                     <Icon name={tab?.icon} size={18} />
                     <span className="font-medium">{tab?.label}</span>
                   </button>
-                )}
+                ))}
               </nav>
 
               {/* Quick Stats */}
@@ -239,7 +247,9 @@ const UserProfileAndSettings = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Total Saved</span>
-                    <span className="font-medium text-success">₹{userData?.totalSavings || '0'}</span>
+                    <span className="font-medium text-success">
+                      ₹{userData?.totalSavings || '0'}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Deals Found</span>
@@ -274,13 +284,11 @@ const UserProfileAndSettings = () => {
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3">
-            {renderTabContent()}
-          </div>
+          <div className="lg:col-span-3">{renderTabContent()}</div>
         </div>
       </div>
-    </div>);
-
+    </div>
+  );
 };
 
 export default UserProfileAndSettings;

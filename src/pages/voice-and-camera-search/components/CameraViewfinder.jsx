@@ -2,12 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const CameraViewfinder = ({ 
-  onCapture, 
-  onBarcodeDetected, 
+const CameraViewfinder = ({
+  onCapture,
+  onBarcodeDetected,
   isProcessing = false,
   mode = 'camera', // 'camera', 'barcode'
-  className = "" 
+  className = ''
 }) => {
   const [isActive, setIsActive] = useState(false);
   const [hasPermission, setHasPermission] = useState(null);
@@ -21,7 +21,7 @@ const CameraViewfinder = ({
   useEffect(() => {
     return () => {
       if (stream) {
-        stream?.getTracks()?.forEach(track => track?.stop());
+        stream?.getTracks()?.forEach((track) => track?.stop());
       }
     };
   }, [stream]);
@@ -30,29 +30,29 @@ const CameraViewfinder = ({
     try {
       setError(null);
       const mediaStream = await navigator.mediaDevices?.getUserMedia({
-        video: { 
+        video: {
           facingMode: 'environment',
           width: { ideal: 1280 },
           height: { ideal: 720 }
         }
       });
-      
+
       setStream(mediaStream);
       setHasPermission(true);
       setIsActive(true);
-      
+
       if (videoRef?.current) {
         videoRef.current.srcObject = mediaStream;
       }
     } catch (err) {
-      setError("Camera access denied. Please enable camera permissions.");
+      setError('Camera access denied. Please enable camera permissions.');
       setHasPermission(false);
     }
   };
 
   const stopCamera = () => {
     if (stream) {
-      stream?.getTracks()?.forEach(track => track?.stop());
+      stream?.getTracks()?.forEach((track) => track?.stop());
       setStream(null);
     }
     setIsActive(false);
@@ -72,7 +72,7 @@ const CameraViewfinder = ({
 
     const imageData = canvas?.toDataURL('image/jpeg', 0.8);
     setCapturedImage(imageData);
-    
+
     if (onCapture) {
       onCapture(imageData);
     }
@@ -130,13 +130,7 @@ const CameraViewfinder = ({
     <div className={`relative w-full h-96 bg-gray-900 rounded-lg overflow-hidden ${className}`}>
       {/* Video Stream */}
       {isActive && !capturedImage && (
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className="w-full h-full object-cover"
-        />
+        <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
       )}
 
       {/* Captured Image Preview */}
@@ -231,7 +225,11 @@ const CameraViewfinder = ({
             <Icon name="AlertCircle" size={48} className="text-red-400 mx-auto mb-4" />
             <p className="text-white text-lg font-medium mb-2">Camera Error</p>
             <p className="text-gray-400 text-sm mb-4">{error}</p>
-            <Button onClick={startCamera} variant="outline" className="border-gray-600 text-gray-300">
+            <Button
+              onClick={startCamera}
+              variant="outline"
+              className="border-gray-600 text-gray-300"
+            >
               Try Again
             </Button>
           </div>
@@ -251,17 +249,19 @@ const CameraViewfinder = ({
               >
                 <Icon name="X" size={20} />
               </Button>
-              
+
               <Button
                 onClick={mode === 'barcode' ? scanBarcode : capturePhoto}
                 disabled={isProcessing || scanningAnimation}
                 className="bg-primary hover:bg-primary/90 w-16 h-16 rounded-full"
               >
-                <Icon name={mode === 'barcode' ? "Scan" : "Camera"} size={24} />
+                <Icon name={mode === 'barcode' ? 'Scan' : 'Camera'} size={24} />
               </Button>
-              
+
               <Button
-                onClick={() => {/* Switch camera */}}
+                onClick={() => {
+                  /* Switch camera */
+                }}
                 variant="outline"
                 size="icon"
                 className="bg-black/50 border-white/30 text-white hover:bg-black/70"
@@ -279,7 +279,7 @@ const CameraViewfinder = ({
                 <Icon name="RotateCcw" size={16} className="mr-2" />
                 Retake
               </Button>
-              
+
               <Button
                 onClick={() => onCapture && onCapture(capturedImage)}
                 className="bg-success hover:bg-success/90"

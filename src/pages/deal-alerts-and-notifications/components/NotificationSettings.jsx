@@ -6,22 +6,24 @@ import Select from '../../../components/ui/Select';
 import { Checkbox } from '../../../components/ui/Checkbox';
 
 const NotificationSettings = ({ settings, onSettingsChange, onSave }) => {
-  const [localSettings, setLocalSettings] = useState(settings || {
-    emailNotifications: true,
-    pushNotifications: true,
-    smsNotifications: false,
-    priceDropThreshold: 10,
-    dealUrgencyLevel: 'medium',
-    frequency: 'immediate',
-    categories: ['electronics', 'fashion', 'home'],
-    quietHours: {
-      enabled: false,
-      start: '22:00',
-      end: '08:00'
-    },
-    aiRecommendations: true,
-    weeklyDigest: true
-  });
+  const [localSettings, setLocalSettings] = useState(
+    settings || {
+      emailNotifications: true,
+      pushNotifications: true,
+      smsNotifications: false,
+      priceDropThreshold: 10,
+      dealUrgencyLevel: 'medium',
+      frequency: 'immediate',
+      categories: ['electronics', 'fashion', 'home'],
+      quietHours: {
+        enabled: false,
+        start: '22:00',
+        end: '08:00'
+      },
+      aiRecommendations: true,
+      weeklyDigest: true
+    }
+  );
 
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -59,10 +61,10 @@ const NotificationSettings = ({ settings, onSettingsChange, onSave }) => {
   };
 
   const handleCategoryChange = (category, checked) => {
-    const newCategories = checked 
+    const newCategories = checked
       ? [...localSettings?.categories, category]
-      : localSettings?.categories?.filter(c => c !== category);
-    
+      : localSettings?.categories?.filter((c) => c !== category);
+
     handleSettingChange('categories', newCategories);
   };
 
@@ -90,13 +92,9 @@ const NotificationSettings = ({ settings, onSettingsChange, onSave }) => {
             <p className="text-sm text-muted-foreground">Customize your alert preferences</p>
           </div>
         </div>
-        
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setIsExpanded(!isExpanded)}
-        >
-          <Icon name={isExpanded ? "ChevronUp" : "ChevronDown"} size={16} />
+
+        <Button variant="ghost" size="icon" onClick={() => setIsExpanded(!isExpanded)}>
+          <Icon name={isExpanded ? 'ChevronUp' : 'ChevronDown'} size={16} />
         </Button>
       </div>
       {/* Quick Settings */}
@@ -137,7 +135,7 @@ const NotificationSettings = ({ settings, onSettingsChange, onSave }) => {
             min="1"
             max="90"
           />
-          
+
           <Select
             label="Alert Frequency"
             description="How often to receive notifications"
@@ -153,7 +151,7 @@ const NotificationSettings = ({ settings, onSettingsChange, onSave }) => {
           {/* Advanced Filters */}
           <div className="space-y-4">
             <h4 className="font-medium text-foreground">Advanced Filters</h4>
-            
+
             <Select
               label="Deal Urgency Level"
               description="Filter alerts by priority level"
@@ -165,7 +163,9 @@ const NotificationSettings = ({ settings, onSettingsChange, onSave }) => {
             {/* Categories */}
             <div className="space-y-3">
               <label className="text-sm font-medium text-foreground">Product Categories</label>
-              <p className="text-xs text-muted-foreground">Select categories you're interested in</p>
+              <p className="text-xs text-muted-foreground">
+                Select categories you're interested in
+              </p>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {categoryOptions?.map((category) => (
                   <Checkbox
@@ -183,7 +183,7 @@ const NotificationSettings = ({ settings, onSettingsChange, onSave }) => {
           {/* Quiet Hours */}
           <div className="space-y-4">
             <h4 className="font-medium text-foreground">Quiet Hours</h4>
-            
+
             <Checkbox
               label="Enable Quiet Hours"
               description="Pause notifications during specified times"
@@ -230,11 +230,7 @@ const NotificationSettings = ({ settings, onSettingsChange, onSave }) => {
 
           {/* Save Button */}
           <div className="flex justify-end pt-4 border-t border-border">
-            <Button
-              onClick={handleSave}
-              iconName="Save"
-              iconPosition="left"
-            >
+            <Button onClick={handleSave} iconName="Save" iconPosition="left">
               Save Settings
             </Button>
           </div>

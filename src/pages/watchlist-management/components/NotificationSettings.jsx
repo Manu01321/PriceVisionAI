@@ -4,11 +4,7 @@ import Button from '../../../components/ui/Button';
 import { Checkbox } from '../../../components/ui/Checkbox';
 import Select from '../../../components/ui/Select';
 
-const NotificationSettings = ({ 
-  settings = {}, 
-  onSettingsChange, 
-  className = "" 
-}) => {
+const NotificationSettings = ({ settings = {}, onSettingsChange, className = '' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [localSettings, setLocalSettings] = useState({
     pushNotifications: true,
@@ -65,11 +61,11 @@ const NotificationSettings = ({
           <Icon name="Settings" size={18} className="text-foreground" />
           <h3 className="font-semibold text-foreground">Notification Settings</h3>
         </div>
-        
+
         <Button
           variant="ghost"
           size="sm"
-          iconName={isOpen ? "ChevronUp" : "ChevronDown"}
+          iconName={isOpen ? 'ChevronUp' : 'ChevronDown'}
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? 'Collapse' : 'Configure'}
@@ -88,14 +84,14 @@ const NotificationSettings = ({
                 checked={localSettings?.pushNotifications}
                 onChange={(e) => handleSettingChange('pushNotifications', e?.target?.checked)}
               />
-              
+
               <Checkbox
                 label="Email Notifications"
                 description="Receive alerts via email"
                 checked={localSettings?.emailNotifications}
                 onChange={(e) => handleSettingChange('emailNotifications', e?.target?.checked)}
               />
-              
+
               <Checkbox
                 label="SMS Notifications"
                 description="Text message alerts for urgent deals"
@@ -114,7 +110,7 @@ const NotificationSettings = ({
               value={localSettings?.alertFrequency}
               onChange={(value) => handleSettingChange('alertFrequency', value)}
             />
-            
+
             <Select
               label="Urgency Threshold"
               description="Minimum urgency level for alerts"
@@ -134,7 +130,7 @@ const NotificationSettings = ({
                 checked={localSettings?.quietHours?.enabled}
                 onChange={(e) => handleQuietHoursChange('enabled', e?.target?.checked)}
               />
-              
+
               {localSettings?.quietHours?.enabled && (
                 <div className="grid grid-cols-2 gap-4 ml-6">
                   <div>
@@ -170,21 +166,21 @@ const NotificationSettings = ({
                 checked={localSettings?.categories?.priceDrops}
                 onChange={(e) => handleCategoryChange('priceDrops', e?.target?.checked)}
               />
-              
+
               <Checkbox
                 label="Back in Stock"
                 description="When out-of-stock items become available"
                 checked={localSettings?.categories?.backInStock}
                 onChange={(e) => handleCategoryChange('backInStock', e?.target?.checked)}
               />
-              
+
               <Checkbox
                 label="Deal Expiry"
                 description="When limited-time deals are about to end"
                 checked={localSettings?.categories?.dealExpiry}
                 onChange={(e) => handleCategoryChange('dealExpiry', e?.target?.checked)}
               />
-              
+
               <Checkbox
                 label="New Deals"
                 description="When new deals are found for similar products"
@@ -220,12 +216,9 @@ const NotificationSettings = ({
             >
               Reset to Defaults
             </Button>
-            
+
             <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                onClick={() => setIsOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setIsOpen(false)}>
                 Cancel
               </Button>
               <Button

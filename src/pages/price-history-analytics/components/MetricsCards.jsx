@@ -94,13 +94,18 @@ const MetricsCards = ({ productData, priceHistory }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {metrics?.map((metric) => (
-        <div key={metric?.id} className="bg-surface border border-border rounded-lg p-6 hover:shadow-soft transition-smooth">
+        <div
+          key={metric?.id}
+          className="bg-surface border border-border rounded-lg p-6 hover:shadow-soft transition-smooth"
+        >
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
-            <div className={`w-10 h-10 rounded-lg ${metric?.bgColor} flex items-center justify-center`}>
+            <div
+              className={`w-10 h-10 rounded-lg ${metric?.bgColor} flex items-center justify-center`}
+            >
               <Icon name={metric?.icon} size={20} className={metric?.color} />
             </div>
-            
+
             {metric?.trend && (
               <div className={`flex items-center space-x-1 ${getTrendColor(metric?.trend)}`}>
                 <Icon name={getTrendIcon(metric?.trend)} size={16} />
@@ -111,14 +116,10 @@ const MetricsCards = ({ productData, priceHistory }) => {
 
           {/* Content */}
           <div>
-            <h3 className="text-sm font-medium text-muted-foreground mb-1">
-              {metric?.title}
-            </h3>
-            
+            <h3 className="text-sm font-medium text-muted-foreground mb-1">{metric?.title}</h3>
+
             <div className="flex items-baseline space-x-2 mb-2">
-              <span className="text-2xl font-bold text-foreground">
-                {metric?.value}
-              </span>
+              <span className="text-2xl font-bold text-foreground">{metric?.value}</span>
               {metric?.change && (
                 <span className={`text-sm font-medium ${getTrendColor(metric?.trend)}`}>
                   {metric?.change}
@@ -134,21 +135,21 @@ const MetricsCards = ({ productData, priceHistory }) => {
                   <span className="text-xs text-muted-foreground">at {metric?.retailer}</span>
                 </div>
               )}
-              
+
               {metric?.date && (
                 <div className="flex items-center space-x-2">
                   <Icon name="Calendar" size={12} className="text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">{metric?.date}</span>
                 </div>
               )}
-              
+
               {metric?.savings && (
                 <div className="flex items-center space-x-2">
                   <Icon name="Coins" size={12} className="text-success" />
                   <span className="text-xs text-success">{metric?.savings}</span>
                 </div>
               )}
-              
+
               {metric?.prediction && (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
@@ -160,28 +161,30 @@ const MetricsCards = ({ productData, priceHistory }) => {
                   )}
                 </div>
               )}
-              
+
               {metric?.range && (
                 <div className="flex items-center space-x-2">
                   <Icon name="BarChart2" size={12} className="text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">Range: {metric?.range}</span>
                 </div>
               )}
-              
+
               {metric?.stability && (
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-muted-foreground">Stability</span>
                   <span className="text-xs font-medium text-foreground">{metric?.stability}</span>
                 </div>
               )}
-              
+
               {metric?.lastDeal && (
                 <div className="flex items-center space-x-2">
                   <Icon name="Clock" size={12} className="text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">Last deal: {metric?.lastDeal}</span>
+                  <span className="text-xs text-muted-foreground">
+                    Last deal: {metric?.lastDeal}
+                  </span>
                 </div>
               )}
-              
+
               {metric?.nextPredicted && (
                 <div className="flex items-center space-x-2">
                   <Icon name="Calendar" size={12} className="text-primary" />
@@ -199,12 +202,12 @@ const MetricsCards = ({ productData, priceHistory }) => {
                 <span>{metric?.confidence || metric?.stability}</span>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
-                <div 
+                <div
                   className={`h-2 rounded-full ${
                     metric?.id === 'savings_potential' ? 'bg-accent' : 'bg-secondary'
                   }`}
-                  style={{ 
-                    width: `${metric?.confidence ? parseInt(metric?.confidence) : parseInt(metric?.stability)}%` 
+                  style={{
+                    width: `${metric?.confidence ? parseInt(metric?.confidence) : parseInt(metric?.stability)}%`
                   }}
                 ></div>
               </div>
