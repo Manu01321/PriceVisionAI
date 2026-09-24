@@ -430,7 +430,7 @@ export async function analyzeProductImages(imageFiles, signal = null) {
     }
 
     const model = genAI?.getGenerativeModel({
-      model: 'gemini-2.0-flash-exp' // Updated to latest model
+      model: 'gemini-2.5-flash' // Updated to active Gemini 2.5 Flash model
     });
 
     // Convert image files to base64 with error handling
@@ -539,7 +539,7 @@ export async function generateProductRecommendations(analysisText) {
     }
 
     const model = genAI?.getGenerativeModel({
-      model: 'gemini-2.0-flash-exp'
+      model: 'gemini-2.5-flash'
     });
 
     const prompt = `Based on this product analysis: "${analysisText}"

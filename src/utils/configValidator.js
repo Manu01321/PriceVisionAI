@@ -1,26 +1,28 @@
 // Configuration validator to ensure frontend-backend connectivity
 
+const env = (typeof import.meta !== 'undefined' && import.meta.env) || (typeof process !== 'undefined' && process.env) || {};
+
 export class ConfigValidator {
   constructor() {
     this.config = {
-      apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000',
-      apiTimeout: parseInt(import.meta.env.VITE_API_TIMEOUT) || 30000,
-      enableRealTimeSearch: import.meta.env.VITE_ENABLE_REAL_TIME_SEARCH === 'true',
-      enablePriceTracking: import.meta.env.VITE_ENABLE_PRICE_TRACKING === 'true',
-      enableImageSearch: import.meta.env.VITE_ENABLE_IMAGE_SEARCH === 'true',
-      maxSearchResults: parseInt(import.meta.env.VITE_MAX_SEARCH_RESULTS) || 20,
-      cacheEnabled: import.meta.env.VITE_CACHE_ENABLED === 'true',
-      notificationsEnabled: import.meta.env.VITE_NOTIFICATIONS_ENABLED === 'true',
-      searchDebounceMs: parseInt(import.meta.env.VITE_SEARCH_DEBOUNCE_MS) || 500,
-      parallelSearch: import.meta.env.VITE_PARALLEL_SEARCH === 'true',
-      maxImageSizeMB: parseInt(import.meta.env.VITE_MAX_IMAGE_SIZE_MB) || 10
+      apiBaseUrl: env.VITE_API_BASE_URL || 'http://localhost:5001',
+      apiTimeout: parseInt(env.VITE_API_TIMEOUT) || 30000,
+      enableRealTimeSearch: env.VITE_ENABLE_REAL_TIME_SEARCH === 'true',
+      enablePriceTracking: env.VITE_ENABLE_PRICE_TRACKING === 'true',
+      enableImageSearch: env.VITE_ENABLE_IMAGE_SEARCH === 'true',
+      maxSearchResults: parseInt(env.VITE_MAX_SEARCH_RESULTS) || 20,
+      cacheEnabled: env.VITE_CACHE_ENABLED === 'true',
+      notificationsEnabled: env.VITE_NOTIFICATIONS_ENABLED === 'true',
+      searchDebounceMs: parseInt(env.VITE_SEARCH_DEBOUNCE_MS) || 500,
+      parallelSearch: env.VITE_PARALLEL_SEARCH === 'true',
+      maxImageSizeMB: parseInt(env.VITE_MAX_IMAGE_SIZE_MB) || 10
     };
     
     this.supportedSites = {
-      amazon: import.meta.env.VITE_ENABLE_AMAZON === 'true',
-      flipkart: import.meta.env.VITE_ENABLE_FLIPKART === 'true',
-      myntra: import.meta.env.VITE_ENABLE_MYNTRA === 'true',
-      snapdeal: import.meta.env.VITE_ENABLE_SNAPDEAL === 'true'
+      amazon: env.VITE_ENABLE_AMAZON === 'true',
+      flipkart: env.VITE_ENABLE_FLIPKART === 'true',
+      myntra: env.VITE_ENABLE_MYNTRA === 'true',
+      snapdeal: env.VITE_ENABLE_SNAPDEAL === 'true'
     };
   }
 

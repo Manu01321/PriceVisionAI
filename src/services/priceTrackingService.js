@@ -769,6 +769,7 @@ class PriceTrackingService {
 
   loadTrackedProducts() {
     try {
+      if (typeof localStorage === 'undefined') return;
       const saved = localStorage.getItem('priceVision_trackedProducts');
       if (saved) {
         const data = JSON.parse(saved);
@@ -783,6 +784,7 @@ class PriceTrackingService {
 
   saveTrackedProducts() {
     try {
+      if (typeof localStorage === 'undefined') return;
       const data = {
         products: Object.fromEntries(this.trackedProducts),
         priceHistory: Object.fromEntries(this.priceHistory),

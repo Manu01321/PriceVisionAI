@@ -454,6 +454,7 @@ class ProductSearchService {
 
   loadRecentSearches() {
     try {
+      if (typeof localStorage === 'undefined') return [];
       const saved = localStorage.getItem('priceVision_recentSearches');
       return saved ? JSON.parse(saved) : [];
     } catch (error) {
@@ -464,6 +465,7 @@ class ProductSearchService {
 
   saveRecentSearches() {
     try {
+      if (typeof localStorage === 'undefined') return;
       localStorage.setItem('priceVision_recentSearches', JSON.stringify(this.recentSearches));
     } catch (error) {
       console.warn('Failed to save recent searches:', error);

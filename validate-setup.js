@@ -1,6 +1,7 @@
 // Setup validation script for Price Vision AI Pro
 // Run this to check if frontend and backend are properly configured
 
+import 'dotenv/config';
 import { configValidator } from './src/services/index.js';
 
 async function main() {
@@ -172,7 +173,7 @@ async function main() {
 }
 
 // Run validation if this script is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url.includes('validate-setup.js')) {
   main().catch(console.error);
 }
 

@@ -149,7 +149,7 @@ class ImageSearchService {
       }
 
       const base64Image = processedImage.buffer.toString('base64');
-      const model = this.geminiClient.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const model = this.geminiClient.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
       const prompt = `
         You are identifying a retail product from an image. Extract and return strict JSON with:

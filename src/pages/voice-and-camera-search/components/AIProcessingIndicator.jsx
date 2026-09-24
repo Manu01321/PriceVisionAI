@@ -170,7 +170,7 @@ const AIProcessingIndicator = ({
         <div className="mt-4 space-y-2">
           <div className="flex items-center space-x-2 text-xs text-muted-foreground">
             <Icon name="Cpu" size={12} />
-            <span>Powered by Google Gemini 2.0 Flash</span>
+            <span>Powered by Google Gemini 2.5 Flash</span>
           </div>
           <div className="flex items-center space-x-2 text-xs text-muted-foreground">
             <Icon name="Zap" size={12} />
